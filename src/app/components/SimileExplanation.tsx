@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Play, Pause, Volume2, MoreVertical, Star, ThumbsUp, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Play, Pause, GripVertical, Plus, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
+import { Input } from './ui/input';
 import { LungSound } from '../data';
 
 interface SimileExplanationProps {
@@ -20,17 +21,90 @@ export function SimileExplanation({
   similes,
 }: SimileExplanationProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedSimiles, setSelectedSimiles] = useState<string[]>([]);
+  const [rankedSimiles, setRankedSimiles] = useState<LungSound['similes']>(similes);
   const [simileRatings, setSimileRatings] = useState<{ [key: string]: number }>({});
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [customSimileText, setCustomSimileText] = useState('');
+  const [hasAddedCustomSimile, setHasAddedCustomSimile] = useState(false);
+  const [isQuerying, setIsQuerying] = useState(false);
+
+  const handleAddSimile = async () => {
+    if (!customSimileText.trim() || isQuerying || hasAddedCustomSimile) return;
+    
+    setIsQuerying(true);
+    
+    // TODO backend model call
+    try {
+      // Simulate backend call
+      await fetch('http://localhost:5000/api/query-simile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          text: customSimileText,
+          audioId: audioName
+        }),
+      }).catch(() => {
+        // Silently catch fetch errors for the dummy demo
+        console.log('Note: Backend endpoint not found, using dummy fallback.');
+      });
+
+      // Simulate network latency
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const newSimile = {
+        id: `custom-${Date.now()}`,
+        text: customSimileText,
+        category: 'User-Generated',
+        relatedFeatures: 'Custom',
+        confidence: 100,
+      };
+      
+      setRankedSimiles([...rankedSimiles, newSimile]);
+      setCustomSimileText('');
+      setHasAddedCustomSimile(true);
+    } catch (error) {
+      console.error('Failed to query backend:', error);
+    } finally {
+      setIsQuerying(false);
+    }
+  };
+
+  useEffect(() => {
+    setRankedSimiles(similes);
+  }, [similes]);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const toggleSimileSelection = (simileId: string) => {
-    setSelectedSimiles((prev) =>
-      prev.includes(simileId) ? prev.filter((id) => id !== simileId) : [...prev, simileId]
-    );
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    const newRanked = [...rankedSimiles];
+    const draggedItem = newRanked[draggedIndex];
+    
+    newRanked.splice(draggedIndex, 1);
+    newRanked.splice(targetIndex, 0, draggedItem);
+    
+    setRankedSimiles(newRanked);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   const handleRating = (simileId: string, rating: number) => {
@@ -41,14 +115,13 @@ export function SimileExplanation({
   };
 
   return (
-    <div className="w-full space-y-6">
-
+    <div className="space-y-6 mx-3">
 
       {/* Audio Player Section */}
       <div className="mb-6">
         <div className="pt-6">
           <div className="flex items-center gap-4">
-            <span className="text-gray-600">Play this lung sound recording.</span>
+            <span className="text-gray-600">Play this lung sound recording:</span>
             <Button variant="ghost" size="icon" onClick={togglePlay}>
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
@@ -108,48 +181,48 @@ export function SimileExplanation({
           </div> */}
 
           <p className="text-gray-600">
-            The system detects the following similes that help explain this classification. 
+            The system detects the following few similes to help explain this classification. 
             <br />
-            Select the ones that help you best understand this classification. 
+            You may rank them in the order of how helpful they are to you in understanding the given recording.
+            <br />
+            <br />
+            <span className="text-sm italic">Drag and drop the cards to reorder them.</span>
           </p>
         </div>
         <div>
-          <div className="space-y-6">
-            {similes.map((simile) => (
+          <div className="space-y-1">
+            {rankedSimiles.map((simile, index) => (
               <div
                 key={simile.id}
-                className={`border-2 transition-all ${
-                  selectedSimiles.includes(simile.id)
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`border-2 transition-all rounded-md cursor-grab active:cursor-grabbing ${
+                  draggedIndex === index
+                    ? 'border-blue-400 bg-blue-50 opacity-60'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
               >
-                <div className="pt-6">
-                  <div className="space-y-4">
+                <div className="px-4 py-3">
+                  <div className="space-y-2">
                     {/* Simile Header */}
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-start gap-3">
-                          <Button
-                            variant={selectedSimiles.includes(simile.id) ? 'default' : 'outline'}
-                            size="icon"
-                            onClick={() => toggleSimileSelection(simile.id)}
-                            className="mt-1"
-                          >
-                            {selectedSimiles.includes(simile.id) ? (
-                              <Check className="w-4 h-4" />
-                            ) : (
-                              <ThumbsUp className="w-4 h-4" />
-                            )}
-                          </Button>
-                          <div className="flex-1">
+                        <div className="flex items-start gap-4">
+                          <div className="flex flex-col items-center justify-center text-gray-400 mt-3">
+                            <GripVertical className="h-5 w-5 mb-1" />
+                            <span className="text-sm font-medium">{index + 1}</span>
+                          </div>
+                          <div className="flex-1 mt-1">
                             <p className="text-lg font-medium mb-2">{simile.text}</p>
-                            {/* <Badge variant="secondary" className="mr-2 mb-2">
+                            <Badge variant="secondary" className="mr-2 mb-2">
                               {simile.category}
-                            </Badge> */}
-                            <Badge variant="outline" className="mr-2 mb-2 bg-slate-50">
-                              {simile.relatedFeatures}
                             </Badge>
+                            {/* <Badge variant="outline" className="mr-2 mb-2 bg-slate-50">
+                              {simile.relatedFeatures}
+                            </Badge> */}
                             {simile.confidence && (
                               <Badge variant="outline" className="mr-2 mb-2 text-gray-500">
                                 {simile.confidence}% Match
@@ -158,33 +231,60 @@ export function SimileExplanation({
                           </div>
                         </div>
                       </div>
+                      
+                      {/* Play Button on the Right */}
+                      <div className="ml-4 flex items-center justify-center pt-2">
+                        <Button 
+                          variant="ghost" 
+                          title="Play Simile Sound" 
+                          onClick={(e) => e.stopPropagation()} // Prevent drag interactions
+                        >
+                          <Play className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
 
-                    {/* Rating Section */}
-                    {/* <div className="ml-14 space-y-2">
-                      <Label className="text-sm text-gray-600">
-                        How understandable is this simile to you?
-                      </Label>
-                      <div className="flex items-center gap-4">
-                        <span className="text-xs text-gray-500">Not at all</span>
-                        <Slider
-                          value={[simileRatings[simile.id] || 50]}
-                          onValueChange={(value) => handleRating(simile.id, value[0])}
-                          max={100}
-                          step={1}
-                          className="flex-1 max-w-md"
-                        />
-                        <span className="text-xs text-gray-500">Very much</span>
-                        <span className="text-sm font-medium min-w-[3rem] text-right">
-                          {simileRatings[simile.id] || 50}%
-                        </span>
-                      </div>
-                    </div> */}
+                    
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Add Custom Simile Input */}
+          {!hasAddedCustomSimile && (
+            <div className="mt-4 flex gap-2 items-center border-t pt-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Type your own simile here..."
+                  value={customSimileText}
+                  onChange={(e) => setCustomSimileText(e.target.value)}
+                  disabled={isQuerying}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddSimile();
+                  }}
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={handleAddSimile} 
+                className="flex gap-2 min-w-[120px]"
+                disabled={isQuerying || !customSimileText.trim()}
+              >
+                {isQuerying ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4" />
+                )}
+                {isQuerying ? 'Querying...' : 'Add Simile'}
+              </Button>
+            </div>
+          )}
+          {hasAddedCustomSimile && (
+            <div className="mt-4 pt-4 border-t text-sm text-gray-500 italic text-center">
+              You have already added a custom simile.
+            </div>
+          )}
         </div>
       </div>
     </div>
