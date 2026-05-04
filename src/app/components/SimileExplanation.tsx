@@ -3,9 +3,7 @@ import { Play, Pause, Volume2, MoreVertical, Star, ThumbsUp, Check } from 'lucid
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Slider } from './ui/slider';
-import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Label } from './ui/label';
-import { LikertScale } from './LikertScale';
 import { LungSound } from '../data';
 import waveformImg from '@/assets/waveform.png';
 
@@ -25,7 +23,6 @@ export function SimileExplanation({
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedSimiles, setSelectedSimiles] = useState<string[]>([]);
   const [simileRatings, setSimileRatings] = useState<{ [key: string]: number }>({});
-  const [userConfidence, setUserConfidence] = useState<number>(50);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
@@ -191,119 +188,6 @@ export function SimileExplanation({
           </div>
         </div>
       </div>
-
-      {/* User Agreement Section */}
-      <div className="mb-6">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Your Assessment</h2>
-        </div>
-        <div className="space-y-6">
-          {/* Selected Similes Summary */}
-          {selectedSimiles.length > 0 && (
-            <div>
-              <p className="text-sm text-gray-600 mb-2">
-                You selected {selectedSimiles.length} simile{selectedSimiles.length !== 1 ? 's' : ''}{' '}
-                as most helpful:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {selectedSimiles.map((id) => {
-                  const simile = similes.find((s) => s.id === id);
-                  return simile ? (
-                    <Badge key={id} variant="default" className="bg-blue-600">
-                      {simile.category}
-                    </Badge>
-                  ) : null;
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Dominant Category Assessment */}
-          <div className="space-y-4">
-            <Label className="text-base font-medium">Which dominant category do you think the audio belongs to?</Label>
-            <LikertScale
-              categories={[
-                'Normal',
-                'Wheeze',
-                'Fine Crackles',
-                'Coarse Crackles',
-                'Rhonchi',
-                'Pleural Rub',
-                'Other',
-              ]}
-            />
-          </div>
-
-          {/* Confidence in Classification */}
-          {/* <div className="space-y-2 pt-8 border-t">
-            <Label>How confident are you in this classification after reviewing the similes?</Label>
-            <div className="flex items-center gap-4 pt-2">
-              <span className="text-xs text-gray-500">Not confident</span>
-              <Slider
-                value={[userConfidence]}
-                onValueChange={(value) => setUserConfidence(value[0])}
-                max={100}
-                step={1}
-                className="flex-1 max-w-md"
-              />
-              <span className="text-xs text-gray-500">Very confident</span>
-              <span className="text-sm font-medium min-w-[3rem] text-right">{userConfidence}%</span>
-            </div>
-          </div> */}
-
-          {/* Agreement Questions */}
-          {/* <div className="space-y-4">
-            <Label>Please rate your agreement with the following statements:</Label>
-            <div className="space-y-4">
-              <AgreementQuestion question="The similes helped me understand the classification" />
-              <AgreementQuestion question="I feel confident I could explain this classification to others" />
-              <AgreementQuestion question="The system's explanation is transparent and trustworthy" />
-            </div>
-          </div> */}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AgreementQuestion({ question }: { question: string }) {
-  const [value, setValue] = useState<string>('');
-
-  return (
-    <div className="space-y-2">
-      <p className="text-sm">{question}</p>
-      <RadioGroup value={value} onValueChange={setValue} className="flex gap-4">
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="strongly-disagree" id={`${question}-sd`} />
-          <Label htmlFor={`${question}-sd`} className="text-xs font-normal">
-            Strongly disagree
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="disagree" id={`${question}-d`} />
-          <Label htmlFor={`${question}-d`} className="text-xs font-normal">
-            Disagree
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="neutral" id={`${question}-n`} />
-          <Label htmlFor={`${question}-n`} className="text-xs font-normal">
-            Neither agree nor disagree
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="agree" id={`${question}-a`} />
-          <Label htmlFor={`${question}-a`} className="text-xs font-normal">
-            Agree
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="strongly-agree" id={`${question}-sa`} />
-          <Label htmlFor={`${question}-sa`} className="text-xs font-normal">
-            Strongly agree
-          </Label>
-        </div>
-      </RadioGroup>
     </div>
   );
 }

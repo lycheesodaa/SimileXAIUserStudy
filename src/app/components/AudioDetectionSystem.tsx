@@ -232,30 +232,6 @@ export function AudioDetectionSystem({
           </div>
         </div>
       </div> */}
-
-      {/* Additional Likelihood Assessment */}
-      <div className="w-full mt-8">
-        <div className="mb-6">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
-              Which dominant category do you think the audio belongs to?
-            </h2>
-          </div>
-          <div>
-            <LikertScale
-              categories={[
-                'Normal',
-                'Wheeze',
-                'Fine Crackles',
-                'Coarse Crackles',
-                'Rhonchi',
-                'Pleural Rub',
-                'Other',
-              ]}
-            />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
