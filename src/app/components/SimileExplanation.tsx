@@ -217,12 +217,14 @@ export function SimileExplanation({
                           </div>
                           <div className="flex-1 mt-1">
                             <p className="text-lg font-medium mb-2">{simile.text}</p>
+                            <span className="text-sm text-gray-500">Commonly associated with: </span>
                             <Badge variant="secondary" className="mr-2 mb-2">
                               {simile.category}
                             </Badge>
                             {/* <Badge variant="outline" className="mr-2 mb-2 bg-slate-50">
                               {simile.relatedFeatures}
                             </Badge> */}
+                            {/* TODO maybe change % match to high/medium/low */}
                             {simile.confidence && (
                               <Badge variant="outline" className="mr-2 mb-2 text-gray-500">
                                 {simile.confidence}% Match

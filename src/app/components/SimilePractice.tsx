@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 
 export function SimilePractice() {
   return (
-    <div className="w-full mb-6">
+    <div className="w-full my-6 mx-3">
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Welcome to Simile Practice Mode</h2>
         <p className="text-gray-600 mb-4">

@@ -62,5 +62,15 @@ export const CUE_RELATIONS: Record<string, CueRelationData> = {
       duration: 'Long',
       continuity: 'Continuous',
     }
+  },
+  'stridor': {
+    id: 'stridor',
+    name: 'Stridor',
+    features: {
+      pitch: 'High',
+      loudness: 'Loud',
+      duration: 'Long',
+      continuity: 'Continuous',
+    }
   }
 };
