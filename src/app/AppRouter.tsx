@@ -1,15 +1,56 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router';
+import { HashRouter, Routes, Route, Navigate, useParams } from 'react-router';
 import { SimilePractice } from './components/SimilePractice';
 import { SimileExplanation } from './components/SimileExplanation';
 import { CuesPractice } from './components/CuesPractice';
 import { CuesExplanation } from './components/CuesExplanation';
 import { LUNG_SOUND_DATA } from './data';
 
-// Extract features from LUNG_SOUND_DATA[0] to match AcousticFeature interface
-const absoluteAudioFeatures = Object.entries(LUNG_SOUND_DATA[0].features).map(([key, val]) => ({
-  name: key,
-  value: val,
-}));
+function SimileExplanationWrapper() {
+  const { id } = useParams<{ id: string }>();
+  let index = 0;
+  if (id) {
+    const parsed = parseInt(id, 10);
+    if (!isNaN(parsed) && parsed > 0 && parsed <= LUNG_SOUND_DATA.length) {
+      index = parsed - 1;
+    }
+  }
+  const data = LUNG_SOUND_DATA[index];
+  
+  return (
+    <SimileExplanation
+      audioName={data.name}
+      classification={data.type}
+      confidence={87}
+      similes={data.similes}
+    />
+  );
+}
+
+function CuesExplanationWrapper() {
+  const { id } = useParams<{ id: string }>();
+  let index = 0;
+  if (id) {
+    const parsed = parseInt(id, 10);
+    if (!isNaN(parsed) && parsed > 0 && parsed <= LUNG_SOUND_DATA.length) {
+      index = parsed - 1;
+    }
+  }
+  const data = LUNG_SOUND_DATA[index];
+  
+  const absoluteAudioFeatures = Object.entries(data.features).map(([key, val]) => ({
+    name: key,
+    value: val as string,
+  }));
+
+  return (
+    <CuesExplanation
+      audioName={data.name}
+      features={absoluteAudioFeatures}
+      comparisons={data.CFcomparison}
+      highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
+    />
+  );
+}
 
 export function AppRouter() {
   return (
@@ -20,25 +61,13 @@ export function AppRouter() {
           
           <Route path="/similes/practice" element={<SimilePractice />} />
           
-          <Route path="/similes/test" element={
-            <SimileExplanation
-              audioName={LUNG_SOUND_DATA[0].name}
-              classification={LUNG_SOUND_DATA[0].type}
-              confidence={87}
-              similes={LUNG_SOUND_DATA[0].similes}
-            />
-          } />
+          <Route path="/similes/test" element={<Navigate to="/similes/test/1" replace />} />
+          <Route path="/similes/test/:id" element={<SimileExplanationWrapper />} />
           
           <Route path="/cues/practice" element={<CuesPractice />} />
           
-          <Route path="/cues/test" element={
-            <CuesExplanation
-              audioName={LUNG_SOUND_DATA[0].name}
-              baselineOptions={['Normal', 'Reference Sample A', 'Reference Sample B']}
-              features={absoluteAudioFeatures}
-              highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
-            />
-          } />
+          <Route path="/cues/test" element={<Navigate to="/cues/test/1" replace />} />
+          <Route path="/cues/test/:id" element={<CuesExplanationWrapper />} />
         </Routes>
       </div>
     </HashRouter>

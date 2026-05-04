@@ -9,22 +9,13 @@ export interface LungSound {
     loudness: 'High' | 'Medium' | 'Low';
     duration: 'Long' | 'Medium' | 'Short';
     continuity: 'Continuous' | 'Discontinuous';
-    quality: string;
   };
-  comparison: {
-    normal: {
-      pitch: 'Higher' | 'Lower' | 'Similar';
-      loudness: 'Higher' | 'Lower' | 'Similar';
-      duration: 'Longer' | 'Shorter' | 'Similar';
-      continuity: 'Different' | 'Similar';
-    };
-    wheeze: {
-      pitch: 'Higher' | 'Lower' | 'Similar';
-      loudness: 'Higher' | 'Lower' | 'Similar';
-      duration: 'Longer' | 'Shorter' | 'Similar';
-      continuity: 'Different' | 'Similar';
-    };
-  };
+  CFcomparison: Record<string, {
+    pitch: 'Higher' | 'Lower' | 'Similar';
+    loudness: 'Higher' | 'Lower' | 'Similar';
+    duration: 'Longer' | 'Shorter' | 'Similar';
+    continuity: 'Higher' | 'Lower' | 'Similar';
+  }>;
   similes: Array<{
     id: string;
     text: string;
@@ -46,26 +37,25 @@ export const LUNG_SOUND_DATA: LungSound[] = [
       loudness: 'Medium',
       duration: 'Short',
       continuity: 'Discontinuous',
-      quality: 'Explosive'
     },
-    comparison: {
+    CFcomparison: {
       normal: {
         pitch: 'Higher',
         loudness: 'Similar',
         duration: 'Shorter',
-        continuity: 'Different'
+        continuity: 'Lower'
       },
-      wheeze: {
+      wheezes: {
         pitch: 'Higher',
         loudness: 'Lower',
         duration: 'Shorter',
-        continuity: 'Different'
+        continuity: 'Lower'
       }
     },
     similes: [
       { id: 's1', text: "Like tearing a piece of velcro", category: "Fine Crackles", relatedFeatures: "Mechanical", confidence: 92 },
       { id: 's2', text: "Like wood popping in a fireplace", category: "Fine Crackles", relatedFeatures: "Nature", confidence: 88 },
-      // { id: 's3', text: "Like rubbing hair between your fingers near your ear", category: "Fine Crackles", relatedFeatures: "Domestic", confidence: 85 },
+      { id: 's3', text: "Like rubbing hair between your fingers near your ear", category: "Fine Crackles", relatedFeatures: "Domestic", confidence: 85 },
       { id: 's4', text: "Like salt falling on a hot pan", category: "Fine Crackles", relatedFeatures: "Domestic", confidence: 76 },
       { id: 's5', text: "Like ripping a heavy piece of canvas or fabric", category: "Coarse Crackles", relatedFeatures: "Domestic", confidence: 80 }
     ]
@@ -81,16 +71,15 @@ export const LUNG_SOUND_DATA: LungSound[] = [
       loudness: 'High',
       duration: 'Long',
       continuity: 'Continuous',
-      quality: 'Musical'
     },
-    comparison: {
+    CFcomparison: {
       normal: {
         pitch: 'Higher',
         loudness: 'Higher',
         duration: 'Longer',
-        continuity: 'Different'
+        continuity: 'Similar'
       },
-      wheeze: {
+      wheezes: {
         pitch: 'Similar',
         loudness: 'Similar',
         duration: 'Similar',
@@ -114,16 +103,15 @@ export const LUNG_SOUND_DATA: LungSound[] = [
       loudness: 'Medium',
       duration: 'Long',
       continuity: 'Continuous',
-      quality: 'Snoring'
     },
-    comparison: {
+    CFcomparison: {
       normal: {
         pitch: 'Lower',
         loudness: 'Higher',
         duration: 'Longer',
-        continuity: 'Different'
+        continuity: 'Similar'
       },
-      wheeze: {
+      wheezes: {
         pitch: 'Lower',
         loudness: 'Similar',
         duration: 'Similar',

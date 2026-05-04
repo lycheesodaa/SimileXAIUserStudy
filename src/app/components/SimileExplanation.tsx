@@ -5,7 +5,6 @@ import { Badge } from './ui/badge';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
 import { LungSound } from '../data';
-import waveformImg from '@/assets/waveform.png';
 
 interface SimileExplanationProps {
   audioName: string;
