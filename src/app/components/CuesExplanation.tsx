@@ -20,19 +20,19 @@ interface AcousticFeature {
   value: string;
 }
 
-interface AudioDetectionSystemProps {
+interface CuesExplanationProps {
   audioName: string;
   baselineOptions: string[];
   features: AcousticFeature[];
   highlightedMoments?: string[];
 }
 
-export function AudioDetectionSystem({
+export function CuesExplanation({
   audioName,
   baselineOptions,
   features,
   highlightedMoments = [],
-}: AudioDetectionSystemProps) {
+}: CuesExplanationProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedBaseline, setSelectedBaseline] = useState(baselineOptions[0]);
   const [featureComparisons, setFeatureComparisons] = useState<{
@@ -63,21 +63,21 @@ export function AudioDetectionSystem({
             <Button variant="ghost" size="icon" onClick={togglePlay}>
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
-            <Button variant="ghost" size="icon">
+            {/* <Button variant="ghost" size="icon">
               <Volume2 className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon">
               <MoreVertical className="w-4 h-4" />
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
 
       {/* Analysis Section */}
       <div className="mb-6">
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <h2 className="text-xl font-semibold mb-2">Understanding Through Cues</h2>
-        </div>
+        </div> */}
         <div className="text-gray-600">
           {/* <div className="flex items-center gap-4 mb-6">
             <span className="text-gray-600">The system has analyzed that the sound has</span>
@@ -110,7 +110,7 @@ export function AudioDetectionSystem({
           {/* Acoustic Features */}
           <div className="space-y-4">
             <div>
-              <p className="mb-2">The system has analyzed that the audio has</p>
+              <p className="mb-2">The system has analyzed that compared to the audio has</p>
               <ul className="space-y-2 ml-6">
                 {features.map((feature, index) => (
                   <li key={index} className="list-disc">
@@ -121,21 +121,21 @@ export function AudioDetectionSystem({
             </div>
 
             {/* Highlighted Moments */}
-            {highlightedMoments.length > 0 && (
+            {/* {highlightedMoments.length > 0 && (
               <div>
                 <p className="mb-2">During the most relevant segments highlighted below:</p>
-                {/* <ul className="space-y-2 ml-6">
+                <ul className="space-y-2 ml-6">
                   {highlightedMoments.map((moment, index) => (
                     <li key={index} className="list-disc">
                       <span className="italic bg-gray-100 px-1">"{moment}"</span>
                     </li>
                   ))}
-                </ul> */}
+                </ul>
                 <div>
                   <img src={waveformImg} width={300} alt="Waveform" />
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Info } from "lucide-react";
 
-export function SimilePracticeTable() {
+export function SimilePractice() {
   return (
     <div className="w-full mb-6">
       <div className="mb-4">

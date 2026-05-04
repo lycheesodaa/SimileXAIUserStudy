@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { AudioDetectionSystem } from './components/AudioDetectionSystem';
+import { CuesExplanation } from './components/CuesExplanation';
 import { SimileExplanation } from './components/SimileExplanation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { LUNG_SOUND_DATA } from './data';
 import { ReferenceTable } from './components/ReferenceTable';
-import { SimilePracticeTable } from './components/SimilePracticeTable';
+import { SimilePractice } from './components/SimilePractice';
 import { CuesPractice } from './components/CuesPractice';
 
 function AppContent() {
@@ -32,7 +32,7 @@ function AppContent() {
   return (
     <div className="w-full bg-transparent">
       {viewMode === "similes" && testMode === "practice" && (
-        <SimilePracticeTable />
+        <SimilePractice />
       )}
 
       {viewMode === "similes" && testMode === "test" && (
@@ -49,7 +49,7 @@ function AppContent() {
       )}
 
       {viewMode === "cues" && testMode === "test" && (
-        <AudioDetectionSystem
+        <CuesExplanation
           audioName={LUNG_SOUND_DATA[0].name}
           baselineOptions={['Normal', 'Reference Sample A', 'Reference Sample B']}
           features={absoluteAudioFeatures}

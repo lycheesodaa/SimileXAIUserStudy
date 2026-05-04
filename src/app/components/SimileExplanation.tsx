@@ -53,12 +53,12 @@ export function SimileExplanation({
             <Button variant="ghost" size="icon" onClick={togglePlay}>
               {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
-            <Button variant="ghost" size="icon">
+            {/* <Button variant="ghost" size="icon">
               <Volume2 className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon">
               <MoreVertical className="w-4 h-4" />
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
@@ -100,13 +100,13 @@ export function SimileExplanation({
       {/* Simile-Based Explanations */}
       <div className="mb-6">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Understanding Through Similes</h2>
-          <p className="text-gray-600">
+          {/* <h2 className="text-xl font-semibold mb-2">Understanding Through Similes</h2> */}
+          {/* <p className="text-gray-600">
             In the following most relevant segments highlighted in the audio:
           </p>
           <div>
             <img src={waveformImg} width={300} alt="Waveform" />
-          </div>
+          </div> */}
 
           <p className="text-gray-600">
             The system detects the following similes that help explain this classification. 
