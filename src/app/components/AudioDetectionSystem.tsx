@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Play, Pause, Volume2, MoreVertical } from 'lucide-react';
 import waveformImg from '@/assets/waveform.png';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
   Select,
   SelectContent,
@@ -53,12 +52,12 @@ export function AudioDetectionSystem({
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="w-full space-y-6">
 
 
       {/* Audio Player Section */}
-      <Card>
-        <CardContent className="pt-6">
+      <div className="mb-6">
+        <div className="pt-6">
           <div className="flex items-center gap-4">
             <span className="text-gray-600">Play this lung sound recording.</span>
             <Button variant="ghost" size="icon" onClick={togglePlay}>
@@ -71,15 +70,15 @@ export function AudioDetectionSystem({
               <MoreVertical className="w-4 h-4" />
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Analysis Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Understanding Through Cues</CardTitle>
-        </CardHeader>
-        <CardContent className="text-gray-600 mt-[-20px]">
+      <div className="mb-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">Understanding Through Cues</h2>
+        </div>
+        <div className="text-gray-600">
           {/* <div className="flex items-center gap-4 mb-6">
             <span className="text-gray-600">The system has analyzed that the sound has</span>
             <Select value={selectedBaseline} onValueChange={setSelectedBaseline}>
@@ -138,13 +137,13 @@ export function AudioDetectionSystem({
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Comparison Questions */}
-      {/* <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">
+      {/* <div className="mb-6">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold mb-2">
             Q3. The audio{' '}
             <Button variant="ghost" size="icon" className="inline-flex">
               <Play className="w-4 h-4" />
@@ -156,9 +155,9 @@ export function AudioDetectionSystem({
               <MoreVertical className="w-4 h-4" />
             </Button>{' '}
             has __ (cue) __ that is __ (higher / lower / similar) __ than {selectedBaseline}.
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+          </h2>
+        </div>
+        <div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -231,18 +230,18 @@ export function AudioDetectionSystem({
               </tbody>
             </table>
           </div>
-        </CardContent>
-      </Card> */}
+        </div>
+      </div> */}
 
       {/* Additional Likelihood Assessment */}
-      <div className="max-w-3xl mx-auto mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+      <div className="w-full mt-8">
+        <div className="mb-6">
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
               Which dominant category do you think the audio belongs to?
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+            </h2>
+          </div>
+          <div>
             <LikertScale
               categories={[
                 'Normal',
@@ -254,8 +253,8 @@ export function AudioDetectionSystem({
                 'Other',
               ]}
             />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

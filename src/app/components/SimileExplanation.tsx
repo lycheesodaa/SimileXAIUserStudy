@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Play, Pause, Volume2, MoreVertical, Star, ThumbsUp, Check } from 'lucide-react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Slider } from './ui/slider';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
@@ -46,12 +45,12 @@ export function SimileExplanation({
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
+    <div className="w-full space-y-6">
 
 
       {/* Audio Player Section */}
-      <Card>
-        <CardContent className="pt-6">
+      <div className="mb-6">
+        <div className="pt-6">
           <div className="flex items-center gap-4">
             <span className="text-gray-600">Play this lung sound recording.</span>
             <Button variant="ghost" size="icon" onClick={togglePlay}>
@@ -64,12 +63,12 @@ export function SimileExplanation({
               <MoreVertical className="w-4 h-4" />
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Classification Result */}
-      {/* <Card>
-        <CardContent className="pt-6">
+      {/* <div className="mb-6">
+        <div className="pt-6">
           <div className="space-y-4">
             <div>
               <span className="text-gray-600">The system has classified this lung sound as: </span>
@@ -98,13 +97,13 @@ export function SimileExplanation({
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card> */}
+        </div>
+      </div> */}
 
       {/* Simile-Based Explanations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Understanding Through Similes</CardTitle>
+      <div className="mb-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">Understanding Through Similes</h2>
           <p className="text-gray-600">
             In the following most relevant segments highlighted in the audio:
           </p>
@@ -117,11 +116,11 @@ export function SimileExplanation({
             <br />
             Select the ones that help you best understand this classification. 
           </p>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div>
           <div className="space-y-6">
             {similes.map((simile) => (
-              <Card
+              <div
                 key={simile.id}
                 className={`border-2 transition-all ${
                   selectedSimiles.includes(simile.id)
@@ -129,7 +128,7 @@ export function SimileExplanation({
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <CardContent className="pt-6">
+                <div className="pt-6">
                   <div className="space-y-4">
                     {/* Simile Header */}
                     <div className="flex items-start justify-between">
@@ -186,19 +185,19 @@ export function SimileExplanation({
                       </div>
                     </div> */}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* User Agreement Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Assessment</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6 mt-[-16px]">
+      <div className="mb-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">Your Assessment</h2>
+        </div>
+        <div className="space-y-6">
           {/* Selected Similes Summary */}
           {selectedSimiles.length > 0 && (
             <div>
@@ -261,8 +260,8 @@ export function SimileExplanation({
               <AgreementQuestion question="The system's explanation is transparent and trustworthy" />
             </div>
           </div> */}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

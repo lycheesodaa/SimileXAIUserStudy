@@ -1,11 +1,4 @@
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import {
   Table,
   TableBody,
   TableCell,
@@ -67,14 +60,14 @@ const referenceData = [
 
 export function ReferenceTable() {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Lung Sound Reference Guide</CardTitle>
-        <CardDescription>
+    <div className="w-full mb-6">
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Lung Sound Reference Guide</h2>
+        <p className="text-gray-600 mb-4">
           A quick reference mapping acoustic cues to common lung sound types.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </p>
+      </div>
+      <div>
         <div className="border rounded-md overflow-x-auto">
           <Table>
             <TableHeader>
@@ -101,7 +94,7 @@ export function ReferenceTable() {
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

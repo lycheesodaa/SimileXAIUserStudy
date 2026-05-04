@@ -30,38 +30,32 @@ function AppContent() {
   // lungSoundSimiles replaced by LUNG_SOUND_DATA
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="w-full">
-          <div className="mt-0">
-            {viewMode === "similes" && testMode === "practice" && (
-              <SimilePracticeTable />
-            )}
+    <div className="w-full bg-transparent">
+      {viewMode === "similes" && testMode === "practice" && (
+        <SimilePracticeTable />
+      )}
 
-            {viewMode === "similes" && testMode === "test" && (
-              <SimileExplanation
-                audioName={LUNG_SOUND_DATA[0].name}
-                classification={LUNG_SOUND_DATA[0].type}
-                confidence={87}
-                similes={LUNG_SOUND_DATA[0].similes}
-              />
-            )}
+      {viewMode === "similes" && testMode === "test" && (
+        <SimileExplanation
+          audioName={LUNG_SOUND_DATA[0].name}
+          classification={LUNG_SOUND_DATA[0].type}
+          confidence={87}
+          similes={LUNG_SOUND_DATA[0].similes}
+        />
+      )}
 
-            {viewMode === "cues" && testMode === "practice" && (
-              <CuesPractice />
-            )}
+      {viewMode === "cues" && testMode === "practice" && (
+        <CuesPractice />
+      )}
 
-            {viewMode === "cues" && testMode === "test" && (
-              <AudioDetectionSystem
-                audioName={LUNG_SOUND_DATA[0].name}
-                baselineOptions={['Normal', 'Reference Sample A', 'Reference Sample B']}
-                features={absoluteAudioFeatures}
-                highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+      {viewMode === "cues" && testMode === "test" && (
+        <AudioDetectionSystem
+          audioName={LUNG_SOUND_DATA[0].name}
+          baselineOptions={['Normal', 'Reference Sample A', 'Reference Sample B']}
+          features={absoluteAudioFeatures}
+          highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
+        />
+      )}
     </div>
   );
 }
