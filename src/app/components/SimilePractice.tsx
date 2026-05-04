@@ -1,33 +1,48 @@
-import { Info } from "lucide-react";
+import { useState } from "react";
+import { Play, Pause } from "lucide-react";
+import { Button } from "./ui/button";
 
 export function SimilePractice() {
+  const [playingId, setPlayingId] = useState<string | null>(null);
+
+  const togglePlay = (id: string) => {
+    setPlayingId(playingId === id ? null : id);
+  };
+
   return (
-    <div className="w-full my-6 mx-3">
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-2">Welcome to Simile Practice Mode</h2>
-        <p className="text-gray-600 mb-4">
-          Review how different lung classifications map to common descriptive similes.
+    <div className="my-6 mx-3">
+      <div className="space-y-4 text-gray-700">
+        <p className="text-gray-600">
+          In this section, you can review how different lung sound categories may be mapped to everyday sounds.
         </p>
-      </div>
-      <div className="space-y-6 text-gray-700">
         <p>
-          Similes can provide intuitive ways to recognize and communicate lung sounds.
-          Familiarize yourself with these associations before moving to the test tab.
+          These are known as similes. Similes can provide intuitive ways to recognize and communicate lung sounds.
         </p>
-        <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+        <p>
+          <i>Some similes may be more intuitive than others, and it may be helpful to take a few seconds to internalize the associations
+            to improve efficiency of recognition.</i>
+        </p>
+        {/* <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
           <h3 className="font-semibold text-blue-900 mb-2">Instructions</h3>
           <ul className="list-disc pl-5 space-y-1 text-blue-800 text-sm">
             <li>Review the Simile Practice Table to understand how descriptions map to sounds.</li>
             <li>Note the various everyday comparisons that professionals use for each classification.</li>
           </ul>
-        </div>
+        </div> */}
 
         <div className="space-y-8 mt-6">
           <section>
-            <h3 className="text-xl font-semibold text-cyan-800 border-b pb-2 mb-3">1. Fine Crackles (Fine Rales)</h3>
-            <p className="italic text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-              High-pitched, short, popping sounds usually heard during inspiration. They are not cleared by coughing.
-            </p>
+            <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <h3 className="text-xl font-semibold text-cyan-800">1. Fine Crackles (Fine Rales)</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePlay("fine-crackles")}
+                className="h-8 w-8 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+              >
+                {playingId === "fine-crackles" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </div>
             <ul className="list-disc pl-6 space-y-1 text-gray-700">
               <li>Like rubbing a lock of hair between your fingers near your ear.</li>
               <li>Like pulling apart a strip of Velcro slowly.</li>
@@ -43,10 +58,17 @@ export function SimilePractice() {
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-cyan-800 border-b pb-2 mb-3">2. Coarse Crackles (Coarse Rales)</h3>
-            <p className="italic text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-              Lower-pitched, louder, longer, and bubbling sounds. They sound "wet" and may decrease after coughing.
-            </p>
+            <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <h3 className="text-xl font-semibold text-cyan-800">2. Coarse Crackles (Coarse Rales)</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePlay("coarse-crackles")}
+                className="h-8 w-8 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+              >
+                {playingId === "coarse-crackles" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </div>
             <ul className="list-disc pl-6 space-y-1 text-gray-700">
               <li>Like water boiling vigorously in a pot.</li>
               <li>Like slurping the last few drops of a drink through a straw.</li>
@@ -62,10 +84,17 @@ export function SimilePractice() {
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-cyan-800 border-b pb-2 mb-3">3. Wheezes (Sibilant)</h3>
-            <p className="italic text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-              High-pitched, musical, continuous sounds often heard on expiration. Caused by narrowed airways.
-            </p>
+            <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <h3 className="text-xl font-semibold text-cyan-800">3. Wheezes</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePlay("wheezes")}
+                className="h-8 w-8 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+              >
+                {playingId === "wheezes" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </div>
             <ul className="list-disc pl-6 space-y-1 text-gray-700">
               <li>Like wind whistling through a tunnel or under a door.</li>
               <li>Like a squeaky door hinge needing oil.</li>
@@ -81,10 +110,17 @@ export function SimilePractice() {
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-cyan-800 border-b pb-2 mb-3">4. Rhonchi (Sonorous Wheezes)</h3>
-            <p className="italic text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-              Low-pitched, snoring, or moaning sounds. They imply obstruction of larger airways and often clear with coughing.
-            </p>
+            <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <h3 className="text-xl font-semibold text-cyan-800">4. Rhonchi</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePlay("rhonchi")}
+                className="h-8 w-8 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+              >
+                {playingId === "rhonchi" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </div>
             <ul className="list-disc pl-6 space-y-1 text-gray-700">
               <li>Like a person snoring deeply.</li>
               <li>Like the low moaning of a ghost in a movie.</li>
@@ -100,10 +136,17 @@ export function SimilePractice() {
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-cyan-800 border-b pb-2 mb-3">5. Stridor</h3>
-            <p className="italic text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-              Loud, high-pitched, crowing sound usually heard without a stethoscope during inspiration. Indicates upper airway obstruction.
-            </p>
+            <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <h3 className="text-xl font-semibold text-cyan-800">5. Stridor</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePlay("stridor")}
+                className="h-8 w-8 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+              >
+                {playingId === "stridor" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </div>
             <ul className="list-disc pl-6 space-y-1 text-gray-700">
               <li>Like a seal barking.</li>
               <li>Like a rooster crowing.</li>
@@ -119,10 +162,17 @@ export function SimilePractice() {
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-cyan-800 border-b pb-2 mb-3">6. Pleural Friction Rub</h3>
-            <p className="italic text-gray-600 mb-3 bg-gray-50 p-2 rounded">
-              A dry, grating, or creaking sound typically heard during both inspiration and expiration. Caused by inflamed pleural surfaces rubbing together.
-            </p>
+            <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <h3 className="text-xl font-semibold text-cyan-800">6. Pleural Friction Rub</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => togglePlay("pleural-friction-rub")}
+                className="h-8 w-8 text-cyan-700 hover:text-cyan-900 hover:bg-cyan-50"
+              >
+                {playingId === "pleural-friction-rub" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+            </div>
             <ul className="list-disc pl-6 space-y-1 text-gray-700">
               <li>Like walking on fresh, cold, crunchy snow.</li>
               <li>Like two pieces of new leather being rubbed together.</li>
