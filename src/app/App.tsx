@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { AudioDetectionSystem } from './components/AudioDetectionSystem';
 import { SimileExplanation } from './components/SimileExplanation';
@@ -9,9 +9,17 @@ import { ReferenceTable } from './components/ReferenceTable';
 import { SimilePracticeTable } from './components/SimilePracticeTable';
 import { CuesPractice } from './components/CuesPractice';
 
-export default function App() {
-  const [viewMode, setViewMode] = useState('similes');
-  const [testMode, setTestMode] = useState('practice');
+function AppContent() {
+  const navigate = useNavigate();
+  const { viewMode = 'similes', testMode = 'practice' } = useParams();
+
+  const handleViewModeChange = (val: string) => {
+    navigate(`/${val}/${testMode}`);
+  };
+
+  const handleTestModeChange = (val: string) => {
+    navigate(`/${viewMode}/${val}`);
+  };
 
   // Extract features from LUNG_SOUND_DATA[0] to match AcousticFeature interface
   const absoluteAudioFeatures = Object.entries(LUNG_SOUND_DATA[0].features).map(([key, val]) => ({
@@ -24,37 +32,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl mb-2">Audio XAI System</h1>
-            <p className="text-gray-600">
-              Explainable AI interfaces for audio classification using acoustic cues and simile-based
-              explanations
-            </p>
-          </div>
-        </div>
-
         <div className="w-full">
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <Tabs value={viewMode} onValueChange={setViewMode} className="w-full md:w-1/2">
-              <TabsList className="grid w-2/3 grid-cols-2">
-                <TabsTrigger value="similes">Similes</TabsTrigger>
-                <TabsTrigger value="cues">Cues</TabsTrigger>
-              </TabsList>
-              <TabsContent value="similes" className="mt-0" />
-              <TabsContent value="cues" className="mt-0" />
-            </Tabs>
-
-            <Tabs value={testMode} onValueChange={setTestMode} className="w-full md:w-1/2">
-              <TabsList className="grid w-2/3 grid-cols-2 ml-auto">
-                <TabsTrigger value="practice">Practice</TabsTrigger>
-                <TabsTrigger value="test">Test</TabsTrigger>
-              </TabsList>
-              <TabsContent value="practice" className="mt-0" />
-              <TabsContent value="test" className="mt-0" />
-            </Tabs>
-          </div>
-
           <div className="mt-0">
             {viewMode === "similes" && testMode === "practice" && (
               <SimilePracticeTable />
@@ -85,5 +63,14 @@ export default function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/similes/practice" replace />} />
+      <Route path="/:viewMode/:testMode" element={<AppContent />} />
+    </Routes>
   );
 }

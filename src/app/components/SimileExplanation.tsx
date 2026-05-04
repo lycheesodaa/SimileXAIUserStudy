@@ -47,7 +47,7 @@ export function SimileExplanation({
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h2 className="text-2xl text-cyan-600">{audioName}</h2>
+
 
       {/* Audio Player Section */}
       <Card>
