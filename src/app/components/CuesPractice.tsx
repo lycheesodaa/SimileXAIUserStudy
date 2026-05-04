@@ -1,17 +1,16 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { ReferenceTable } from './ReferenceTable';
 
 export function CuesPractice() {
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Welcome to Cues Practice Mode</CardTitle>
-          <CardDescription>
+      <div className="mb-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">Welcome to Cues Practice Mode</h2>
+          <p className="text-gray-600 mb-4">
             Review how different lung classifications map to common descriptive cues.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 text-gray-700">
+          </p>
+        </div>
+        <div className="space-y-4 text-gray-700">
           <p>
             In this section, you can review the common acoustic cues that help
             identify different lung sounds. Familiarizing yourself with these attributes
@@ -27,8 +26,8 @@ export function CuesPractice() {
           <div>
             <ReferenceTable />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

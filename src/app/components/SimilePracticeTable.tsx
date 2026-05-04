@@ -1,22 +1,15 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
 import { Info } from "lucide-react";
 
 export function SimilePracticeTable() {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Welcome to Simile Practice Mode</CardTitle>
-        <CardDescription>
+    <div className="w-full mb-6">
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Welcome to Simile Practice Mode</h2>
+        <p className="text-gray-600 mb-4">
           Review how different lung classifications map to common descriptive similes.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6 text-gray-700">
+        </p>
+      </div>
+      <div className="space-y-6 text-gray-700">
         <p>
           Similes can provide intuitive ways to recognize and communicate lung sounds.
           Familiarize yourself with these associations before moving to the test tab.
@@ -144,7 +137,7 @@ export function SimilePracticeTable() {
             </ul>
           </section>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
