@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Play, Pause } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 export function SimilePractice() {
   const [playingId, setPlayingId] = useState<string | null>(null);

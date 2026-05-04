@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Play, Pause, GripVertical, Plus, Loader2 } from 'lucide-react';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Slider } from './ui/slider';
-import { Label } from './ui/label';
-import { Input } from './ui/input';
-import { LungSound } from '../data';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Slider } from '../ui/slider';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { LungSound } from '../../data';
 
 interface SimileExplanationProps {
   audioName: string;
@@ -30,9 +30,9 @@ export function SimileExplanation({
 
   const handleAddSimile = async () => {
     if (!customSimileText.trim() || isQuerying || hasAddedCustomSimile) return;
-    
+
     setIsQuerying(true);
-    
+
     // TODO backend model call
     try {
       // Simulate backend call
@@ -41,7 +41,7 @@ export function SimileExplanation({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           text: customSimileText,
           audioId: audioName
         }),
@@ -60,7 +60,7 @@ export function SimileExplanation({
         relatedFeatures: 'Custom',
         confidence: 100,
       };
-      
+
       setRankedSimiles([...rankedSimiles, newSimile]);
       setCustomSimileText('');
       setHasAddedCustomSimile(true);
@@ -95,10 +95,10 @@ export function SimileExplanation({
 
     const newRanked = [...rankedSimiles];
     const draggedItem = newRanked[draggedIndex];
-    
+
     newRanked.splice(draggedIndex, 1);
     newRanked.splice(targetIndex, 0, draggedItem);
-    
+
     setRankedSimiles(newRanked);
     setDraggedIndex(null);
   };
@@ -181,7 +181,7 @@ export function SimileExplanation({
           </div> */}
 
           <p className="text-gray-600">
-            The system detects the following few similes to help explain this classification. 
+            The system detects the following few similes to help explain this classification.
             <br />
             You may rank them in the order of how helpful they are to you in understanding the given recording.
             <br />
@@ -199,11 +199,10 @@ export function SimileExplanation({
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDrop={(e) => handleDrop(e, index)}
                 onDragEnd={handleDragEnd}
-                className={`border-2 transition-all rounded-md cursor-grab active:cursor-grabbing ${
-                  draggedIndex === index
+                className={`border-2 transition-all rounded-md cursor-grab active:cursor-grabbing ${draggedIndex === index
                     ? 'border-blue-400 bg-blue-50 opacity-60'
                     : 'border-gray-200 hover:border-gray-300 bg-white'
-                }`}
+                  }`}
               >
                 <div className="px-4 py-3">
                   <div className="space-y-2">
@@ -233,12 +232,12 @@ export function SimileExplanation({
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Play Button on the Right */}
                       <div className="ml-4 flex items-center justify-center pt-2">
-                        <Button 
-                          variant="ghost" 
-                          title="Play Simile Sound" 
+                        <Button
+                          variant="ghost"
+                          title="Play Simile Sound"
                           onClick={(e) => e.stopPropagation()} // Prevent drag interactions
                         >
                           <Play className="w-4 h-4" />
@@ -246,7 +245,7 @@ export function SimileExplanation({
                       </div>
                     </div>
 
-                    
+
                   </div>
                 </div>
               </div>
@@ -267,9 +266,9 @@ export function SimileExplanation({
                   }}
                 />
               </div>
-              <Button 
-                variant="outline" 
-                onClick={handleAddSimile} 
+              <Button
+                variant="outline"
+                onClick={handleAddSimile}
                 className="flex gap-2 min-w-[120px]"
                 disabled={isQuerying || !customSimileText.trim()}
               >

@@ -1,8 +1,8 @@
-import { CUE_RELATIONS } from '../cueRelations';
+import { CUE_RELATIONS } from '../../cueRelations';
 
 export function ReferenceTable() {
   const baselineOptions = Object.values(CUE_RELATIONS);
-  
+
   const descriptions: Record<string, string> = {
     pitch: 'Frequency (e.g., high or low)',
     loudness: 'Volume or intensity',
