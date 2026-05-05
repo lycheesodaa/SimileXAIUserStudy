@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause, GripVertical, Plus, Loader2 } from 'lucide-react';
+import { Play, Pause, Plus, Loader2 } from 'lucide-react';
+import { SimileList } from '../similes/SimileList';
+import { CustomSimileInput } from '../similes/CustomSimileInput';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
@@ -43,10 +45,6 @@ export function CombinedExplanation({
 
   // Simile State
   const [rankedSimiles, setRankedSimiles] = useState<LungSound['similes']>(similes);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [customSimileText, setCustomSimileText] = useState('');
-  const [hasAddedCustomSimile, setHasAddedCustomSimile] = useState(false);
-  const [isQuerying, setIsQuerying] = useState(false);
 
   // Cues State
   const baselineOptions = Object.values(CUE_RELATIONS);
@@ -60,49 +58,8 @@ export function CombinedExplanation({
     setIsPlaying(!isPlaying);
   };
 
-  // Simile Handlers
-  const handleAddSimile = async () => {
-    if (!customSimileText.trim() || isQuerying || hasAddedCustomSimile) return;
-    setIsQuerying(true);
-    try {
-      // Simulate backend call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const newSimile = {
-        id: `custom-${Date.now()}`,
-        text: customSimileText,
-        category: 'User-Generated',
-        relatedFeatures: 'Custom',
-        confidence: 100,
-      };
-      setRankedSimiles([...rankedSimiles, newSimile]);
-      setCustomSimileText('');
-      setHasAddedCustomSimile(true);
-    } catch (error) {
-      console.error('Failed to query backend:', error);
-    } finally {
-      setIsQuerying(false);
-    }
-  };
-
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) return;
-    const newRanked = [...rankedSimiles];
-    const draggedItem = newRanked[draggedIndex];
-    newRanked.splice(draggedIndex, 1);
-    newRanked.splice(targetIndex, 0, draggedItem);
-    setRankedSimiles(newRanked);
-    setDraggedIndex(null);
+  const handleAddSimileToRanked = (newSimile: LungSound['similes'][0]) => {
+    setRankedSimiles([...rankedSimiles, newSimile]);
   };
 
   return (
@@ -130,92 +87,12 @@ export function CombinedExplanation({
           </p>
         </div>
 
-        <div className="space-y-1">
-          {rankedSimiles.map((simile, index) => (
-            <div
-              key={simile.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={() => setDraggedIndex(null)}
-              className={`border-2 transition-all rounded-md cursor-grab active:cursor-grabbing ${draggedIndex === index
-                ? 'border-blue-400 bg-blue-50 opacity-60'
-                : 'border-gray-200 hover:border-gray-300 bg-white'
-                }`}
-            >
-              <div className="px-4 py-3">
-                <div className="space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-start gap-4">
-                        <div className="flex flex-col items-center justify-center text-gray-400 mt-3">
-                          <GripVertical className="h-5 w-5 mb-1" />
-                          <span className="text-sm font-medium">{index + 1}</span>
-                        </div>
-                        <div className="flex-1 mt-1">
-                          <p className="text-lg font-medium mb-2">{simile.text}</p>
-                          <span className="text-sm text-gray-500">Commonly associated with: </span>
-                          <Badge variant="secondary" className="mr-2 mb-2">
-                            {simile.category}
-                          </Badge>
-                          {simile.confidence && (
-                            <Badge variant="outline" className="mr-2 mb-2 text-gray-500">
-                              {simile.confidence}% Match
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="ml-4 flex items-center justify-center pt-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Play className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Add Custom Simile Input */}
-          {!hasAddedCustomSimile ? (
-            <div className="mt-4 flex gap-2 items-center border-t pt-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="Type your own simile here..."
-                  value={customSimileText}
-                  onChange={(e) => setCustomSimileText(e.target.value)}
-                  disabled={isQuerying}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddSimile()}
-                />
-              </div>
-              <Button
-                variant="outline"
-                onClick={handleAddSimile}
-                className="flex gap-2 min-w-[120px]"
-                disabled={isQuerying || !customSimileText.trim()}
-              >
-                {isQuerying ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Plus className="w-4 h-4" />
-                )}
-                {isQuerying ? 'Querying...' : 'Add Simile'}
-              </Button>
-            </div>
-          ) : (
-            <div className="mt-4 pt-4 border-t text-sm text-gray-500 italic text-center">
-              You have already added a custom simile.
-            </div>
-          )}
+        <div>
+          <SimileList similes={rankedSimiles} onRankChange={setRankedSimiles} />
+          <CustomSimileInput audioName={audioName} onSimileAdded={handleAddSimileToRanked} />
         </div>
       </div>
+
 
       {/* 3. Cue-Based Explanations */}
       <div className="mb-6 border-t pt-4">
