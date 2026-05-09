@@ -29,6 +29,7 @@ interface CombinedExplanationProps {
   features: AcousticFeature[];
   comparisons?: Record<string, Record<string, string>>;
   highlightedMoments?: string[];
+  originalAudioUrl?: string;
 }
 
 export function CombinedExplanation({
@@ -39,10 +40,8 @@ export function CombinedExplanation({
   features,
   comparisons = {},
   highlightedMoments = [],
+  originalAudioUrl,
 }: CombinedExplanationProps) {
-  // Shared State
-  const [isPlaying, setIsPlaying] = useState(false);
-
   // Simile State
   const [rankedSimiles, setRankedSimiles] = useState<LungSound['similes']>(similes);
 
@@ -54,10 +53,6 @@ export function CombinedExplanation({
     setRankedSimiles(similes);
   }, [similes]);
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
   const handleAddSimileToRanked = (newSimile: LungSound['similes'][0]) => {
     setRankedSimiles([...rankedSimiles, newSimile]);
   };
@@ -65,12 +60,22 @@ export function CombinedExplanation({
   return (
     <div className="space-y-6 mx-3 pb-12">
       {/* 1. Shared Audio Player Section */}
-      <div className="pt-6">
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600">Play this lung sound recording:</span>
-          <Button variant="ghost" size="icon" onClick={togglePlay}>
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-          </Button>
+      <div className="mb-6">
+        <div className="pt-6">
+          <div className="flex flex-col gap-2">
+            <span className="text-gray-600">Play this lung sound recording:</span>
+            {originalAudioUrl ? (
+              <audio
+                controls
+                className="w-full max-w-md h-10"
+                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
+              >
+                Your browser does not support the audio element.
+              </audio>
+            ) : (
+              <span className="text-sm text-gray-400 italic">No audio available for this sample</span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -88,7 +93,10 @@ export function CombinedExplanation({
         </div>
 
         <div>
-          <SimileList similes={rankedSimiles} onRankChange={setRankedSimiles} />
+          <SimileList 
+            similes={rankedSimiles} 
+            onRankChange={setRankedSimiles} 
+          />
           <CustomSimileInput audioName={audioName} onSimileAdded={handleAddSimileToRanked} />
         </div>
       </div>
@@ -111,16 +119,7 @@ export function CombinedExplanation({
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="icon">
-              <Play className="w-4 h-4" />
-            </Button>
-            <span>, the current recording</span>
-            <Button variant="ghost" size="icon" onClick={togglePlay}>
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
-            <span>
-              has:
-            </span>
+            <span>, the current recording has:</span>
           </div>
 
           <div>

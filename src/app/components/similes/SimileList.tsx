@@ -81,14 +81,16 @@ export function SimileList({ similes, onRankChange }: SimileListProps) {
                 </div>
 
                 <div className="ml-4 flex items-center justify-center pt-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title="Play Simile Sound"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Play className="w-4 h-4" />
-                  </Button>
+                  {simile.withinClassAudioUrl && (
+                    <audio
+                      controls
+                      className="h-8 w-48"
+                      aria-label={`Audio example for: ${simile.text}`}
+                      src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${simile.withinClassAudioUrl}`}
+                    >
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
                 </div>
               </div>
             </div>

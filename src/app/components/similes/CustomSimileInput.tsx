@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../ui/tooltip';
 import { LungSound } from '../../data';
 
 interface CustomSimileInputProps {
@@ -65,31 +66,44 @@ export function CustomSimileInput({ audioName, onSimileAdded }: CustomSimileInpu
   }
 
   return (
-    <div className="mt-4 flex gap-2 items-center border-t pt-4">
-      <div className="flex-1">
-        <Input
-          placeholder="Type your own simile here..."
-          value={customSimileText}
-          onChange={(e) => setCustomSimileText(e.target.value)}
-          disabled={isQuerying}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleAddSimile();
-          }}
-        />
-      </div>
-      <Button
-        variant="outline"
-        onClick={handleAddSimile}
-        className="flex gap-2 min-w-[120px]"
-        disabled={isQuerying || !customSimileText.trim()}
-      >
-        {isQuerying ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Plus className="w-4 h-4" />
-        )}
-        {isQuerying ? 'Querying...' : 'Add Simile'}
-      </Button>
-    </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="mt-4 flex gap-2 items-center border-t pt-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Type your own simile here..."
+                value={customSimileText}
+                onChange={(e) => setCustomSimileText(e.target.value)}
+                // disabled={isQuerying}
+                disabled={true}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddSimile();
+                }}
+              />
+            </div>
+            <span className="inline-block">
+              <Button
+                variant="outline"
+                onClick={handleAddSimile}
+                className="flex gap-2 min-w-[120px]"
+                // disabled={isQuerying || !customSimileText.trim()}
+                disabled={true}
+              >
+                {isQuerying ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4" />
+                )}
+                {isQuerying ? 'Querying...' : 'Add Simile'}
+              </Button>
+            </span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          Not implemented yet!
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

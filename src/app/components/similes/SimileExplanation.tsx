@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Plus, Loader2 } from 'lucide-react';
 import { SimileList } from './SimileList';
 import { CustomSimileInput } from './CustomSimileInput';
@@ -14,6 +14,7 @@ interface SimileExplanationProps {
   classification: string;
   confidence: number;
   similes: LungSound['similes'];
+  originalAudioUrl?: string;
 }
 
 export function SimileExplanation({
@@ -21,8 +22,8 @@ export function SimileExplanation({
   classification,
   confidence,
   similes,
+  originalAudioUrl,
 }: SimileExplanationProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [rankedSimiles, setRankedSimiles] = useState<LungSound['similes']>(similes);
   const [simileRatings, setSimileRatings] = useState<{ [key: string]: number }>({});
 
@@ -34,9 +35,6 @@ export function SimileExplanation({
     setRankedSimiles(similes);
   }, [similes]);
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
 
   const handleRating = (simileId: string, rating: number) => {
     setSimileRatings((prev) => ({
@@ -51,17 +49,19 @@ export function SimileExplanation({
       {/* Audio Player Section */}
       <div className="mb-6">
         <div className="pt-6">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-2">
             <span className="text-gray-600">Play this lung sound recording:</span>
-            <Button variant="ghost" size="icon" onClick={togglePlay}>
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
-            {/* <Button variant="ghost" size="icon">
-              <Volume2 className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="w-4 h-4" />
-            </Button> */}
+            {originalAudioUrl ? (
+              <audio
+                controls
+                className="w-full max-w-md h-10"
+                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
+              >
+                Your browser does not support the audio element.
+              </audio>
+            ) : (
+              <span className="text-sm text-gray-400 italic">No audio available for this sample</span>
+            )}
           </div>
         </div>
       </div>
@@ -121,7 +121,10 @@ export function SimileExplanation({
           </p>
         </div>
         <div>
-          <SimileList similes={rankedSimiles} onRankChange={setRankedSimiles} />
+          <SimileList 
+            similes={rankedSimiles} 
+            onRankChange={setRankedSimiles} 
+          />
 
 
           <CustomSimileInput audioName={audioName} onSimileAdded={handleAddSimileToRanked} />
