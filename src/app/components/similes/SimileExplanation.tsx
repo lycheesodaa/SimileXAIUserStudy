@@ -112,12 +112,12 @@ export function SimileExplanation({
           </div> */}
 
           <p className="text-gray-600">
-            The system detects the following few similes to help explain this classification.
-            <br />
+            The system detects the following simile(s) to help explain this classification.
+            {/* <br />sm 
             You may rank them in the order of how helpful they are to you in understanding the given recording.
             <br />
             <br />
-            <span className="text-sm italic">Drag and drop the cards to reorder them.</span>
+            <span className="text-italic">Drag and drop the cards to reorder them.</span> */}
           </p>
         </div>
         <div>
