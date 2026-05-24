@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Info } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { LungSound } from '../../data_v2';
+import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip';
 
 interface CustomSimileInputProps {
   audioName: string;
@@ -73,8 +74,8 @@ export function CustomSimileInput({ audioName, originalAudioUrl, onSimileAdded }
       const blob = await response.blob();
       const audioUrl = URL.createObjectURL(blob);
 
-      // Save the visqol mos lqo similarity as the confidence score (fallback to 100 if unavailable)
-      const confidenceScore = visqolMosLqo !== null ? visqolMosLqo : 100;
+      // Save the visqol vnsim similarity as the confidence score (fallback to 100 if unavailable)
+      const confidenceScore = visqolVnsim !== null ? (visqolVnsim <= 1 ? visqolVnsim * 100 : visqolVnsim) : 100;
 
       const newSimile = {
         id: `custom-${Date.now()}`,
@@ -100,6 +101,7 @@ export function CustomSimileInput({ audioName, originalAudioUrl, onSimileAdded }
       }
 
       console.log('Local/development environment: falling back to local simile creation.');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const newSimile = {
         id: `custom-${Date.now()}`,
         text: customSimileText,
@@ -139,22 +141,31 @@ export function CustomSimileInput({ audioName, originalAudioUrl, onSimileAdded }
             }}
           />
         </div>
-        <span className="inline-block">
-          <Button
-            variant="outline"
-            onClick={handleAddSimile}
-            className="flex gap-2 min-w-[120px]"
-            disabled={isQuerying || !customSimileText.trim()}
-          >
-            {isQuerying ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Plus className="w-4 h-4" />
-            )}
-            {isQuerying ? 'Querying...' : 'Add Simile'}
-          </Button>
-        </span>
+            <span className="inline-block">
+              <Button
+                variant="outline"
+                onClick={handleAddSimile}
+                className="flex gap-2 min-w-[120px]"
+                disabled={isQuerying || !customSimileText.trim()}
+              >
+                {isQuerying ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4" />
+                )}
+                {isQuerying ? 'Querying...' : 'Add Simile'}
+              </Button>
+            </span>
       </div>
+      {isQuerying && (
+        <div className="text-xs text-blue-600 dark:text-blue-400 font-medium animate-pulse flex items-center gap-2 py-1.5 px-2 bg-blue-50/50 dark:bg-blue-950/20 rounded-md border border-blue-100/50 dark:border-blue-900/30 w-fit select-none">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+          </span>
+          <span>Generating custom audio comparison... (takes about 20 seconds)</span>
+        </div>
+      )}
       {error && (
         <p className="text-sm font-medium text-rose-500 select-none animate-in fade-in slide-in-from-top-1 duration-200">
           {error}
