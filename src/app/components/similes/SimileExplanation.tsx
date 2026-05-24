@@ -127,7 +127,11 @@ export function SimileExplanation({
           />
 
 
-          <CustomSimileInput audioName={audioName} onSimileAdded={handleAddSimileToRanked} />
+          <CustomSimileInput 
+            audioName={audioName} 
+            originalAudioUrl={originalAudioUrl} 
+            onSimileAdded={handleAddSimileToRanked} 
+          />
         </div>
       </div>
     </div>

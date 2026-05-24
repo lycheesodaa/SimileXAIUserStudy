@@ -6,10 +6,11 @@ import { LungSound } from '../../data_v2';
 
 interface CustomSimileInputProps {
   audioName: string;
+  originalAudioUrl?: string;
   onSimileAdded: (newSimile: LungSound['similes'][0]) => void;
 }
 
-export function CustomSimileInput({ audioName, onSimileAdded }: CustomSimileInputProps) {
+export function CustomSimileInput({ audioName, originalAudioUrl, onSimileAdded }: CustomSimileInputProps) {
   const [customSimileText, setCustomSimileText] = useState('');
   const [hasAddedCustomSimile, setHasAddedCustomSimile] = useState(false);
   const [isQuerying, setIsQuerying] = useState(false);
@@ -22,6 +23,9 @@ export function CustomSimileInput({ audioName, onSimileAdded }: CustomSimileInpu
     setError(null);
 
     try {
+      const fullPath = originalAudioUrl || audioName;
+      const filename = fullPath.split(/[/\\]/).pop() || fullPath;
+
       const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/generate-from-simile`, {
         method: 'POST',
         headers: {
@@ -30,7 +34,7 @@ export function CustomSimileInput({ audioName, onSimileAdded }: CustomSimileInpu
         },
         body: JSON.stringify({
           simile_text: customSimileText,
-          reference_audio_path: audioName // Using audioName as the path reference
+          reference_audio_path: filename
         }),
       });
 
