@@ -24,6 +24,9 @@ export interface LungSound {
     relatedFeatures: string;
     confidence: number;
     withinClassAudioUrl?: string;
+    visqolMosLqo?: number | null;
+    visqolVnsim?: number | null;
+    genToOrig?: number | null;
   }>;
 }
 

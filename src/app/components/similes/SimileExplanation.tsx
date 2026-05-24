@@ -7,7 +7,7 @@ import { Badge } from '../ui/badge';
 import { Slider } from '../ui/slider';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
-import { LungSound } from '../../data';
+import { LungSound } from '../../data_v2';
 
 interface SimileExplanationProps {
   audioName: string;

@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { ReferenceTable } from '../cues/ReferenceTable';
-import { LungSound } from '../../data';
+import { LungSound } from '../../data_v2';
 import { CUE_RELATIONS } from '../../cueRelations';
 
 interface AcousticFeature {
@@ -83,12 +83,7 @@ export function CombinedExplanation({
       <div className="mb-6">
         <div className="mb-4">
           <p className="text-gray-600">
-            The system detects the following few similes to help explain this classification.
-            <br />
-            You may rank them in the order of how helpful they are to you in understanding the given recording.
-            <br />
-            <br />
-            <span className="text-sm italic">Drag and drop the cards to reorder them.</span>
+            The system detects the following simile(s) to help explain this classification.
           </p>
         </div>
 

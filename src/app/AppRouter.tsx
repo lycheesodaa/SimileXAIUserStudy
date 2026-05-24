@@ -4,7 +4,7 @@ import { SimileExplanation } from './components/similes/SimileExplanation';
 import { CuesPractice } from './components/cues/CuesPractice';
 import { CuesExplanation } from './components/cues/CuesExplanation';
 import { CombinedExplanation } from './components/combined/CombinedExplanation';
-import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data';
+import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
 
 // ─── Sample Navigator ──────────────────────────────────────────────────────────
 // Shown on Simile test pages so users can switch pathology + sample without

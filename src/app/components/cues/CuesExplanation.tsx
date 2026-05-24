@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { ReferenceTable } from './ReferenceTable';
-import { LungSound } from '../../data';
+import { LungSound } from '../../data_v2';
 import { CUE_RELATIONS } from '../../cueRelations';
 
 interface AcousticFeature {
