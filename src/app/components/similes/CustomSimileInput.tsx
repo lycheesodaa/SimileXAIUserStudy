@@ -36,7 +36,8 @@ export function CustomSimileInput({ audioName, onSimileAdded }: CustomSimileInpu
         throw new Error(`Server responded with ${response.status}`);
       }
 
-      const data = await response.json();
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
 
       const newSimile = {
         id: `custom-${Date.now()}`,
@@ -44,6 +45,7 @@ export function CustomSimileInput({ audioName, onSimileAdded }: CustomSimileInpu
         category: 'User-Generated',
         relatedFeatures: 'Custom',
         confidence: 100,
+        withinClassAudioUrl: audioUrl,
       };
 
       onSimileAdded(newSimile);

@@ -81,16 +81,22 @@ export function SimileList({ similes, onRankChange }: SimileListProps) {
                 </div>
 
                 <div className="ml-4 flex items-center justify-center pt-2">
-                  {simile.withinClassAudioUrl && (
-                    <audio
-                      controls
-                      className="h-8 w-48"
-                      aria-label={`Audio example for: ${simile.text}`}
-                      src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${simile.withinClassAudioUrl}`}
-                    >
-                      Your browser does not support the audio element.
-                    </audio>
-                  )}
+                  {simile.withinClassAudioUrl && (() => {
+                    const isBlobOrAbsolute = simile.withinClassAudioUrl.startsWith('blob:') || simile.withinClassAudioUrl.startsWith('http');
+                    const audioSrc = isBlobOrAbsolute 
+                      ? simile.withinClassAudioUrl 
+                      : `${import.meta.env.BASE_URL.replace(/\/$/, '')}${simile.withinClassAudioUrl}`;
+                    return (
+                      <audio
+                        controls
+                        className="h-8 w-48"
+                        aria-label={`Audio example for: ${simile.text}`}
+                        src={audioSrc}
+                      >
+                        Your browser does not support the audio element.
+                      </audio>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
