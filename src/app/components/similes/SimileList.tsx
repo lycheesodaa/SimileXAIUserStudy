@@ -22,11 +22,10 @@ export function SimileList({ similes, onRankChange }: SimileListProps) {
                 <div className="flex-1">
                   <div className="flex items-start gap-4">
                     <div className="flex flex-col items-center justify-center mt-2">
-                      <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-sm border ${
-                        simile.category === 'Custom'
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center font-semibold text-sm border ${simile.category === 'Custom'
                           ? 'bg-blue-100 border-blue-200 text-blue-500'
                           : 'bg-gray-100 border-gray-200 text-gray-600'
-                      }`}>
+                        }`}>
                         {simile.category === 'Custom' ? 'C' : index + 1}
                       </div>
                     </div>
@@ -39,10 +38,10 @@ export function SimileList({ similes, onRankChange }: SimileListProps) {
                           </Badge>
                           {((simile.visqolVnsim !== undefined && simile.visqolVnsim !== null) || (simile.confidence !== undefined)) && (
                             <Badge variant="outline" className="border-blue-200 text-blue-500 bg-blue-50/50 font-medium">
-                              VNSIM Match: {(() => {
+                              {(() => {
                                 const rawVal = simile.visqolVnsim ?? simile.confidence ?? 100;
                                 return (rawVal <= 1 ? rawVal * 100 : rawVal).toFixed(1);
-                              })()}%
+                              })()}% Match
                             </Badge>
                           )}
                         </div>
@@ -68,8 +67,8 @@ export function SimileList({ similes, onRankChange }: SimileListProps) {
                 <div className="ml-4 flex items-center justify-center pt-2">
                   {simile.withinClassAudioUrl ? (() => {
                     const isBlobOrAbsolute = simile.withinClassAudioUrl.startsWith('blob:') || simile.withinClassAudioUrl.startsWith('http');
-                    const audioSrc = isBlobOrAbsolute 
-                      ? simile.withinClassAudioUrl 
+                    const audioSrc = isBlobOrAbsolute
+                      ? simile.withinClassAudioUrl
                       : `${import.meta.env.BASE_URL.replace(/\/$/, '')}${simile.withinClassAudioUrl}`;
                     return (
                       <audio
