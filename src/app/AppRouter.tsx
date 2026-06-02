@@ -6,6 +6,33 @@ import { CuesExplanation } from './components/cues/CuesExplanation';
 import { CombinedExplanation } from './components/combined/CombinedExplanation';
 import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const FIRST_PATHOLOGY = LUNG_SOUND_DATA[0]?.pathology || 'coarse_crackles';
+
+function resolvePathologyAndIndex(pathology: string | undefined, localIndexStr: string | undefined): number {
+  if (!pathology) return 0;
+  const filtered = LUNG_SOUND_DATA.filter((d) => d.pathology === pathology);
+  if (filtered.length === 0) return 0;
+
+  if (!localIndexStr) return LUNG_SOUND_DATA.indexOf(filtered[0]);
+
+  const parsed = parseInt(localIndexStr, 10);
+  if (isNaN(parsed) || parsed < 1 || parsed > filtered.length) {
+    return LUNG_SOUND_DATA.indexOf(filtered[0]);
+  }
+
+  return LUNG_SOUND_DATA.indexOf(filtered[parsed - 1]);
+}
+
+function getPathForGlobalIndex(currentIndex: number, basePath: string): string {
+  const target = LUNG_SOUND_DATA[currentIndex];
+  if (!target) return basePath;
+  const filtered = LUNG_SOUND_DATA.filter((d) => d.pathology === target.pathology);
+  const localIndex = filtered.indexOf(target) + 1;
+  return `${basePath}/${target.pathology}/${localIndex}`;
+}
+
 // ─── Sample Navigator ──────────────────────────────────────────────────────────
 // Shown on Simile test pages so users can switch pathology + sample without
 // having to manually edit the URL.
@@ -27,13 +54,13 @@ function SampleNavigator({ currentIndex, basePath }: SampleNavigatorProps) {
 
   const handlePathologyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newPathology = e.target.value;
-    const firstIndex = LUNG_SOUND_DATA.findIndex((d) => d.pathology === newPathology);
-    if (firstIndex >= 0) navigate(`${basePath}/${firstIndex + 1}`);
+    // Go to first sample of that pathology
+    navigate(`${basePath}/${newPathology}/1`);
   };
 
   const handleSampleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const globalIndex = parseInt(e.target.value, 10);
-    navigate(`${basePath}/${globalIndex + 1}`);
+    const localIdx = parseInt(e.target.value, 10);
+    navigate(`${basePath}/${current.pathology}/${localIdx + 1}`);
   };
 
   return (
@@ -78,7 +105,7 @@ function SampleNavigator({ currentIndex, basePath }: SampleNavigatorProps) {
       <label style={{ fontSize: '13px', color: '#0369a1' }}>
         Sample&nbsp;
         <select
-          value={currentIndex}
+          value={samplesForPathology.indexOf(current)}
           onChange={handleSampleChange}
           style={{
             fontSize: '13px',
@@ -90,10 +117,9 @@ function SampleNavigator({ currentIndex, basePath }: SampleNavigatorProps) {
             cursor: 'pointer',
           }}
         >
-          {samplesForPathology.map((d) => {
-            const globalIdx = LUNG_SOUND_DATA.indexOf(d);
+          {samplesForPathology.map((d, localIdx) => {
             return (
-              <option key={d.id} value={globalIdx}>
+              <option key={d.id} value={localIdx}>
                 {d.name}
               </option>
             );
@@ -104,7 +130,7 @@ function SampleNavigator({ currentIndex, basePath }: SampleNavigatorProps) {
       {/* Prev / Next buttons */}
       <div style={{ display: 'flex', gap: '6px', marginLeft: 'auto' }}>
         <button
-          onClick={() => currentIndex > 0 && navigate(`${basePath}/${currentIndex}`)}
+          onClick={() => currentIndex > 0 && navigate(getPathForGlobalIndex(currentIndex - 1, basePath))}
           disabled={currentIndex === 0}
           style={{
             fontSize: '12px',
@@ -121,7 +147,7 @@ function SampleNavigator({ currentIndex, basePath }: SampleNavigatorProps) {
         <button
           onClick={() =>
             currentIndex < LUNG_SOUND_DATA.length - 1 &&
-            navigate(`${basePath}/${currentIndex + 2}`)
+            navigate(getPathForGlobalIndex(currentIndex + 1, basePath))
           }
           disabled={currentIndex === LUNG_SOUND_DATA.length - 1}
           style={{
@@ -144,16 +170,9 @@ function SampleNavigator({ currentIndex, basePath }: SampleNavigatorProps) {
 
 // ─── Route Wrappers ────────────────────────────────────────────────────────────
 
-function resolveIndex(id: string | undefined): number {
-  if (!id) return 0;
-  const parsed = parseInt(id, 10);
-  if (!isNaN(parsed) && parsed > 0 && parsed <= LUNG_SOUND_DATA.length) return parsed - 1;
-  return 0;
-}
-
 function SimileExplanationWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const index = resolveIndex(id);
+  const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
+  const index = resolvePathologyAndIndex(pathology, localIndex);
   const data = LUNG_SOUND_DATA[index];
 
   return (
@@ -171,8 +190,8 @@ function SimileExplanationWrapper() {
 }
 
 function CuesExplanationWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const index = resolveIndex(id);
+  const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
+  const index = resolvePathologyAndIndex(pathology, localIndex);
   const data = LUNG_SOUND_DATA[index];
 
   const absoluteAudioFeatures = Object.entries(data.features).map(([key, val]) => ({
@@ -194,8 +213,8 @@ function CuesExplanationWrapper() {
 }
 
 function CombinedExplanationWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const index = resolveIndex(id);
+  const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
+  const index = resolvePathologyAndIndex(pathology, localIndex);
   const data = LUNG_SOUND_DATA[index];
 
   const absoluteAudioFeatures = Object.entries(data.features).map(([key, val]) => ({
@@ -229,16 +248,16 @@ export function AppRouter() {
 
           <Route path="/similes/practice" element={<SimilePractice />} />
 
-          <Route path="/similes/test" element={<Navigate to="/similes/test/1" replace />} />
-          <Route path="/similes/test/:id" element={<SimileExplanationWrapper />} />
+          <Route path="/similes/test" element={<Navigate to={`/similes/test/${FIRST_PATHOLOGY}/1`} replace />} />
+          <Route path="/similes/test/:pathology/:localIndex" element={<SimileExplanationWrapper />} />
 
           <Route path="/cues/practice" element={<CuesPractice />} />
 
-          <Route path="/cues/test" element={<Navigate to="/cues/test/1" replace />} />
-          <Route path="/cues/test/:id" element={<CuesExplanationWrapper />} />
+          <Route path="/cues/test" element={<Navigate to={`/cues/test/${FIRST_PATHOLOGY}/1`} replace />} />
+          <Route path="/cues/test/:pathology/:localIndex" element={<CuesExplanationWrapper />} />
 
-          <Route path="/combined/test" element={<Navigate to="/combined/test/1" replace />} />
-          <Route path="/combined/test/:id" element={<CombinedExplanationWrapper />} />
+          <Route path="/combined/test" element={<Navigate to={`/combined/test/${FIRST_PATHOLOGY}/1`} replace />} />
+          <Route path="/combined/test/:pathology/:localIndex" element={<CombinedExplanationWrapper />} />
         </Routes>
       </div>
     </HashRouter>

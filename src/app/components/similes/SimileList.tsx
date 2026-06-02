@@ -53,9 +53,12 @@ export function SimileList({ similes, onRankChange }: SimileListProps) {
                               {simile.category}
                             </Badge>
                           </div>
-                          {simile.confidence && (
+                          {((simile.visqolVnsim !== undefined && simile.visqolVnsim !== null) || (simile.confidence !== undefined)) && (
                             <Badge variant="outline" className="text-gray-500 font-medium">
-                              {simile.confidence}% Match
+                              {(() => {
+                                const rawVal = simile.visqolVnsim ?? simile.confidence ?? 100;
+                                return (rawVal <= 1 ? rawVal * 100 : rawVal).toFixed(1);
+                              })()}% Match
                             </Badge>
                           )}
                         </div>
