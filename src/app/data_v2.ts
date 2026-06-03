@@ -50,8 +50,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_9269_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -127,8 +130,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_10816_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -204,8 +210,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_13082_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -281,8 +290,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_24076_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Longer', continuity: 'Lower' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Longer', continuity: 'Lower' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Longer', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Longer', continuity: 'Lower' }
     },
     similes: [
       {
@@ -358,8 +370,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_9570_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -435,8 +450,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_10204_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Higher', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'normal': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -512,8 +530,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_11057_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Longer', continuity: 'Lower' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Longer', continuity: 'Lower' }
     },
     similes: [
       {
@@ -589,8 +610,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_11814_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -666,8 +690,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_13739_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -743,8 +770,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_594_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -820,8 +850,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_2644_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -897,8 +930,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_10038_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Higher', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -974,8 +1010,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_14537_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1051,8 +1090,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_18629_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1128,8 +1170,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_26060_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1205,8 +1250,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_28542_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1282,8 +1330,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_30751_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1359,8 +1410,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_32609_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1436,8 +1490,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_34529_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1513,8 +1570,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_24614_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1590,8 +1650,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_27508_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1667,8 +1730,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_31850_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'wheezes': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1744,8 +1810,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_33472_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'wheezes': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1821,8 +1890,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_38105_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      wheezes: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1898,8 +1970,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_11831_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      rhonchi: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Lower', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -1975,8 +2050,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_27004_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      rhonchi: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'wheezes': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -2052,8 +2130,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_32992_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      rhonchi: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {
@@ -2129,8 +2210,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_33222_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      rhonchi: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Lower', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'rhonchi': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Higher' },
+      'stridor': { pitch: 'Lower', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' }
     },
     similes: [
       {
@@ -2206,8 +2290,11 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_36284_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
-      normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
-      rhonchi: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
+      'coarse-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Similar' },
+      'fine-crackles': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'normal': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
+      'stridor': { pitch: 'Similar', loudness: 'Similar', duration: 'Shorter', continuity: 'Higher' },
+      'wheezes': { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' }
     },
     similes: [
       {

@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { Play, Pause, Volume2, MoreVertical } from 'lucide-react';
-import { Button } from '../ui/button';
+import { useState, useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -9,8 +7,16 @@ import {
   SelectValue,
 } from '../ui/select';
 import { ReferenceTable } from './ReferenceTable';
-import { LungSound } from '../../data_v2';
 import { CUE_RELATIONS } from '../../cueRelations';
+
+const BASELINE_TO_CLASS_INDEX: Record<string, string> = {
+  'coarse-crackles': 'class0',
+  'fine-crackles': 'class1',
+  'normal': 'class2',
+  'rhonchi': 'class3',
+  'stridor': 'class4',
+  'wheezes': 'class5',
+};
 
 interface AcousticFeature {
   name: string;
@@ -22,6 +28,20 @@ interface CuesExplanationProps {
   features: AcousticFeature[];
   comparisons?: Record<string, Record<string, string>>;
   highlightedMoments?: string[];
+  originalAudioUrl?: string;
+  pathology?: string;
+  sampleId?: string;
+  randomFoil?: boolean;
+}
+
+function getDeterministicFoil(sampleId: string, options: any[]) {
+  if (options.length === 0) return null;
+  let hash = 0;
+  for (let i = 0; i < sampleId.length; i++) {
+    hash = sampleId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % options.length;
+  return options[index];
 }
 
 export function CuesExplanation({
@@ -29,50 +49,83 @@ export function CuesExplanation({
   features,
   comparisons = {},
   highlightedMoments = [],
+  originalAudioUrl,
+  pathology,
+  sampleId,
+  randomFoil = false,
 }: CuesExplanationProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const baselineOptions = Object.values(CUE_RELATIONS);
-  const [selectedBaselineId, setSelectedBaselineId] = useState(baselineOptions[0].id);
+  const filteredOptions = Object.values(CUE_RELATIONS).filter(
+    (option) => comparisons && comparisons[option.id]
+  );
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
+  const baselineOptions = (randomFoil && sampleId)
+    ? [getDeterministicFoil(sampleId, filteredOptions)].filter(Boolean) as typeof filteredOptions
+    : filteredOptions;
 
-  const getFeatureText = (feature: AcousticFeature) => {
-    return (
-      <span className="capitalize">
-        <span className="font-semibold">{feature.name}:</span> {feature.value}
-      </span>
-    );
-  };
+  const [selectedBaselineId, setSelectedBaselineId] = useState(
+    baselineOptions[0]?.id || Object.values(CUE_RELATIONS)[0].id
+  );
 
+  useEffect(() => {
+    if (baselineOptions.length > 0 && !baselineOptions.some(o => o.id === selectedBaselineId)) {
+      setSelectedBaselineId(baselineOptions[0].id);
+    }
+  }, [comparisons, baselineOptions, selectedBaselineId]);
 
+  const classIndex = BASELINE_TO_CLASS_INDEX[selectedBaselineId];
+  let contrastAudioUrl = '';
+  if (originalAudioUrl && pathology && classIndex) {
+    const filename = originalAudioUrl.split('/').pop() || '';
+    const prefix = filename.replace('_original.wav', '');
+    contrastAudioUrl = `/audio/lungausc_v2/rexnet/${pathology}/${prefix}_vs_${classIndex}_contrast.wav`;
+  }
+
+  const selectedBaselineName = baselineOptions.find(o => o.id === selectedBaselineId)?.name || 'Comparison';
 
   return (
     <div className="w-full space-y-6 mx-3">
       {/* Audio Player Section */}
-      <div className="pt-6">
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600">Play this lung sound recording:</span>
-          <Button variant="ghost" size="icon" onClick={togglePlay}>
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-          </Button>
-          {/* <Button variant="ghost" size="icon">
-            <Volume2 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="w-4 h-4" />
-          </Button> */}
+      <div className="mb-6 pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+          <div className="flex flex-col gap-2">
+            <span className="text-gray-600 font-medium">Target Lung Sound (Current):</span>
+            {originalAudioUrl ? (
+              <audio
+                controls
+                className="w-full h-10"
+                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
+              >
+                Your browser does not support the audio element.
+              </audio>
+            ) : (
+              <span className="text-sm text-gray-400 italic">No audio available for this sample</span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-gray-600 font-medium">
+              Contrast Foil Sound ({selectedBaselineName}):
+            </span>
+            {contrastAudioUrl ? (
+              <audio
+                key={selectedBaselineId} // Key ensures the element reloads and updates the source immediately when selection changes
+                controls
+                className="w-full h-10"
+                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${contrastAudioUrl}`}
+              >
+                Your browser does not support the audio element.
+              </audio>
+            ) : (
+              <span className="text-sm text-gray-400 italic">No contrast audio available</span>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Analysis Section */}
       <div className="mb-6">
-        {/* <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Understanding Through Cues</h2>
-        </div> */}
         <div className="text-gray-600">
-          <div className="flex items-center mb-6">
+          <div className="flex items-center mb-6 flex-wrap gap-y-2">
             <span className="text-gray-600">The system has analyzed that compared to</span>
             <Select value={selectedBaselineId} onValueChange={setSelectedBaselineId}>
               <SelectTrigger className="w-[200px] mx-1">
@@ -86,16 +139,7 @@ export function CuesExplanation({
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="icon">
-              <Play className="w-4 h-4" />
-            </Button>
-            <span>, the current recording</span>
-            <Button variant="ghost" size="icon" onClick={togglePlay}>
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
-            <span>
-              has:
-            </span>
+            <span className="text-gray-600">, the current recording has:</span>
           </div>
 
           <div>

@@ -1,4 +1,5 @@
 import { HashRouter, Routes, Route, Navigate, useParams, useNavigate, useLocation } from 'react-router';
+import { createContext, useContext, useState } from 'react';
 import { SimilePractice } from './components/similes/SimilePractice';
 import { SimileExplanation } from './components/similes/SimileExplanation';
 import { CuesPractice } from './components/cues/CuesPractice';
@@ -6,6 +7,14 @@ import { CuesExplanation } from './components/cues/CuesExplanation';
 import { CombinedExplanation } from './components/combined/CombinedExplanation';
 import { ExampleExplanation } from './components/examples/ExampleExplanation';
 import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
+
+export const SettingsContext = createContext<{
+  randomFoil: boolean;
+  setRandomFoil: (val: boolean) => void;
+}>({
+  randomFoil: false,
+  setRandomFoil: () => {},
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -41,6 +50,7 @@ function getPathForGlobalIndex(currentIndex: number): string {
 function SampleNavigator() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { randomFoil, setRandomFoil } = useContext(SettingsContext);
 
   const pathParts = location.pathname.split('/');
   const xaiType = pathParts[1] || 'similes';
@@ -152,6 +162,19 @@ function SampleNavigator() {
             <option value="test">Test</option>
           </select>
         </label>
+
+        {/* Hide True Label (Single Foil) Checkbox */}
+        {(xaiType === 'rexnet' || xaiType === 'combined') && mode === 'test' && (
+          <label style={{ fontSize: '13px', color: '#0369a1', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', marginLeft: '8px' }}>
+            <input
+              type="checkbox"
+              checked={randomFoil}
+              onChange={(e) => setRandomFoil(e.target.checked)}
+              style={{ cursor: 'pointer' }}
+            />
+            Hide True Label (Single Foil)
+          </label>
+        )}
       </div>
 
       {/* Row 2: Pathology/Sample navigation (Only shown in Test mode) */}
@@ -294,6 +317,7 @@ function CuesExplanationWrapper() {
   const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
   const index = resolvePathologyAndIndex(pathology, localIndex);
   const data = LUNG_SOUND_DATA[index];
+  const { randomFoil } = useContext(SettingsContext);
 
   const absoluteAudioFeatures = Object.entries(data.features).map(([key, val]) => ({
     name: key,
@@ -302,10 +326,14 @@ function CuesExplanationWrapper() {
 
   return (
     <CuesExplanation
+      sampleId={data.id}
       audioName={data.name}
       features={absoluteAudioFeatures}
       comparisons={data.CFcomparison}
       highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
+      originalAudioUrl={data.originalAudioUrl}
+      pathology={data.pathology}
+      randomFoil={randomFoil}
     />
   );
 }
@@ -314,6 +342,7 @@ function CombinedExplanationWrapper() {
   const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
   const index = resolvePathologyAndIndex(pathology, localIndex);
   const data = LUNG_SOUND_DATA[index];
+  const { randomFoil } = useContext(SettingsContext);
 
   const absoluteAudioFeatures = Object.entries(data.features).map(([key, val]) => ({
     name: key,
@@ -322,6 +351,7 @@ function CombinedExplanationWrapper() {
 
   return (
     <CombinedExplanation
+      sampleId={data.id}
       audioName={data.name}
       classification={data.type}
       confidence={87}
@@ -330,6 +360,8 @@ function CombinedExplanationWrapper() {
       comparisons={data.CFcomparison}
       highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
       originalAudioUrl={data.originalAudioUrl}
+      pathology={data.pathology}
+      randomFoil={randomFoil}
     />
   );
 }
@@ -374,39 +406,43 @@ function NavigateToRexnet() {
 }
 
 export function AppRouter() {
+  const [randomFoil, setRandomFoil] = useState(false);
+
   return (
-    <HashRouter>
-      <div className="w-full bg-transparent">
-        <SampleNavigator />
-        <Routes>
-          <Route path="/" element={<Navigate to="/similes/practice" replace />} />
+    <SettingsContext.Provider value={{ randomFoil, setRandomFoil }}>
+      <HashRouter>
+        <div className="w-full bg-transparent">
+          <SampleNavigator />
+          <Routes>
+            <Route path="/" element={<Navigate to="/similes/practice" replace />} />
 
-          {/* Similes */}
-          <Route path="/similes/practice" element={<SimilePractice />} />
-          <Route path="/similes/test" element={<Navigate to={`/similes/test/${FIRST_PATHOLOGY}/1`} replace />} />
-          <Route path="/similes/test/:pathology/:localIndex" element={<SimileExplanationWrapper />} />
+            {/* Similes */}
+            <Route path="/similes/practice" element={<SimilePractice />} />
+            <Route path="/similes/test" element={<Navigate to={`/similes/test/${FIRST_PATHOLOGY}/1`} replace />} />
+            <Route path="/similes/test/:pathology/:localIndex" element={<SimileExplanationWrapper />} />
 
-          {/* RexNet */}
-          <Route path="/rexnet/practice" element={<CuesPractice />} />
-          <Route path="/rexnet/test" element={<Navigate to={`/rexnet/test/${FIRST_PATHOLOGY}/1`} replace />} />
-          <Route path="/rexnet/test/:pathology/:localIndex" element={<CuesExplanationWrapper />} />
+            {/* RexNet */}
+            <Route path="/rexnet/practice" element={<CuesPractice />} />
+            <Route path="/rexnet/test" element={<Navigate to={`/rexnet/test/${FIRST_PATHOLOGY}/1`} replace />} />
+            <Route path="/rexnet/test/:pathology/:localIndex" element={<CuesExplanationWrapper />} />
 
-          {/* Onomatopoeia */}
-          <Route path="/onomatopoeia/practice" element={<SimilePractice isOnomatopoeia={true} />} />
-          <Route path="/onomatopoeia/test" element={<Navigate to={`/onomatopoeia/test/${FIRST_PATHOLOGY}/1`} replace />} />
-          <Route path="/onomatopoeia/test/:pathology/:localIndex" element={<OnomatopoeiaExplanationWrapper />} />
+            {/* Onomatopoeia */}
+            <Route path="/onomatopoeia/practice" element={<SimilePractice isOnomatopoeia={true} />} />
+            <Route path="/onomatopoeia/test" element={<Navigate to={`/onomatopoeia/test/${FIRST_PATHOLOGY}/1`} replace />} />
+            <Route path="/onomatopoeia/test/:pathology/:localIndex" element={<OnomatopoeiaExplanationWrapper />} />
 
-          {/* Examples */}
-          <Route path="/examples/practice" element={<ExamplesPractice />} />
-          <Route path="/examples/test" element={<Navigate to={`/examples/test/${FIRST_PATHOLOGY}/1`} replace />} />
-          <Route path="/examples/test/:pathology/:localIndex" element={<ExampleExplanationWrapper />} />
+            {/* Examples */}
+            <Route path="/examples/practice" element={<ExamplesPractice />} />
+            <Route path="/examples/test" element={<Navigate to={`/examples/test/${FIRST_PATHOLOGY}/1`} replace />} />
+            <Route path="/examples/test/:pathology/:localIndex" element={<ExampleExplanationWrapper />} />
 
-          {/* Legacy redirects for cues */}
-          <Route path="/cues/practice" element={<Navigate to="/rexnet/practice" replace />} />
-          <Route path="/cues/test" element={<Navigate to="/rexnet/test" replace />} />
-          <Route path="/cues/test/:pathology/:localIndex" element={<NavigateToRexnet />} />
-        </Routes>
-      </div>
-    </HashRouter>
+            {/* Legacy redirects for cues */}
+            <Route path="/cues/practice" element={<Navigate to="/rexnet/practice" replace />} />
+            <Route path="/cues/test" element={<Navigate to="/rexnet/test" replace />} />
+            <Route path="/cues/test/:pathology/:localIndex" element={<NavigateToRexnet />} />
+          </Routes>
+        </div>
+      </HashRouter>
+    </SettingsContext.Provider>
   );
 }

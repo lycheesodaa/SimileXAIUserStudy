@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause, Plus, Loader2 } from 'lucide-react';
 import { SimileList } from '../similes/SimileList';
 import { CustomSimileInput } from '../similes/CustomSimileInput';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Input } from '../ui/input';
 import {
   Select,
   SelectContent,
@@ -15,6 +11,15 @@ import {
 import { ReferenceTable } from '../cues/ReferenceTable';
 import { LungSound } from '../../data_v2';
 import { CUE_RELATIONS } from '../../cueRelations';
+
+const BASELINE_TO_CLASS_INDEX: Record<string, string> = {
+  'coarse-crackles': 'class0',
+  'fine-crackles': 'class1',
+  'normal': 'class2',
+  'rhonchi': 'class3',
+  'stridor': 'class4',
+  'wheezes': 'class5',
+};
 
 interface AcousticFeature {
   name: string;
@@ -30,6 +35,19 @@ interface CombinedExplanationProps {
   comparisons?: Record<string, Record<string, string>>;
   highlightedMoments?: string[];
   originalAudioUrl?: string;
+  pathology?: string;
+  sampleId?: string;
+  randomFoil?: boolean;
+}
+
+function getDeterministicFoil(sampleId: string, options: any[]) {
+  if (options.length === 0) return null;
+  let hash = 0;
+  for (let i = 0; i < sampleId.length; i++) {
+    hash = sampleId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % options.length;
+  return options[index];
 }
 
 export function CombinedExplanation({
@@ -41,39 +59,85 @@ export function CombinedExplanation({
   comparisons = {},
   highlightedMoments = [],
   originalAudioUrl,
+  pathology,
+  sampleId,
+  randomFoil = false,
 }: CombinedExplanationProps) {
   // Simile State
   const [rankedSimiles, setRankedSimiles] = useState<LungSound['similes']>(similes);
 
   // Cues State
-  const baselineOptions = Object.values(CUE_RELATIONS);
-  const [selectedBaselineId, setSelectedBaselineId] = useState(baselineOptions[0].id);
+  const filteredOptions = Object.values(CUE_RELATIONS).filter(
+    (option) => comparisons && comparisons[option.id]
+  );
+
+  const baselineOptions = (randomFoil && sampleId)
+    ? [getDeterministicFoil(sampleId, filteredOptions)].filter(Boolean) as typeof filteredOptions
+    : filteredOptions;
+
+  const [selectedBaselineId, setSelectedBaselineId] = useState(
+    baselineOptions[0]?.id || Object.values(CUE_RELATIONS)[0].id
+  );
 
   useEffect(() => {
     setRankedSimiles(similes);
   }, [similes]);
 
+  useEffect(() => {
+    if (baselineOptions.length > 0 && !baselineOptions.some(o => o.id === selectedBaselineId)) {
+      setSelectedBaselineId(baselineOptions[0].id);
+    }
+  }, [comparisons, baselineOptions, selectedBaselineId]);
+
   const handleAddSimileToRanked = (newSimile: LungSound['similes'][0]) => {
     setRankedSimiles([...rankedSimiles, newSimile]);
   };
 
+  const classIndex = BASELINE_TO_CLASS_INDEX[selectedBaselineId];
+  let contrastAudioUrl = '';
+  if (originalAudioUrl && pathology && classIndex) {
+    const filename = originalAudioUrl.split('/').pop() || '';
+    const prefix = filename.replace('_original.wav', '');
+    contrastAudioUrl = `/audio/lungausc_v2/rexnet/${pathology}/${prefix}_vs_${classIndex}_contrast.wav`;
+  }
+
+  const selectedBaselineName = baselineOptions.find(o => o.id === selectedBaselineId)?.name || 'Comparison';
+
   return (
     <div className="space-y-6 mx-3 pb-12">
       {/* 1. Shared Audio Player Section */}
-      <div className="mb-6">
-        <div className="pt-6">
+      <div className="mb-6 pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
           <div className="flex flex-col gap-2">
-            <span className="text-gray-600">Play this lung sound recording:</span>
+            <span className="text-gray-600 font-medium">Target Lung Sound (Current):</span>
             {originalAudioUrl ? (
               <audio
                 controls
-                className="w-full max-w-md h-10"
+                className="w-full h-10"
                 src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
               >
                 Your browser does not support the audio element.
               </audio>
             ) : (
               <span className="text-sm text-gray-400 italic">No audio available for this sample</span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-gray-600 font-medium">
+              Contrast Foil Sound ({selectedBaselineName}):
+            </span>
+            {contrastAudioUrl ? (
+              <audio
+                key={selectedBaselineId} // Key ensures the element reloads and updates the source immediately when selection changes
+                controls
+                className="w-full h-10"
+                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${contrastAudioUrl}`}
+              >
+                Your browser does not support the audio element.
+              </audio>
+            ) : (
+              <span className="text-sm text-gray-400 italic">No contrast audio available</span>
             )}
           </div>
         </div>
@@ -104,7 +168,7 @@ export function CombinedExplanation({
       {/* 3. Cue-Based Explanations */}
       <div className="mb-6 border-t pt-4">
         <div className="text-gray-600">
-          <div className="flex items-center mb-6">
+          <div className="flex items-center mb-6 flex-wrap gap-y-2">
             <span className="text-gray-600">In addition, the system has analyzed that compared to</span>
             <Select value={selectedBaselineId} onValueChange={setSelectedBaselineId}>
               <SelectTrigger className="w-[200px] mx-1">
@@ -118,7 +182,7 @@ export function CombinedExplanation({
                 ))}
               </SelectContent>
             </Select>
-            <span>, the current recording has:</span>
+            <span className="text-gray-600">, the current recording has:</span>
           </div>
 
           <div>
