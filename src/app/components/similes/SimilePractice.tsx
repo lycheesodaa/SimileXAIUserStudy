@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Play, Pause } from "lucide-react";
 import { Button } from "../ui/button";
 
-export function SimilePractice() {
+interface SimilePracticeProps {
+  isOnomatopoeia?: boolean;
+}
+
+export function SimilePractice({ isOnomatopoeia = false }: SimilePracticeProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
 
   const togglePlay = (id: string) => {
@@ -13,13 +17,13 @@ export function SimilePractice() {
     <div className="my-6 mx-3">
       <div className="space-y-4 text-gray-700">
         <p className="text-gray-600">
-          In this section, you can review how different lung sound categories may be mapped to everyday sounds.
+          In this section, you can review how different lung sound categories may be mapped to {isOnomatopoeia ? 'onomatopoeic sounds (words that imitate the sound)' : 'everyday sounds'}.
         </p>
         <p>
-          These are known as similes. Similes can provide intuitive ways to recognize and communicate lung sounds.
+          These are known as {isOnomatopoeia ? 'onomatopoeias' : 'similes'}. {isOnomatopoeia ? 'Onomatopoeias' : 'Similes'} can provide intuitive ways to recognize and communicate lung sounds.
         </p>
         <p>
-          <i>Some similes may be more intuitive than others, and it may be helpful to take a few seconds to internalize the associations
+          <i>Some {isOnomatopoeia ? 'onomatopoeias' : 'similes'} may be more intuitive than others, and it may be helpful to take a few seconds to internalize the associations
             to improve efficiency of recognition.</i>
         </p>
         {/* <div className="bg-blue-50 p-4 rounded-md border border-blue-100">

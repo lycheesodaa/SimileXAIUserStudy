@@ -15,6 +15,7 @@ interface SimileExplanationProps {
   confidence: number;
   similes: LungSound['similes'];
   originalAudioUrl?: string;
+  isOnomatopoeia?: boolean;
 }
 
 export function SimileExplanation({
@@ -23,6 +24,7 @@ export function SimileExplanation({
   confidence,
   similes,
   originalAudioUrl,
+  isOnomatopoeia = false,
 }: SimileExplanationProps) {
   const [rankedSimiles, setRankedSimiles] = useState<LungSound['similes']>(similes);
   const [simileRatings, setSimileRatings] = useState<{ [key: string]: number }>({});
@@ -112,7 +114,7 @@ export function SimileExplanation({
           </div> */}
 
           <p className="text-gray-600">
-            The system detects the following simile(s) to help explain this classification.
+            The system detects the following {isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} to help explain this classification.
             {/* <br />sm 
             You may rank them in the order of how helpful they are to you in understanding the given recording.
             <br />
