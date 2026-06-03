@@ -38,7 +38,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Coarse Crackles',
     pathology: 'coarse_crackles',
     description: 'Low-pitched, moist, bubbling sounds present during inspiration and sometimes expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/coarse_crackles/coarse crackle_9269_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_9269_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -86,7 +86,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Coarse Crackles',
     pathology: 'coarse_crackles',
     description: 'Low-pitched, moist, bubbling sounds present during inspiration and sometimes expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/coarse_crackles/coarse crackle_10816_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_10816_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -134,7 +134,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Coarse Crackles',
     pathology: 'coarse_crackles',
     description: 'Low-pitched, moist, bubbling sounds present during inspiration and sometimes expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/coarse_crackles/coarse crackle_13082_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_13082_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -182,7 +182,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Coarse Crackles',
     pathology: 'coarse_crackles',
     description: 'Low-pitched, moist, bubbling sounds present during inspiration and sometimes expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/coarse_crackles/coarse crackle_24076_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/coarse_crackles/coarse crackle_24076_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -230,7 +230,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Fine Crackles',
     pathology: 'fine_crackles',
     description: 'Discontinuous, high-pitched, short popping sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/fine_crackles/fine crackle_9570_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_9570_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -278,7 +278,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Fine Crackles',
     pathology: 'fine_crackles',
     description: 'Discontinuous, high-pitched, short popping sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/fine_crackles/fine crackle_10204_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_10204_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -326,7 +326,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Fine Crackles',
     pathology: 'fine_crackles',
     description: 'Discontinuous, high-pitched, short popping sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/fine_crackles/fine crackle_11057_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_11057_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -374,7 +374,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Fine Crackles',
     pathology: 'fine_crackles',
     description: 'Discontinuous, high-pitched, short popping sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/fine_crackles/fine crackle_11814_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_11814_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -422,7 +422,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Fine Crackles',
     pathology: 'fine_crackles',
     description: 'Discontinuous, high-pitched, short popping sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/fine_crackles/fine crackle_13739_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/fine_crackles/fine crackle_13739_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Discontinuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -470,7 +470,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Normal',
     pathology: 'normal',
     description: 'Normal vesicular breath sounds — soft, low-pitched sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/normal/normal_594_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_594_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -518,7 +518,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Normal',
     pathology: 'normal',
     description: 'Normal vesicular breath sounds — soft, low-pitched sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/normal/normal_2644_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_2644_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -566,7 +566,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Normal',
     pathology: 'normal',
     description: 'Normal vesicular breath sounds — soft, low-pitched sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/normal/normal_10038_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_10038_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -614,7 +614,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Normal',
     pathology: 'normal',
     description: 'Normal vesicular breath sounds — soft, low-pitched sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/normal/normal_14537_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_14537_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -662,7 +662,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Normal',
     pathology: 'normal',
     description: 'Normal vesicular breath sounds — soft, low-pitched sounds heard during inspiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/normal/normal_18629_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/normal/normal_18629_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       fine_crackles: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -710,7 +710,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Rhonchi',
     pathology: 'rhonchi',
     description: 'Low-pitched, snoring-quality, continuous sounds caused by airway secretions.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/rhonchi/rhonchi_26060_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_26060_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -758,7 +758,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Rhonchi',
     pathology: 'rhonchi',
     description: 'Low-pitched, snoring-quality, continuous sounds caused by airway secretions.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/rhonchi/rhonchi_28542_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_28542_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -806,7 +806,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Rhonchi',
     pathology: 'rhonchi',
     description: 'Low-pitched, snoring-quality, continuous sounds caused by airway secretions.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/rhonchi/rhonchi_30751_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_30751_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -854,7 +854,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Rhonchi',
     pathology: 'rhonchi',
     description: 'Low-pitched, snoring-quality, continuous sounds caused by airway secretions.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/rhonchi/rhonchi_32609_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_32609_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -902,7 +902,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Rhonchi',
     pathology: 'rhonchi',
     description: 'Low-pitched, snoring-quality, continuous sounds caused by airway secretions.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/rhonchi/rhonchi_34529_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/rhonchi/rhonchi_34529_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -950,7 +950,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Stridor',
     pathology: 'stridor',
     description: 'High-pitched, harsh, musical sound caused by turbulent airflow through a narrowed airway.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/stridor/stridor_24614_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_24614_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -998,7 +998,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Stridor',
     pathology: 'stridor',
     description: 'High-pitched, harsh, musical sound caused by turbulent airflow through a narrowed airway.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/stridor/stridor_27508_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_27508_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1046,7 +1046,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Stridor',
     pathology: 'stridor',
     description: 'High-pitched, harsh, musical sound caused by turbulent airflow through a narrowed airway.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/stridor/stridor_31850_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_31850_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1094,7 +1094,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Stridor',
     pathology: 'stridor',
     description: 'High-pitched, harsh, musical sound caused by turbulent airflow through a narrowed airway.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/stridor/stridor_33472_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_33472_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1142,7 +1142,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Stridor',
     pathology: 'stridor',
     description: 'High-pitched, harsh, musical sound caused by turbulent airflow through a narrowed airway.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/stridor/stridor_38105_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/stridor/stridor_38105_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1190,7 +1190,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Wheezes',
     pathology: 'wheezes',
     description: 'Continuous, musical, high-pitched sounds heard during expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/wheezes/wheeze_11831_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_11831_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1238,7 +1238,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Wheezes',
     pathology: 'wheezes',
     description: 'Continuous, musical, high-pitched sounds heard during expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/wheezes/wheeze_27004_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_27004_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1286,7 +1286,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Wheezes',
     pathology: 'wheezes',
     description: 'Continuous, musical, high-pitched sounds heard during expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/wheezes/wheeze_32992_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_32992_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1334,7 +1334,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Wheezes',
     pathology: 'wheezes',
     description: 'Continuous, musical, high-pitched sounds heard during expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/wheezes/wheeze_33222_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_33222_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
@@ -1382,7 +1382,7 @@ export const LUNG_SOUND_DATA: LungSound[] = [
     type: 'Wheezes',
     pathology: 'wheezes',
     description: 'Continuous, musical, high-pitched sounds heard during expiration.',
-    originalAudioUrl: '/audio/lungausc_v2/similes/wheezes/wheeze_36284_original.wav',
+    originalAudioUrl: '/audio/lungausc_v2/original/wheezes/wheeze_36284_original.wav',
     features: { pitch: 'Medium', loudness: 'Medium', duration: 'Medium', continuity: 'Continuous' },
     CFcomparison: {
       normal: { pitch: 'Similar', loudness: 'Similar', duration: 'Similar', continuity: 'Similar' },
