@@ -64,10 +64,8 @@ export function SimileExplanationV3({
 
   const getAudioUrl = (path: string | undefined) => {
     if (!path) return '';
-    if (path.startsWith('http') || path.startsWith('blob:')) return path;
-    const baseUrl = (import.meta.env.VITE_SERVER_URL || '').replace(/\/$/, '');
-    const apiKey = import.meta.env.VITE_API_KEY;
-    return `${baseUrl}${path}${apiKey ? `?api_key=${apiKey}` : ''}`;
+    // All audio URLs are now absolute S3 paths, no need for server prepending
+    return path;
   };
 
   return (
