@@ -62,6 +62,14 @@ export function SimileExplanationV3({
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  const getAudioUrl = (path: string | undefined) => {
+    if (!path) return '';
+    if (path.startsWith('http') || path.startsWith('blob:')) return path;
+    const baseUrl = (import.meta.env.VITE_SERVER_URL || '').replace(/\/$/, '');
+    const apiKey = import.meta.env.VITE_API_KEY;
+    return `${baseUrl}${path}${apiKey ? `?api_key=${apiKey}` : ''}`;
+  };
+
   return (
     <>
       <div className="space-y-6 mx-3">
@@ -74,7 +82,7 @@ export function SimileExplanationV3({
               <audio
                 controls
                 className="w-full max-w-md h-10"
-                src={originalAudioUrl.startsWith('http') || originalAudioUrl.startsWith('blob:') ? originalAudioUrl : `${(import.meta.env.VITE_SERVER_URL || '').replace(/\/$/, '')}${originalAudioUrl}`}
+                src={getAudioUrl(originalAudioUrl)}
               >
                 Your browser does not support the audio element.
               </audio>
@@ -115,7 +123,7 @@ export function SimileExplanationV3({
                   <div className="flex justify-end items-center gap-2 text-right text-sm text-gray-700 leading-tight">
                     <span>{s.text}</span>
                     {s.withinClassAudioUrl && (
-                      <SimileAudioPlayer url={s.withinClassAudioUrl.startsWith('http') || s.withinClassAudioUrl.startsWith('blob:') ? s.withinClassAudioUrl : `${(import.meta.env.VITE_SERVER_URL || '').replace(/\/$/, '')}${s.withinClassAudioUrl}`} />
+                      <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} />
                     )}
                   </div>
                   <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm">
