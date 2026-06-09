@@ -7,6 +7,8 @@ import { CuesExplanation } from './components/cues/CuesExplanation';
 import { CombinedExplanation } from './components/combined/CombinedExplanation';
 import { ExampleExplanation } from './components/examples/ExampleExplanation';
 import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
+import { LUNG_SOUND_DATA_V3 } from './data_v3';
+import { SimileExplanationV3 } from './components/similes/SimileExplanationV3';
 
 export const SettingsContext = createContext<{
   randomFoil: boolean;
@@ -58,15 +60,36 @@ function SampleNavigator() {
   const pathology = pathParts[3] || FIRST_PATHOLOGY;
   const localIndexStr = pathParts[4] || '1';
 
-  // Find index in LUNG_SOUND_DATA
-  const index = resolvePathologyAndIndex(pathology, localIndexStr);
-  const current = LUNG_SOUND_DATA[index];
+  // Select data source based on xaiType
+  const dataSource = xaiType === 'similes_v3' ? LUNG_SOUND_DATA_V3 : LUNG_SOUND_DATA;
+
+  // Custom resolve based on dataSource
+  const resolveForDataSource = (path: string, locIdxStr: string, arr: any[]) => {
+    const filtered = arr.filter((d) => d.pathology === path);
+    if (filtered.length === 0) return 0;
+    const parsed = parseInt(locIdxStr, 10);
+    if (isNaN(parsed) || parsed < 1 || parsed > filtered.length) {
+      return arr.indexOf(filtered[0]);
+    }
+    return arr.indexOf(filtered[parsed - 1]);
+  };
+
+  const getPathForDataIndex = (currentIndex: number, arr: any[]) => {
+    const target = arr[currentIndex];
+    if (!target) return '';
+    const filtered = arr.filter((d) => d.pathology === target.pathology);
+    const localIdx = filtered.indexOf(target) + 1;
+    return `${target.pathology}/${localIdx}`;
+  };
+
+  const index = resolveForDataSource(pathology, localIndexStr, dataSource);
+  const current = dataSource[index];
 
   // Derive unique pathologies in insertion order
-  const pathologies = Array.from(new Set(LUNG_SOUND_DATA.map((d) => d.pathology)));
+  const pathologies = Array.from(new Set(dataSource.map((d) => d.pathology)));
 
   // Samples for the currently selected pathology
-  const samplesForPathology = LUNG_SOUND_DATA.filter((d) => d.pathology === current.pathology);
+  const samplesForPathology = dataSource.filter((d) => d.pathology === current?.pathology);
 
   const handleXaiTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newXaiType = e.target.value;
@@ -97,7 +120,7 @@ function SampleNavigator() {
   };
 
   const prevIndex = index > 0 ? index - 1 : null;
-  const nextIndex = index < LUNG_SOUND_DATA.length - 1 ? index + 1 : null;
+  const nextIndex = index < dataSource.length - 1 ? index + 1 : null;
 
   return (
     <div
@@ -136,6 +159,7 @@ function SampleNavigator() {
             }}
           >
             <option value="similes">Similes</option>
+            <option value="similes_v3">Similes V3</option>
             <option value="rexnet">RexNet</option>
             <option value="onomatopoeia">Onomatopoeia</option>
             <option value="examples">Examples</option>
@@ -242,7 +266,7 @@ function SampleNavigator() {
           {/* Prev / Next buttons */}
           <div style={{ display: 'flex', gap: '6px', marginLeft: 'auto' }}>
             <button
-              onClick={() => prevIndex !== null && navigate(`/${xaiType}/test/${getPathForGlobalIndex(prevIndex)}`)}
+              onClick={() => prevIndex !== null && navigate(`/${xaiType}/test/${getPathForDataIndex(prevIndex, dataSource)}`)}
               disabled={prevIndex === null}
               style={{
                 fontSize: '12px',
@@ -257,7 +281,7 @@ function SampleNavigator() {
               ← Prev
             </button>
             <button
-              onClick={() => nextIndex !== null && navigate(`/${xaiType}/test/${getPathForGlobalIndex(nextIndex)}`)}
+              onClick={() => nextIndex !== null && navigate(`/${xaiType}/test/${getPathForDataIndex(nextIndex, dataSource)}`)}
               disabled={nextIndex === null}
               style={{
                 fontSize: '12px',
@@ -290,6 +314,40 @@ function SimileExplanationWrapper() {
       audioName={data.name}
       classification={data.type}
       confidence={87}
+      similes={data.similes}
+      originalAudioUrl={data.originalAudioUrl}
+    />
+  );
+}
+
+function SimileExplanationV3Wrapper() {
+  const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
+  
+  // Custom resolver for V3
+  const resolveV3 = () => {
+    if (!pathology) return 0;
+    const filtered = LUNG_SOUND_DATA_V3.filter((d) => d.pathology === pathology);
+    if (filtered.length === 0) return 0;
+
+    if (!localIndex) return LUNG_SOUND_DATA_V3.indexOf(filtered[0]);
+
+    const parsed = parseInt(localIndex, 10);
+    if (isNaN(parsed) || parsed < 1 || parsed > filtered.length) {
+      return LUNG_SOUND_DATA_V3.indexOf(filtered[0]);
+    }
+
+    return LUNG_SOUND_DATA_V3.indexOf(filtered[parsed - 1]);
+  };
+  
+  const index = resolveV3();
+  const data = LUNG_SOUND_DATA_V3[index];
+
+  if (!data) return <div>Data not found</div>;
+
+  return (
+    <SimileExplanationV3
+      audioName={data.name}
+      classification={data.type}
       similes={data.similes}
       originalAudioUrl={data.originalAudioUrl}
     />
@@ -420,6 +478,11 @@ export function AppRouter() {
             <Route path="/similes/practice" element={<SimilePractice />} />
             <Route path="/similes/test" element={<Navigate to={`/similes/test/${FIRST_PATHOLOGY}/1`} replace />} />
             <Route path="/similes/test/:pathology/:localIndex" element={<SimileExplanationWrapper />} />
+
+            {/* Similes V3 */}
+            <Route path="/similes_v3/practice" element={<SimilePractice />} />
+            <Route path="/similes_v3/test" element={<Navigate to={`/similes_v3/test/${FIRST_PATHOLOGY}/1`} replace />} />
+            <Route path="/similes_v3/test/:pathology/:localIndex" element={<SimileExplanationV3Wrapper />} />
 
             {/* RexNet */}
             <Route path="/rexnet/practice" element={<CuesPractice />} />
