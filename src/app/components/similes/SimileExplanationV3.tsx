@@ -74,7 +74,7 @@ export function SimileExplanationV3({
               <audio
                 controls
                 className="w-full max-w-md h-10"
-                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
+                src={originalAudioUrl.startsWith('http') || originalAudioUrl.startsWith('blob:') ? originalAudioUrl : `${(import.meta.env.VITE_SERVER_URL || '').replace(/\/$/, '')}${originalAudioUrl}`}
               >
                 Your browser does not support the audio element.
               </audio>
@@ -115,7 +115,7 @@ export function SimileExplanationV3({
                   <div className="flex justify-end items-center gap-2 text-right text-sm text-gray-700 leading-tight">
                     <span>{s.text}</span>
                     {s.withinClassAudioUrl && (
-                      <SimileAudioPlayer url={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${s.withinClassAudioUrl}`} />
+                      <SimileAudioPlayer url={s.withinClassAudioUrl.startsWith('http') || s.withinClassAudioUrl.startsWith('blob:') ? s.withinClassAudioUrl : `${(import.meta.env.VITE_SERVER_URL || '').replace(/\/$/, '')}${s.withinClassAudioUrl}`} />
                     )}
                   </div>
                   <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm">
