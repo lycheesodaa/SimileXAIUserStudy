@@ -15,6 +15,10 @@ export function useStudyInstrumentation(
   useEffect(() => {
     if (!logger || !xaiCfg) return;
 
+    // 'minimal' (e.g. the noxai control): session lifecycle, audio and
+    // visibility/focus only — no click or scroll tracking.
+    const minimal = xaiCfg.logging === 'minimal';
+
     const mountT = performance.now();
     const playCounts: Record<string, number> = {};
 
@@ -79,7 +83,7 @@ export function useStudyInstrumentation(
         text: interactive.textContent?.trim().slice(0, 60) || undefined,
       });
     };
-    document.addEventListener('click', onClick, true);
+    if (!minimal) document.addEventListener('click', onClick, true);
 
     // ── Scroll depth (throttled, 10% buckets, max only) ──────────────────────
     let maxBucket = 0;
@@ -99,7 +103,7 @@ export function useStudyInstrumentation(
     const onScroll = () => {
       if (scrollTimer === null) scrollTimer = window.setTimeout(measureScroll, 500);
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
+    if (!minimal) window.addEventListener('scroll', onScroll, { passive: true });
 
     // ── Visibility / focus ───────────────────────────────────────────────────
     const onVisibility = () => {

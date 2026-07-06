@@ -70,8 +70,8 @@ Field semantics:
 | `pid` | Participant id (Prolific PID / Qualtrics ResponseID), or `"unknown"`. Opaque string. |
 | `domain` | Study domain, currently `"lung"`. More domains later. |
 | `mode` | `"train"` (practice page, no sample) or `"test"` (one sample's explanation). |
-| `sampleId` | Dataset sample id; `"none"` in train mode. |
-| `xaiType` | Explanation UI variant, currently `"similes_v3"`. |
+| `sampleId` | Dataset sample id; `"none"` in train mode. Opaque string — currently `icbhi_*` (v3 dataset: similes_v3, noxai) or `lungausc_<n>` (v2 dataset aliases: rexnet, rexnet_foil, onomatopoeia, examples). The audio sample set will eventually move to a v4 set with new ids — **do not validate or enumerate sample ids server-side.** |
+| `xaiType` | Explanation UI condition. Currently one of `"similes_v3"`, `"rexnet"`, `"rexnet_foil"`, `"onomatopoeia"`, `"examples"`, `"noxai"`. More variants later (e.g. `"similes_v4"`) — accept any string. |
 | `clientTime` | Wall-clock time the batch was sent. |
 | `events[].seq` | 1-based counter within the session. `(sessionId, seq)` is the dedupe key — the client re-sends a failed batch once, so duplicates are possible. |
 | `events[].t` | Wall-clock ISO timestamp of the event. |
@@ -80,6 +80,8 @@ Field semantics:
 | `events[].payload` | Free-form object, may be absent. May contain `"__requeued": true` on retried batches — ignore. |
 
 Batch sizes are small: the client flushes every 5 s or at 20 events, whichever first, plus a final flush on unload. Expect bodies of a few KB.
+
+Not every session contains every event type: the `noxai` control condition logs minimally (only `session_start`/`session_end`, `audio_*`, `visibility`, `iframe_focus`/`iframe_blur` — no `click` or `scroll_depth`). Don't treat missing event types as an error.
 
 ## Storage
 
