@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fake Qualtrics — Study Mode Test Harness</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #f4f4f4; }
+  header { background: #147bd1; color: #fff; padding: 12px 20px; font-size: 15px; }
+  .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 14px 20px; background: #fff; border-bottom: 1px solid #ddd; }
+  .controls label { display: flex; flex-direction: column; font-size: 12px; color: #555; gap: 3px; }
+  .controls input, .controls select { padding: 5px 8px; font-size: 13px; min-width: 160px; }
+  .controls input#sampleId { min-width: 320px; }
+  button { padding: 7px 16px; font-size: 13px; cursor: pointer; }
+  .survey { max-width: 1000px; margin: 24px auto; background: #fff; padding: 24px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+  .qtext { font-size: 15px; margin-bottom: 12px; }
+  iframe { width: 100%; height: 900px; border: none; }
+  code { background: #eee; padding: 1px 5px; border-radius: 3px; font-size: 12px; word-break: break-all; }
+</style>
+</head>
+<body>
+<header>Fake Qualtrics — simulates the Loop &amp; Merge iframe embedding (open this file directly in a browser while <code>npm run dev</code> is running)</header>
+
+<div class="controls">
+  <label>App base URL (dev server incl. base path)
+    <input id="origin" value="http://localhost:5173/SimileXAIUserStudy" style="min-width:280px">
+  </label>
+  <label>Domain (lm://Field/2)
+    <input id="domain" value="lung">
+  </label>
+  <label>Mode
+    <select id="mode">
+      <option value="test" selected>test</option>
+      <option value="train">train</option>
+    </select>
+  </label>
+  <label>Sample ID (lm://Field/1, ignored in train mode)
+    <input id="sampleId" value="icbhi_222_1b1_Pr_sc_Meditron_11">
+  </label>
+  <label>XAI type (lm://Field/3)
+    <input id="xai" value="similes_v3" list="xaiOptions">
+    <datalist id="xaiOptions">
+      <option value="similes_v3">
+      <option value="rexnet">
+      <option value="rexnet_foil">
+      <option value="onomatopoeia">
+      <option value="examples">
+    </datalist>
+  </label>
+  <!-- similes_v3 uses V3 ids (icbhi_...); rexnet/onomatopoeia/examples use V2 aliases (lungausc_9269 etc., see dev/loop-and-merge-*.tsv) -->
+  <label>pid (e://Field/PROLIFIC_PID)
+    <input id="pid" value="TEST123">
+  </label>
+  <label>pos (loop position)
+    <input id="pos" value="1" style="min-width:60px">
+  </label>
+  <button onclick="load()">Load question</button>
+</div>
+
+<div class="survey">
+  <div class="qtext">Please listen to the recording and explanation below, then answer the questions that follow.</div>
+  <iframe id="frame" allow="autoplay"></iframe>
+  <div style="margin-top:10px;font-size:12px;color:#777">iframe src: <code id="src"></code></div>
+</div>
+
+<script>
+function load() {
+  const origin = document.getElementById('origin').value.replace(/\/$/, '');
+  const domain = encodeURIComponent(document.getElementById('domain').value);
+  const mode = document.getElementById('mode').value;
+  const sampleId = encodeURIComponent(document.getElementById('sampleId').value);
+  const xai = encodeURIComponent(document.getElementById('xai').value);
+  const pid = encodeURIComponent(document.getElementById('pid').value);
+  const pos = encodeURIComponent(document.getElementById('pos').value);
+  const path = mode === 'train' ? `study/${domain}/train` : `study/${domain}/test/${sampleId}`;
+  const url = `${origin}/#/${path}?pid=${pid}&xai=${xai}&pos=${pos}`;
+  document.getElementById('frame').src = url;
+  document.getElementById('src').textContent = url;
+}
+load();
+</script>
+</body>
+</html>

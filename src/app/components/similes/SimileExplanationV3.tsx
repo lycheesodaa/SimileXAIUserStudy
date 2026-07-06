@@ -11,7 +11,7 @@ interface SimileExplanationV3Props {
   isOnomatopoeia?: boolean;
 }
 
-function SimileAudioPlayer({ url }: { url: string }) {
+function SimileAudioPlayer({ url, logId }: { url: string; logId?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -28,10 +28,11 @@ function SimileAudioPlayer({ url }: { url: string }) {
 
   return (
     <div className="flex items-center flex-shrink-0">
-      <button 
-        onClick={togglePlay} 
+      <button
+        onClick={togglePlay}
         className="p-1.5 rounded-full text-blue-600 hover:bg-blue-50 transition-colors"
         title={isPlaying ? "Pause" : "Play"}
+        data-log-id={logId}
       >
         {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
       </button>
@@ -81,6 +82,7 @@ export function SimileExplanationV3({
                 controls
                 className="w-full max-w-md h-10"
                 src={getAudioUrl(originalAudioUrl)}
+                data-log-id="original-audio"
               >
                 Your browser does not support the audio element.
               </audio>
@@ -121,7 +123,7 @@ export function SimileExplanationV3({
                   <div className="flex justify-end items-center gap-2 text-right text-sm text-gray-700 leading-tight">
                     <span>{s.text}</span>
                     {s.withinClassAudioUrl && (
-                      <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} />
+                      <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
                     )}
                   </div>
                   <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm">
@@ -169,6 +171,7 @@ export function SimileExplanationV3({
         onClick={() => setIsDrawerOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 bg-cyan-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-cyan-700 transition-colors z-40"
         title="Open Simile Cheatsheet"
+        data-log-id="cheatsheet-open"
       >
         <HelpCircle size={28} />
       </button>

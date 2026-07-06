@@ -6,9 +6,11 @@ import { CuesPractice } from './components/cues/CuesPractice';
 import { CuesExplanation } from './components/cues/CuesExplanation';
 import { CombinedExplanation } from './components/combined/CombinedExplanation';
 import { ExampleExplanation } from './components/examples/ExampleExplanation';
+import { ExamplesPractice } from './components/examples/ExamplesPractice';
 import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
 import { LUNG_SOUND_DATA_V3 } from './data_v3';
 import { SimileExplanationV3 } from './components/similes/SimileExplanationV3';
+import { StudyView } from './study/StudyView';
 
 export const SettingsContext = createContext<{
   randomFoil: boolean;
@@ -302,6 +304,14 @@ function SampleNavigator() {
   );
 }
 
+// Dev-only chrome: hidden on /study routes so participants never see
+// pathology labels or sample navigation.
+function DevNavigator() {
+  const location = useLocation();
+  if (location.pathname.startsWith('/study')) return null;
+  return <SampleNavigator />;
+}
+
 // ─── Route Wrappers ────────────────────────────────────────────────────────────
 
 function SimileExplanationWrapper() {
@@ -440,24 +450,6 @@ function ExampleExplanationWrapper() {
   );
 }
 
-function ExamplesPractice() {
-  return (
-    <div className="flex flex-col gap-6 my-6 mx-3 text-gray-700">
-      <div className="space-y-4">
-        <p>
-          In this section, you can review how example-based explanations help explain classifications.
-        </p>
-        <p>
-          Example-based explanations display the most similar actual training examples (prototypes) along with their similarity weights and active segments to help explain why the system made a particular classification.
-        </p>
-        <p>
-          <i>Please switch to <strong>Test</strong> mode to see how these examples are shown and used to explain specific test lung sound recordings.</i>
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function NavigateToRexnet() {
   const { pathology, localIndex } = useParams<{ pathology: string; localIndex: string }>();
   return <Navigate to={`/rexnet/test/${pathology}/${localIndex}`} replace />;
@@ -470,9 +462,13 @@ export function AppRouter() {
     <SettingsContext.Provider value={{ randomFoil, setRandomFoil }}>
       <HashRouter>
         <div className="w-full bg-transparent">
-          <SampleNavigator />
+          <DevNavigator />
           <Routes>
             <Route path="/" element={<Navigate to="/similes/practice" replace />} />
+
+            {/* Study mode (Qualtrics-embedded; no class labels in URL).
+                train = practice descriptions, test = one sample's explanation */}
+            <Route path="/study/:domain/:mode/:sampleId?" element={<StudyView />} />
 
             {/* Similes */}
             <Route path="/similes/practice" element={<SimilePractice />} />
