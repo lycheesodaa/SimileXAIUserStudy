@@ -1,0 +1,109 @@
+{
+  "schema_version": "v1",
+  "generated_at": "2026-07-09T09:26:21.117257+00:00",
+  "audio_base_url": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/",
+  "concept_audio_base_url": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/",
+  "domains": [
+    "lung",
+    "bird"
+  ],
+  "counts": {
+    "lung": 225,
+    "bird": 221
+  },
+  "models": {
+    "lung": [
+      {
+        "key": "lf_cbm_similes_adapted",
+        "family": "LF-CBM",
+        "concept_set": "similes",
+        "mode": "adapted"
+      },
+      {
+        "key": "lf_cbm_onomatopoeia_adapted",
+        "family": "LF-CBM",
+        "concept_set": "onomatopoeia",
+        "mode": "adapted"
+      },
+      {
+        "key": "fused_simile_lung",
+        "family": "Fused-LF-CBM",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_beta_breakdown_simile_lung",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_onomatopoeia_lung",
+        "family": "Fused-LF-CBM",
+        "concept_set": "onomatopoeia",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_beta_breakdown_onomatopoeia_lung",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "onomatopoeia",
+        "beta": 0.5
+      },
+      {
+        "key": "rexnet",
+        "family": "RExNet"
+      },
+      {
+        "key": "proto",
+        "family": "Proto"
+      }
+    ],
+    "bird": [
+      {
+        "key": "lf_cbm_similes_adapted",
+        "family": "LF-CBM",
+        "concept_set": "similes",
+        "mode": "adapted"
+      },
+      {
+        "key": "lf_cbm_onomatopoeia_adapted",
+        "family": "LF-CBM",
+        "concept_set": "onomatopoeia",
+        "mode": "adapted"
+      },
+      {
+        "key": "fused_simile_bird",
+        "family": "Fused-LF-CBM",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_beta_breakdown_simile_bird",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_onomatopoeia_bird",
+        "family": "Fused-LF-CBM",
+        "concept_set": "onomatopoeia",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_beta_breakdown_onomatopoeia_bird",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "onomatopoeia",
+        "beta": 0.5
+      },
+      {
+        "key": "rexnet",
+        "family": "RExNet"
+      },
+      {
+        "key": "proto",
+        "family": "Proto"
+      }
+    ]
+  },
+  "annotation_csv": "samples_annotation.csv"
+}
