@@ -10,7 +10,7 @@ export function NoXaiExplanation({ originalAudioUrl }: NoXaiExplanationProps) {
       <div className="mb-6">
         <div className="pt-6">
           <div className="flex flex-col gap-2">
-            <span className="text-gray-600">Play this lung sound recording:</span>
+            <span className="text-gray-600">Play this sound recording:</span>
             {originalAudioUrl ? (
               <audio controls className="w-full max-w-md h-10" src={originalAudioUrl}>
                 Your browser does not support the audio element.

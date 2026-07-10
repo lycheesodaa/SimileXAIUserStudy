@@ -34,20 +34,21 @@
     </select>
   </label>
   <label>Sample ID (lm://Field/1, ignored in train mode)
-    <input id="sampleId" value="icbhi_222_1b1_Pr_sc_Meditron_11">
+    <input id="sampleId" value="icbhi_156_8b3_Ar_mc_AKGC417L_0">
   </label>
   <label>XAI type (lm://Field/3)
-    <input id="xai" value="similes_v3" list="xaiOptions">
+    <input id="xai" value="similes" list="xaiOptions">
     <datalist id="xaiOptions">
-      <option value="similes_v3">
-      <option value="rexnet">
-      <option value="rexnet_foil">
+      <option value="similes">
       <option value="onomatopoeia">
+      <option value="similes_dualview">
+      <option value="onomatopoeia_dualview">
+      <option value="rexnet">
       <option value="examples">
       <option value="noxai">
     </datalist>
   </label>
-  <!-- similes_v3 uses V3 ids (icbhi_...); rexnet/onomatopoeia/examples use V2 aliases (lungausc_9269 etc., see dev/loop-and-merge-*.tsv) -->
+  <!-- sample ids come from public/data_v1/<domain>/core_samples.json (see dev/loop-and-merge-*.tsv) -->
   <label>pid (e://Field/PROLIFIC_PID)
     <input id="pid" value="TEST123">
   </label>
@@ -72,7 +73,7 @@ function load() {
   const xai = encodeURIComponent(document.getElementById('xai').value);
   const pid = encodeURIComponent(document.getElementById('pid').value);
   const pos = encodeURIComponent(document.getElementById('pos').value);
-  const path = mode === 'train' ? `study/${domain}/train` : `study/${domain}/test/${sampleId}`;
+  const path = mode === 'train' ? `study/v1/${domain}/train` : `study/v1/${domain}/test/${sampleId}`;
   const url = `${origin}/#/${path}?pid=${pid}&xai=${xai}&pos=${pos}`;
   document.getElementById('frame').src = url;
   document.getElementById('src').textContent = url;

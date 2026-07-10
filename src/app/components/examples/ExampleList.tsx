@@ -1,8 +1,18 @@
 import { Badge } from '../ui/badge';
-import { LungSound } from '../../data_v2';
+
+export interface ExampleItem {
+  id: string;
+  rank: number;
+  className: string;
+  weight: number;
+  audioUrl: string;
+  prototypeIdx?: number;
+  activeWindow?: string;
+  similarity?: number;
+}
 
 interface ExampleListProps {
-  examples: LungSound['examples'];
+  examples: ExampleItem[];
 }
 
 export function ExampleList({ examples }: ExampleListProps) {
@@ -13,7 +23,10 @@ export function ExampleList({ examples }: ExampleListProps) {
   return (
     <div className="space-y-3">
       {examples.map((example) => {
-        const audioSrc = `${import.meta.env.BASE_URL.replace(/\/$/, '')}${example.audioUrl}`;
+        // v1 data uses absolute S3 URLs; legacy v2 paths are root-relative.
+        const audioSrc = example.audioUrl.startsWith('http')
+          ? example.audioUrl
+          : `${import.meta.env.BASE_URL.replace(/\/$/, '')}${example.audioUrl}`;
         return (
           <div
             key={example.id}
@@ -30,7 +43,9 @@ export function ExampleList({ examples }: ExampleListProps) {
                         </div>
                       </div>
                       <div className="flex-1 mt-1">
-                        <p className="text-lg font-medium mb-2">Similar Training Example (Prototype #{example.prototypeIdx})</p>
+                        <p className="text-lg font-medium mb-2">
+                          Similar Training Example {example.prototypeIdx !== undefined ? `(Prototype #${example.prototypeIdx})` : `#${example.rank}`}
+                        </p>
                         <div className="flex flex-wrap gap-2 mb-2 items-center">
                           <div>
                             <span className="text-sm text-gray-500">True Class: </span>
@@ -38,18 +53,28 @@ export function ExampleList({ examples }: ExampleListProps) {
                               {example.className}
                             </Badge>
                           </div>
+                          {example.similarity !== undefined && (
+                            <div>
+                              <span className="text-sm text-gray-500">Similarity: </span>
+                              <Badge variant="outline" className="text-gray-600 font-medium">
+                                {example.similarity.toFixed(4)}
+                              </Badge>
+                            </div>
+                          )}
                           <div>
                             <span className="text-sm text-gray-500">Similarity Weight: </span>
                             <Badge variant="outline" className="text-gray-600 font-medium">
                               {example.weight.toFixed(4)}
                             </Badge>
                           </div>
-                          <div>
-                            <span className="text-sm text-gray-500">Active Segment: </span>
-                            <Badge variant="outline" className="text-gray-600 font-medium border-dashed">
-                              {example.activeWindow}
-                            </Badge>
-                          </div>
+                          {example.activeWindow && (
+                            <div>
+                              <span className="text-sm text-gray-500">Active Segment: </span>
+                              <Badge variant="outline" className="text-gray-600 font-medium border-dashed">
+                                {example.activeWindow}
+                              </Badge>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -59,7 +84,7 @@ export function ExampleList({ examples }: ExampleListProps) {
                     <audio
                       controls
                       className="h-8 w-48"
-                      aria-label={`Audio example for prototype ${example.prototypeIdx}`}
+                      aria-label={`Audio for similar training example ${example.rank}`}
                       src={audioSrc}
                     >
                       Your browser does not support the audio element.

@@ -1,28 +1,42 @@
 import { ReactNode } from 'react';
-import { LUNG_SOUND_DATA_V3, LungSoundV3 } from '../data_v3';
-import { LUNG_SOUND_DATA, LungSound } from '../data_v2';
-import { SimileExplanationV3 } from '../components/similes/SimileExplanationV3';
-import { SimileExplanation } from '../components/similes/SimileExplanation';
-import { SimilePractice } from '../components/similes/SimilePractice';
-import { CuesExplanation } from '../components/cues/CuesExplanation';
+import { SimileExplanationV3, SimileItem } from '../components/similes/SimileExplanationV3';
+import { CuesExplanationV1 } from '../components/cues/CuesExplanationV1';
 import { CuesPractice } from '../components/cues/CuesPractice';
 import { ExampleExplanation } from '../components/examples/ExampleExplanation';
+import { ExampleItem } from '../components/examples/ExampleList';
 import { ExamplesPractice } from '../components/examples/ExamplesPractice';
 import { NoXaiExplanation } from '../components/noxai/NoXaiExplanation';
 import { NoXaiPractice } from '../components/noxai/NoXaiPractice';
+import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
+import {
+  ConceptSet,
+  RexnetReport,
+  V1BetaBreakdownModel,
+  V1FusedModel,
+  V1Sample,
+  betaBreakdownModelKey,
+  fusedModelKey,
+  loadConcepts,
+  loadSample,
+  parseRexnetReport,
+  prettifyOnomatopoeia,
+} from './dataV1';
 
 // A study domain groups the XAI variants (conditions) available for one kind
-// of data. Each variant owns its dataset lookup, audio-identity resolution,
-// test render and train render, so variants may use different datasets with
-// different sample-id schemes. Adding a future condition (e.g. similes_v4)
-// means adding one StudyXaiVariant entry to the domain's xaiVariants.
+// of data. Every condition is backed by the modular v1 bundle in
+// public/data_v1/ (one JSON per sample, fetched at runtime and cached), so a
+// variant's getSample is async and resolves to a pre-mapped view model that
+// both render() and audioIdForSrc() consume synchronously. Adding a domain
+// means one makeV1Domain(<domain>) entry — the bundle layout and model keys
+// are uniform across domains.
 export interface StudyXaiVariant<S = unknown> {
   /** 'minimal' logs only session lifecycle, audio and visibility/focus events
    *  (no click or scroll tracking). Default: 'full'. */
   logging?: 'full' | 'minimal';
   /** Sample ids exposed here end up in Qualtrics URLs — they must be opaque
-   *  (no class labels). */
-  getSample(sampleId: string): S | undefined;
+   *  (no class labels). Resolves undefined on missing sample/model/fetch
+   *  failure, which StudyView surfaces as lookup_error. */
+  getSample(sampleId: string): Promise<S | undefined>;
   /** Resolve which audio a media event belongs to, from the element's src. */
   audioIdForSrc(sample: S, src: string): string;
   render(sample: S): ReactNode;
@@ -35,153 +49,208 @@ export interface StudyDomainConfig {
   xaiVariants: Record<string, StudyXaiVariant<any>>;
 }
 
-// ─── Lung: similes_v3 (V3 dataset, S3 audio, opaque icbhi_* ids) ─────────────
+// ─── Shared helpers ───────────────────────────────────────────────────────────
 
-const v3ById = new Map<string, LungSoundV3>(
-  LUNG_SOUND_DATA_V3.map((d) => [d.id, d])
-);
+const slugify = (s: string): string =>
+  s.toLowerCase().replace(/\W+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
-// V3 audio srcs are absolute S3 URLs, so exact equality works.
-const v3AudioIdForSrc = (sample: LungSoundV3, src: string): string => {
-  if (!src) return 'unknown';
-  if (src.startsWith('blob:')) return 'custom';
-  if (sample.originalAudioUrl && src === sample.originalAudioUrl) return 'original';
-  const simile = sample.similes.find((s) => s.withinClassAudioUrl && src === s.withinClassAudioUrl);
-  return simile ? simile.id : 'unknown';
-};
-
-const lungSimilesV3: StudyXaiVariant<LungSoundV3> = {
-  getSample: (sampleId) => v3ById.get(sampleId),
-  audioIdForSrc: v3AudioIdForSrc,
-  // Pass predictedType (never the true label) so a future change that renders
-  // the classification cannot leak ground truth in study mode.
-  render: (sample) => (
-    <SimileExplanationV3
-      audioName={sample.name}
-      classification={sample.predictedType}
-      similes={sample.similes}
-      originalAudioUrl={sample.originalAudioUrl}
-    />
-  ),
-  renderTrain: () => <SimilePractice />,
-};
-
-// ─── Lung: rexnet / onomatopoeia / examples (V2 dataset, local audio) ─────────
-
-// V2 ids embed the class label (e.g. "coarse-crackle-9269"), which must not
-// appear in Qualtrics URLs. The numeric suffix is unique across the dataset,
-// so study URLs use the opaque alias "lungausc_<number>" instead.
-const v2ByAlias = new Map<string, LungSound>(
-  LUNG_SOUND_DATA.map((d) => [`lungausc_${d.id.split('-').pop()}`, d])
-);
-
-// V2 audio urls are root-relative paths rendered with BASE_URL prepended (and
-// URL-encoded — filenames contain spaces), so compare decoded pathname suffixes.
-const decodedPathname = (src: string): string => {
+// v1 filenames are opaque sample ids or concept phrases — never class labels —
+// so a filename fallback is safe and more useful in logs than 'unknown'.
+const filenameOf = (src: string): string => {
   try {
-    return decodeURIComponent(new URL(src, window.location.origin).pathname);
+    return decodeURIComponent(new URL(src).pathname.split('/').pop() || 'unknown');
   } catch {
-    return src;
+    return 'unknown';
   }
 };
-const v2PathMatches = (src: string, storedPath?: string): boolean =>
-  !!storedPath && decodedPathname(src).endsWith(storedPath);
 
-const v2AudioIdForSrc = (sample: LungSound, src: string): string => {
+const audioIdOrFallback = (src: string, resolve: (src: string) => string | undefined): string => {
   if (!src) return 'unknown';
   if (src.startsWith('blob:')) return 'custom';
-  if (v2PathMatches(src, sample.originalAudioUrl)) return 'original';
-  const simile = sample.similes.find((s) => v2PathMatches(src, s.withinClassAudioUrl));
-  if (simile) return simile.id;
-  // Prototype audio ids ("coarse crackle_9269-ex1") embed the class label —
-  // log by rank instead.
-  const example = sample.examples.find((x) => v2PathMatches(src, x.audioUrl));
-  if (example) return `example-rank${example.rank}`;
-  // RexNet contrast audio is built inside CuesExplanation, not stored on the
-  // sample: .../<prefix>_vs_<baselineClass>_contrast.wav
-  const contrast = /_vs_(.+)_contrast\.wav$/.exec(decodedPathname(src));
-  if (contrast) return `contrast-${contrast[1]}`;
-  return 'unknown';
+  return resolve(src) ?? filenameOf(src);
 };
 
-const v2Features = (sample: LungSound) =>
-  Object.entries(sample.features).map(([name, value]) => ({ name, value: value as string }));
+// ─── Fused simile / onomatopoeia conditions ───────────────────────────────────
 
-// randomFoil=true shows a single deterministic contrast class instead of the
-// full baseline dropdown (dev navbar's "Hide True Label (Single Foil)").
-const lungRexnet = (randomFoil: boolean): StudyXaiVariant<LungSound> => ({
-  getSample: (sampleId) => v2ByAlias.get(sampleId),
-  audioIdForSrc: v2AudioIdForSrc,
-  render: (sample) => (
-    <CuesExplanation
-      sampleId={sample.id}
-      audioName={sample.name}
-      features={v2Features(sample)}
-      comparisons={sample.CFcomparison}
-      highlightedMoments={['First inhalation phase', 'Mid-expiration crackling']}
-      originalAudioUrl={sample.originalAudioUrl}
-      pathology={sample.pathology}
-      randomFoil={randomFoil}
+interface FusedView {
+  sample: V1Sample;
+  items: SimileItem[];
+  predictedLabel: string;
+}
+
+const fusedVariant = (
+  domain: string,
+  set: ConceptSet,
+  dualview = false
+): StudyXaiVariant<FusedView> => ({
+  getSample: async (sampleId) => {
+    const [sample, conceptMap] = await Promise.all([
+      loadSample(domain, sampleId),
+      loadConcepts(domain, set),
+    ]);
+    const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
+    if (!sample || !model?.concepts?.length) return undefined;
+
+    if (dualview) {
+      // Beta-breakdown view: per-concept evidence is decomposed into the two
+      // fusion branches. Branch evidence = mixing weight × branch z × the
+      // predicted-class head weight (taken from the fused model), so
+      // clap + beats = fused_z × head_weight = the bar's net value. Note this
+      // net differs from the plain view's contribution (activation ×
+      // head_weight): the bundle's breakdown z's and the fused model's
+      // activations come from different normalization stages upstream.
+      const breakdown = sample.models[betaBreakdownModelKey(domain, set)] as
+        | V1BetaBreakdownModel
+        | undefined;
+      if (!breakdown?.concepts?.length) return undefined;
+      const zByConcept = new Map(breakdown.concepts.map((c) => [c.concept, c]));
+      const dualItems = model.concepts.flatMap((c) => {
+        const z = zByConcept.get(c.concept);
+        if (!z) return [];
+        const clap = breakdown.clap_weight * z.clap_z * c.head_weight;
+        const beats = breakdown.beats_weight * z.beats_z * c.head_weight;
+        return [
+          {
+            id: slugify(c.concept),
+            text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+            net: clap + beats,
+            clapValue: clap,
+            beatsValue: beats,
+            withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
+          },
+        ];
+      });
+      if (!dualItems.length) return undefined;
+      const maxAbs = Math.max(...dualItems.map((i) => Math.abs(i.net)), 1e-9);
+      const items: SimileItem[] = dualItems
+        .sort((a, b) => Math.abs(b.net) - Math.abs(a.net))
+        .map(({ net, ...rest }) => ({ ...rest, confidence: net / maxAbs, displayValue: net }));
+      return { sample, items, predictedLabel: model.predicted_label };
+    }
+
+    // Bar width is normalized to the sample's max |contribution|; the raw
+    // contribution is what gets printed in the bar label.
+    const maxAbs = Math.max(...model.concepts.map((c) => Math.abs(c.contribution)), 1e-9);
+    const items: SimileItem[] = model.concepts.map((c) => ({
+      id: slugify(c.concept),
+      text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+      confidence: c.contribution / maxAbs,
+      displayValue: c.contribution,
+      withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
+    }));
+    return { sample, items, predictedLabel: model.predicted_label };
+  },
+  audioIdForSrc: (view, src) =>
+    audioIdOrFallback(src, (s) => {
+      if (s === view.sample.audio) return 'original';
+      return view.items.find((i) => i.withinClassAudioUrl === s)?.id;
+    }),
+  render: (view) => (
+    <SimileExplanationV3
+      audioName={view.sample.sample_id}
+      classification={view.predictedLabel}
+      similes={view.items}
+      originalAudioUrl={view.sample.audio}
+      isOnomatopoeia={set === 'onomatopoeia'}
+      threshold={0}
+      cheatsheet={<ConceptCheatsheet domain={domain} set={set} />}
     />
   ),
+  renderTrain: () => <ConceptCheatsheet domain={domain} set={set} />,
+});
+
+// ─── RexNet (cues) condition ──────────────────────────────────────────────────
+
+interface RexnetView {
+  sample: V1Sample;
+  report: RexnetReport;
+}
+
+const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
+  getSample: async (sampleId) => {
+    const sample = await loadSample(domain, sampleId);
+    const model = sample?.models.rexnet;
+    if (!sample || !model?.explanation_md) return undefined;
+    // Parsing (rather than rendering the report markdown raw) keeps the true
+    // label and correctness verdicts embedded in it out of the DOM.
+    const report = parseRexnetReport(model.explanation_md);
+    if (report.contrasts.length === 0) return undefined;
+    return { sample, report };
+  },
+  audioIdForSrc: (view, src) =>
+    audioIdOrFallback(src, (s) => (s === view.sample.audio ? 'original' : undefined)),
+  render: (view) => <CuesExplanationV1 audioUrl={view.sample.audio} report={view.report} />,
   renderTrain: () => <CuesPractice />,
 });
 
-const lungOnomatopoeia: StudyXaiVariant<LungSound> = {
-  getSample: (sampleId) => v2ByAlias.get(sampleId),
-  audioIdForSrc: v2AudioIdForSrc,
-  render: (sample) => (
-    <SimileExplanation
-      audioName={sample.name}
-      classification={sample.type}
-      confidence={87}
-      similes={sample.similes}
-      originalAudioUrl={sample.originalAudioUrl}
-      isOnomatopoeia={true}
-    />
-  ),
-  renderTrain: () => <SimilePractice isOnomatopoeia={true} />,
-};
+// ─── Proto (examples) condition ───────────────────────────────────────────────
 
-const lungExamples: StudyXaiVariant<LungSound> = {
-  getSample: (sampleId) => v2ByAlias.get(sampleId),
-  audioIdForSrc: v2AudioIdForSrc,
-  render: (sample) => (
+interface ProtoView {
+  sample: V1Sample;
+  examples: ExampleItem[];
+  predictedLabel: string;
+  confidence: number;
+}
+
+const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
+  getSample: async (sampleId) => {
+    const sample = await loadSample(domain, sampleId);
+    const model = sample?.models.proto;
+    if (!sample || !model?.prototypes?.length) return undefined;
+    const examples: ExampleItem[] = model.prototypes.map((p) => ({
+      id: `example-rank${p.rank}`,
+      rank: p.rank,
+      className: p.proto_class,
+      weight: p.weight,
+      similarity: p.similarity,
+      audioUrl: p.audio,
+    }));
+    return { sample, examples, predictedLabel: model.predicted_label, confidence: model.confidence };
+  },
+  audioIdForSrc: (view, src) =>
+    audioIdOrFallback(src, (s) => {
+      if (s === view.sample.audio) return 'original';
+      return view.examples.find((e) => e.audioUrl === s)?.id;
+    }),
+  render: (view) => (
     <ExampleExplanation
-      audioName={sample.name}
-      classification={sample.type}
-      confidence={87}
-      examples={sample.examples}
-      originalAudioUrl={sample.originalAudioUrl}
+      audioName={view.sample.sample_id}
+      classification={view.predictedLabel}
+      confidence={Math.round(view.confidence * 100)}
+      examples={view.examples}
+      originalAudioUrl={view.sample.audio}
     />
   ),
   renderTrain: () => <ExamplesPractice />,
-};
+});
 
-// ─── Lung: noxai (control — audio only, no explanation, V3 dataset) ──────────
+// ─── noxai (control — audio only, no explanation) ─────────────────────────────
 
-const lungNoXai: StudyXaiVariant<LungSoundV3> = {
+const noXaiVariant = (domain: string): StudyXaiVariant<V1Sample> => ({
   logging: 'minimal',
-  getSample: (sampleId) => v3ById.get(sampleId),
-  audioIdForSrc: v3AudioIdForSrc,
-  render: (sample) => <NoXaiExplanation originalAudioUrl={sample.originalAudioUrl} />,
+  getSample: (sampleId) => loadSample(domain, sampleId),
+  audioIdForSrc: (sample, src) =>
+    audioIdOrFallback(src, (s) => (s === sample.audio ? 'original' : undefined)),
+  render: (sample) => <NoXaiExplanation originalAudioUrl={sample.audio} />,
   renderTrain: () => <NoXaiPractice />,
-};
+});
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
-const lung: StudyDomainConfig = {
-  defaultXai: 'similes_v3',
+const makeV1Domain = (domain: string): StudyDomainConfig => ({
+  defaultXai: 'similes',
   xaiVariants: {
-    similes_v3: lungSimilesV3,
-    rexnet: lungRexnet(false),
-    rexnet_foil: lungRexnet(true),
-    onomatopoeia: lungOnomatopoeia,
-    examples: lungExamples,
-    noxai: lungNoXai,
+    similes: fusedVariant(domain, 'similes'),
+    onomatopoeia: fusedVariant(domain, 'onomatopoeia'),
+    similes_dualview: fusedVariant(domain, 'similes', true),
+    onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', true),
+    rexnet: rexnetVariant(domain),
+    examples: protoVariant(domain),
+    noxai: noXaiVariant(domain),
   },
-};
+});
 
 export const STUDY_DOMAINS: Record<string, StudyDomainConfig> = {
-  lung,
+  lung: makeV1Domain('lung'),
+  bird: makeV1Domain('bird'),
 };

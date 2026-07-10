@@ -1,11 +1,10 @@
-import { ExampleList } from './ExampleList';
-import { LungSound } from '../../data_v2';
+import { ExampleList, ExampleItem } from './ExampleList';
 
 interface ExampleExplanationProps {
   audioName: string;
   classification: string;
   confidence: number;
-  examples: LungSound['examples'];
+  examples: ExampleItem[];
   originalAudioUrl?: string;
 }
 
@@ -27,7 +26,10 @@ export function ExampleExplanation({
               <audio
                 controls
                 className="w-full max-w-md h-10"
-                src={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
+                src={originalAudioUrl.startsWith('http')
+                  ? originalAudioUrl
+                  : `${import.meta.env.BASE_URL.replace(/\/$/, '')}${originalAudioUrl}`}
+                data-log-id="original-audio"
               >
                 Your browser does not support the audio element.
               </audio>
