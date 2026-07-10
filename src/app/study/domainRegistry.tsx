@@ -221,6 +221,7 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       sampleId={view.sample.sample_id}
       randomFoil={true}
       hideDropdown={ctx?.isStudy === true}
+      domain={domain}
     />
   ),
   renderTrain: () => <CuesPractice />,

@@ -8,7 +8,6 @@ import {
 } from '../ui/select';
 import { RexnetReport } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
-import { ReferenceTable } from './ReferenceTable';
 
 // Study-mode cues (RExNet) explanation, fed by the structured report parsed
 // from data_v1's explanation_md. Like the other study conditions, it never
@@ -21,6 +20,7 @@ interface CuesExplanationV1Props {
   sampleId?: string;
   randomFoil?: boolean;
   hideDropdown?: boolean;
+  domain?: string;
 }
 
 function getDeterministicFoil<T>(sampleId: string, options: T[]): T | undefined {
@@ -39,10 +39,23 @@ export function CuesExplanationV1({
   sampleId,
   randomFoil = false,
   hideDropdown = false,
+  domain,
 }: CuesExplanationV1Props) {
   const contrasts = report.contrasts;
   const deterministicFoil =
     randomFoil && sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
+
+  const birdClasses = new Set([
+    'Eastern Towhee',
+    'Wood Thrush',
+    'Black-capped Chickadee',
+    'Tufted Titmouse',
+    'Ovenbird',
+  ]);
+  const isBird =
+    domain === 'bird' ||
+    contrasts.some((c) => birdClasses.has(c.contrastClass));
+  const effectiveDomain = isBird ? 'bird' : 'lung';
 
   const [selectedClass, setSelectedClass] = useState(
     deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
@@ -60,6 +73,13 @@ export function CuesExplanationV1({
   }, [contrasts, randomFoil, sampleId, selectedClass]);
 
   const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
+
+  const visibleCues = selected?.cues.filter(
+    (cue) =>
+      !cue.cue.toLowerCase().includes('trill rate') &&
+      !cue.cue.toLowerCase().includes('gap ratio')
+  ) ?? [];
+  const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
 
   return (
     <div className="w-full space-y-6 mx-3">
@@ -137,7 +157,7 @@ export function CuesExplanationV1({
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-400">
-                    {selected.cues.map((cue) => (
+                    {visibleCues.map((cue) => (
                       <tr key={cue.cue}>
                         <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{cue.cue}</td>
                         {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.targetValue}</td> */}
@@ -154,7 +174,7 @@ export function CuesExplanationV1({
                 {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
                   <p className="text-sm text-gray-500 mt-2">
                     The system's predicted relations match the measured relations for{' '}
-                    {selected.cuesCorrect} of {selected.cuesTotal} cues.
+                    {visibleCuesCorrect} of {visibleCues.length} cues.
                   </p>
                 )}
               </div>
@@ -167,9 +187,142 @@ export function CuesExplanationV1({
       <div className="mt-8 pt-4 border-t border-gray-200">
         <h3 className="text-lg font-semibold mb-2">Acoustic Cues Reference Table</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Reference table summarizing the ranking of each acoustic attribute across lung sound categories:
+          Reference table summarizing the ranking of each acoustic attribute across{' '}
+          {isBird ? 'bird sound' : 'lung sound'} categories (
+          <span className="font-medium">
+            {isBird
+              ? 'Eastern Towhee · Wood Thrush · Black-capped Chickadee · Tufted Titmouse · Ovenbird'
+              : 'Crackle · Normal · Wheeze · Rhonchi · Stridor'}
+          </span>
+          ):
         </p>
-        <ReferenceTable />
+        <ReferenceTableV1 domain={effectiveDomain} />
+      </div>
+    </div>
+  );
+}
+
+export interface CueReferenceRow {
+  cue: string;
+  metric: string;
+  description: string;
+  ranking: string;
+}
+
+export const LUNG_CUE_ROWS: CueReferenceRow[] = [
+  {
+    cue: 'Loudness / Intensity',
+    metric: 'energy_level',
+    description: 'Overall volume/strength of the breath sounds.',
+    ranking: 'Normal < Crackle < Wheeze ~ Rhonchi ~ Stridor',
+  },
+  {
+    cue: 'Pitch / Brightness (high vs low)',
+    metric: 'spectral_centroid_hi',
+    description: 'Brightness centre of the adventitious sound, measured above the breath fundamental.',
+    ranking: 'Normal < Stridor ~ Wheeze ~ Crackle < Rhonchi',
+  },
+  {
+    cue: 'Spectral Width (broad vs narrow/tonal)',
+    metric: 'spectral_bandwidth',
+    description: 'How spread-out the energy is across frequencies (broad/noisy vs narrow/tonal).',
+    ranking: 'Stridor < Rhonchi ~ Wheeze < Crackle < Normal',
+  },
+  {
+    cue: 'High-Frequency Shrillness',
+    metric: 'hf_content',
+    description: 'Fraction of energy sitting in the high band (shrill vs low rumble).',
+    ranking: 'Normal < Stridor < Crackle ~ Wheeze ~ Rhonchi',
+  },
+  {
+    cue: 'Crackle Spikiness (popping)',
+    metric: 'crest_factor',
+    description: 'How impulsive/spiky the peaks are vs the background breath.',
+    ranking: 'Stridor ~ Rhonchi ~ Wheeze < Crackle ~ Normal',
+  },
+  {
+    cue: 'Crackle / Event Density',
+    metric: 'event_rate',
+    description: 'Number of discrete sound events per second.',
+    ranking: 'Wheeze ~ Crackle ~ Normal ~ Rhonchi ~ Stridor',
+  },
+];
+
+export const BIRD_CUE_ROWS: CueReferenceRow[] = [
+  {
+    cue: 'Average Song Pitch',
+    metric: 'average_pitch',
+    description: 'Mean fundamental frequency (F0) of the song.',
+    ranking: 'Ovenbird ~ Black-capped Chickadee ~ Tufted Titmouse ~ Wood Thrush ~ Eastern Towhee',
+  },
+  {
+    cue: 'High-Pitch Shrillness',
+    metric: 'hf_content',
+    description: 'Fraction of energy in the high band.',
+    ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Eastern Towhee ~ Wood Thrush ≪ Ovenbird',
+  },
+  // {
+  //   cue: 'Trill Rate / Note Tempo',
+  //   metric: 'event_rate',
+  //   description: 'Notes/syllables per second.',
+  //   ranking: 'Black-capped Chickadee ~ Ovenbird ~ Wood Thrush ~ Eastern Towhee ~ Tufted Titmouse',
+  // },
+  // {
+  //   cue: 'Gap Ratio / Pause Duration',
+  //   metric: 'silence_ratio',
+  //   description: 'Fraction of the clip that is silence between notes.',
+  //   ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Ovenbird ~ Eastern Towhee ~ Wood Thrush',
+  // },
+  {
+    cue: 'Note Frequency Span',
+    metric: 'spectral_bandwidth',
+    description: 'Frequency spread of the notes (broadband/buzzy vs pure tone).',
+    ranking: 'Ovenbird ≪ Black-capped Chickadee < Wood Thrush ~ Tufted Titmouse ~ Eastern Towhee',
+  },
+  {
+    cue: 'Vocal Inflection Speed',
+    metric: 'pitch_modulation_velocity',
+    description: 'How fast pitch changes frame-to-frame (warble speed).',
+    ranking: 'Black-capped Chickadee ~ Wood Thrush ~ Eastern Towhee ~ Tufted Titmouse ~ Ovenbird',
+  },
+];
+
+export function ReferenceTableV1({ domain = 'lung' }: { domain?: string }) {
+  const isBird = domain === 'bird';
+  const rows = isBird ? BIRD_CUE_ROWS : LUNG_CUE_ROWS;
+
+  return (
+    <div className="mb-6">
+      <div className="overflow-x-auto">
+        <table className="divide-y divide-gray-400 text-sm border-b border-gray-400 w-full">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Description</th>
+              <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Class Ranking (low → high)</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-400">
+            {rows.map((row) => (
+              <tr key={row.cue}>
+                <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">
+                  {row.cue}
+                </td>
+                <td className="px-4 py-2 text-gray-600">
+                  {row.description}
+                </td>
+                <td className="px-4 py-2 text-gray-800 font-medium min-w-[320px]">
+                  {row.ranking}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-xs text-gray-500 mt-2">
+          Legend: <span className="font-semibold">&lt;</span> moderate difference &middot;{' '}
+          <span className="font-semibold">&laquo;</span> strong difference &middot;{' '}
+          <span className="font-semibold">~</span> negligible difference (essentially tied)
+        </p>
       </div>
     </div>
   );
