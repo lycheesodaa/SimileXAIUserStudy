@@ -11,7 +11,8 @@ import { useStudyInstrumentation } from './useStudyInstrumentation';
 // The URL carries no class labels; Qualtrics Loop & Merge decides which
 // sample (and in what order) each participant sees. The xai param selects the
 // condition (similes, onomatopoeia, similes_dualview, onomatopoeia_dualview,
-// rexnet, examples, noxai); an unrecognized
+// similes_dualview_approx, onomatopoeia_dualview_approx, rexnet, examples,
+// noxai); an unrecognized
 // value renders the neutral fallback and logs lookup_error rather than
 // silently showing the wrong condition. Train mode shows the condition's
 // training/practice descriptions without any sample or navbar.

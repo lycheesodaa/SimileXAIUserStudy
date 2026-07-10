@@ -18,6 +18,8 @@ const XAI_CONDITIONS = [
   'onomatopoeia',
   'similes_dualview',
   'onomatopoeia_dualview',
+  'similes_dualview_approx',
+  'onomatopoeia_dualview_approx',
   'rexnet',
   'examples',
   'noxai',

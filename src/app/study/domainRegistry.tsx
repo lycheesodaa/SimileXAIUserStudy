@@ -11,7 +11,9 @@ import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
 import {
   ConceptSet,
   RexnetReport,
+  V1AttrBreakdownModel,
   V1BetaBreakdownModel,
+  attrBreakdownModelKey,
   V1FusedModel,
   V1Sample,
   betaBreakdownModelKey,
@@ -81,7 +83,7 @@ interface FusedView {
 const fusedVariant = (
   domain: string,
   set: ConceptSet,
-  dualview = false
+  dualview?: 'beta' | 'attr'
 ): StudyXaiVariant<FusedView> => ({
   getSample: async (sampleId) => {
     const [sample, conceptMap] = await Promise.all([
@@ -91,7 +93,37 @@ const fusedVariant = (
     const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
     if (!sample || !model?.concepts?.length) return undefined;
 
-    if (dualview) {
+    if (dualview === 'attr') {
+      // Approximate branch attribution of the deployed activation: the bundle
+      // ships clap/beats contributions that sum exactly to the plain view's
+      // contribution, so bars, order and net labels match the plain condition;
+      // only the two-shade split is added.
+      const attr = sample.models[attrBreakdownModelKey(domain, set)] as
+        | V1AttrBreakdownModel
+        | undefined;
+      if (!attr?.concepts?.length) return undefined;
+      const attrByConcept = new Map(attr.concepts.map((c) => [c.concept, c]));
+      const maxAbs = Math.max(...model.concepts.map((c) => Math.abs(c.contribution)), 1e-9);
+      const items: SimileItem[] = model.concepts.flatMap((c) => {
+        const a = attrByConcept.get(c.concept);
+        if (!a) return [];
+        return [
+          {
+            id: slugify(c.concept),
+            text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+            confidence: c.contribution / maxAbs,
+            displayValue: c.contribution,
+            clapValue: a.clap_contribution,
+            beatsValue: a.beats_contribution,
+            withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
+          },
+        ];
+      });
+      if (!items.length) return undefined;
+      return { sample, items, predictedLabel: model.predicted_label };
+    }
+
+    if (dualview === 'beta') {
       // Beta-breakdown view: per-concept evidence is decomposed into the two
       // fusion branches. Branch evidence = mixing weight × branch z × the
       // predicted-class head weight (taken from the fused model), so
@@ -242,8 +274,10 @@ const makeV1Domain = (domain: string): StudyDomainConfig => ({
   xaiVariants: {
     similes: fusedVariant(domain, 'similes'),
     onomatopoeia: fusedVariant(domain, 'onomatopoeia'),
-    similes_dualview: fusedVariant(domain, 'similes', true),
-    onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', true),
+    similes_dualview: fusedVariant(domain, 'similes', 'beta'),
+    onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', 'beta'),
+    similes_dualview_approx: fusedVariant(domain, 'similes', 'attr'),
+    onomatopoeia_dualview_approx: fusedVariant(domain, 'onomatopoeia', 'attr'),
     rexnet: rexnetVariant(domain),
     examples: protoVariant(domain),
     noxai: noXaiVariant(domain),

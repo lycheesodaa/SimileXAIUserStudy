@@ -37,6 +37,31 @@ export interface V1BetaBreakdownModel {
   concepts: V1BetaBreakdownConcept[];
 }
 
+export interface V1AttrBreakdownConcept {
+  concept: string;
+  category: string;
+  /** Identical to the fused model's activation (the deployed head input). */
+  activation: number;
+  clap_attribution: number;
+  beats_attribution: number;
+  clap_share: number;
+  /** = clap_attribution × head_weight; clap + beats == the fused model's
+   *  contribution exactly (verified across bundle). */
+  clap_contribution: number;
+  beats_contribution: number;
+}
+
+/** Approximate branch attribution of the deployed cos³ CBL activation
+ *  (decomposition: "approx_activation_split") — unlike the beta breakdown,
+ *  this reconciles exactly with the plain fused view. */
+export interface V1AttrBreakdownModel {
+  beta: number;
+  clap_weight: number;
+  beats_weight: number;
+  decomposition: string;
+  concepts: V1AttrBreakdownConcept[];
+}
+
 export interface V1Prototype {
   rank: number;
   proto_class: string;
@@ -88,6 +113,11 @@ export const betaBreakdownModelKey = (domain: string, set: ConceptSet): string =
   set === 'similes'
     ? `fused_beta_breakdown_simile_${domain}`
     : `fused_beta_breakdown_onomatopoeia_${domain}`;
+
+export const attrBreakdownModelKey = (domain: string, set: ConceptSet): string =>
+  set === 'similes'
+    ? `fused_attr_breakdown_simile_${domain}`
+    : `fused_attr_breakdown_onomatopoeia_${domain}`;
 
 // "rattle_rattle_rattle_gemini_tts" -> "rattle rattle rattle"
 export const prettifyOnomatopoeia = (concept: string): string =>
