@@ -59,16 +59,17 @@ export function CuesExplanation({
     (option) => comparisons && comparisons[option.id]
   );
 
-  const baselineOptions = (randomFoil && sampleId)
-    ? [getDeterministicFoil(sampleId, filteredOptions)].filter(Boolean) as typeof filteredOptions
-    : filteredOptions;
+  const initialFoil =
+    randomFoil && sampleId ? getDeterministicFoil(sampleId, filteredOptions) : filteredOptions[0];
+
+  const baselineOptions = filteredOptions;
 
   const [selectedBaselineId, setSelectedBaselineId] = useState(
-    baselineOptions[0]?.id || Object.values(CUE_RELATIONS)[0].id
+    initialFoil?.id || Object.values(CUE_RELATIONS)[0].id
   );
 
   useEffect(() => {
-    if (baselineOptions.length > 0 && !baselineOptions.some(o => o.id === selectedBaselineId)) {
+    if (baselineOptions.length > 0 && !baselineOptions.some((o) => o.id === selectedBaselineId)) {
       setSelectedBaselineId(baselineOptions[0].id);
     }
   }, [comparisons, baselineOptions, selectedBaselineId]);

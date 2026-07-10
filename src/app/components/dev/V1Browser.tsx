@@ -209,5 +209,5 @@ export function V1DevView() {
   if (isTrain) {
     return <>{xaiCfg.renderTrain()}</>;
   }
-  return <>{xaiCfg.render(load.view)}</>;
+  return <>{xaiCfg.render(load.view, { isStudy: false })}</>;
 }

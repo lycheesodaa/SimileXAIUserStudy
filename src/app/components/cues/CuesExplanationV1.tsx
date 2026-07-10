@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -8,6 +8,7 @@ import {
 } from '../ui/select';
 import { RexnetReport } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
+import { ReferenceTable } from './ReferenceTable';
 
 // Study-mode cues (RExNet) explanation, fed by the structured report parsed
 // from data_v1's explanation_md. Like the other study conditions, it never
@@ -17,11 +18,47 @@ import { ClassBadge } from '../ClassBadge';
 interface CuesExplanationV1Props {
   audioUrl: string;
   report: RexnetReport;
+  sampleId?: string;
+  randomFoil?: boolean;
+  hideDropdown?: boolean;
 }
 
-export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) {
+function getDeterministicFoil<T>(sampleId: string, options: T[]): T | undefined {
+  if (options.length === 0) return undefined;
+  let hash = 0;
+  for (let i = 0; i < sampleId.length; i++) {
+    hash = sampleId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % options.length;
+  return options[index];
+}
+
+export function CuesExplanationV1({
+  audioUrl,
+  report,
+  sampleId,
+  randomFoil = false,
+  hideDropdown = false,
+}: CuesExplanationV1Props) {
   const contrasts = report.contrasts;
-  const [selectedClass, setSelectedClass] = useState(contrasts[0]?.contrastClass ?? '');
+  const deterministicFoil =
+    randomFoil && sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
+
+  const [selectedClass, setSelectedClass] = useState(
+    deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
+  );
+
+  useEffect(() => {
+    if (randomFoil) {
+      const foil = sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
+      if (foil && foil.contrastClass !== selectedClass) {
+        setSelectedClass(foil.contrastClass);
+      }
+    } else if (contrasts.length > 0 && !contrasts.some((c) => c.contrastClass === selectedClass)) {
+      setSelectedClass(contrasts[0].contrastClass);
+    }
+  }, [contrasts, randomFoil, sampleId, selectedClass]);
+
   const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
 
   return (
@@ -52,24 +89,37 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
         ) : (
           <>
             <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <span className="text-gray-600 font-medium">Compare against:</span>
-              <Select value={selected?.contrastClass} onValueChange={setSelectedClass}>
-                <SelectTrigger className="w-64" data-log-id="contrast-select">
-                  <SelectValue placeholder="Select a contrast category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {contrasts.map((c) => (
-                    <SelectItem key={c.contrastClass} value={c.contrastClass}>
-                      {c.contrastClass}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selected?.contrastClass && (
+              {hideDropdown ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">Counterfactual Class:</span>
-                  <ClassBadge className={selected.contrastClass} size="sm" />
+                  <span className="text-gray-600 font-medium">
+                    Comparing against Counterfactual Class:
+                  </span>
+                  {selected?.contrastClass && (
+                    <ClassBadge className={selected.contrastClass} size="sm" />
+                  )}
                 </div>
+              ) : (
+                <>
+                  <span className="text-gray-600 font-medium">Compare against:</span>
+                  <Select value={selected?.contrastClass} onValueChange={setSelectedClass}>
+                    <SelectTrigger className="w-64" data-log-id="contrast-select">
+                      <SelectValue placeholder="Select a contrast category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contrasts.map((c) => (
+                        <SelectItem key={c.contrastClass} value={c.contrastClass}>
+                          {c.contrastClass}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selected?.contrastClass && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">Counterfactual Class:</span>
+                      <ClassBadge className={selected.contrastClass} size="sm" />
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
@@ -81,9 +131,9 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
                       {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">This Sound</th> */}
                       {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">{selected.contrastClass} Sound</th> */}
-                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Measured Relation</th>
+                      {/* <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Measured Relation</th> */}
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">System Predicted</th>
-                      <th className="px-4 py-2 text-center font-medium text-gray-500 uppercase">Match</th>
+                      {/* <th className="px-4 py-2 text-center font-medium text-gray-500 uppercase">Match</th> */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-400">
@@ -92,11 +142,11 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
                         <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{cue.cue}</td>
                         {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.targetValue}</td> */}
                         {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.foilValue}</td> */}
-                        <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.heuristicRelation}</td>
+                        {/* <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.heuristicRelation}</td> */}
                         <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.predictedRelation}</td>
-                        <td className={`px-4 py-2 whitespace-nowrap text-center font-semibold ${cue.agree ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {/* <td className={`px-4 py-2 whitespace-nowrap text-center font-semibold ${cue.agree ? 'text-emerald-600' : 'text-red-500'}`}>
                           {cue.agree ? '✓' : '✗'}
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                   </tbody>
@@ -111,6 +161,15 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
             )}
           </>
         )}
+      </div>
+
+      {/* Reference Table Section */}
+      <div className="mt-8 pt-4 border-t border-gray-200">
+        <h3 className="text-lg font-semibold mb-2">Acoustic Cues Reference Table</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Reference table summarizing the ranking of each acoustic attribute across lung sound categories:
+        </p>
+        <ReferenceTable />
       </div>
     </div>
   );

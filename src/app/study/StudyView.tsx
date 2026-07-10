@@ -108,5 +108,5 @@ export function StudyView() {
     return <>{xaiCfg.renderTrain()}</>;
   }
 
-  return <>{xaiCfg.render(sample)}</>;
+  return <>{xaiCfg.render(sample, { isStudy: true })}</>;
 }

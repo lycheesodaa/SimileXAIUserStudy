@@ -41,7 +41,7 @@ export interface StudyXaiVariant<S = unknown> {
   getSample(sampleId: string): Promise<S | undefined>;
   /** Resolve which audio a media event belongs to, from the element's src. */
   audioIdForSrc(sample: S, src: string): string;
-  render(sample: S): ReactNode;
+  render(sample: S, ctx?: { isStudy?: boolean }): ReactNode;
   /** Training/practice descriptions shown before the test items (no sample). */
   renderTrain(): ReactNode;
 }
@@ -214,7 +214,15 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => (s === view.sample.audio ? 'original' : undefined)),
-  render: (view) => <CuesExplanationV1 audioUrl={view.sample.audio} report={view.report} />,
+  render: (view, ctx) => (
+    <CuesExplanationV1
+      audioUrl={view.sample.audio}
+      report={view.report}
+      sampleId={view.sample.sample_id}
+      randomFoil={true}
+      hideDropdown={ctx?.isStudy === true}
+    />
+  ),
   renderTrain: () => <CuesPractice />,
 });
 
