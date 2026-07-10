@@ -1,4 +1,5 @@
 import { Badge } from '../ui/badge';
+import { ClassBadge } from '../ClassBadge';
 
 export interface ExampleItem {
   id: string;
@@ -47,11 +48,9 @@ export function ExampleList({ examples }: ExampleListProps) {
                           Similar Training Example {example.prototypeIdx !== undefined ? `(Prototype #${example.prototypeIdx})` : `#${example.rank}`}
                         </p>
                         <div className="flex flex-wrap gap-2 mb-2 items-center">
-                          <div>
-                            <span className="text-sm text-gray-500">True Class: </span>
-                            <Badge variant="secondary" className="mr-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-100">
-                              {example.className}
-                            </Badge>
+                          <div className="flex items-center gap-1.5 mr-2">
+                            <span className="text-sm text-gray-500">True Class:</span>
+                            <ClassBadge className={example.className} size="sm" />
                           </div>
                           {example.similarity !== undefined && (
                             <div>

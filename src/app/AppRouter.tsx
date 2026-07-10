@@ -35,8 +35,8 @@ const VERSION_HOME: Record<string, string> = {
 const XAI_TYPES_BY_VERSION: Record<string, { value: string; label: string }[]> = {
   'v0.1': [
     { value: 'similes', label: 'Similes' },
-    { value: 'rexnet', label: 'RexNet' },
     { value: 'onomatopoeia', label: 'Onomatopoeia' },
+    { value: 'rexnet', label: 'RexNet' },
     { value: 'examples', label: 'Examples' },
   ],
   'v0.2': [{ value: 'similes_v3', label: 'Similes V3' }],

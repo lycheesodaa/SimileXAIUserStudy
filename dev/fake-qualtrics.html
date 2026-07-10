@@ -8,9 +8,12 @@
   header { background: #147bd1; color: #fff; padding: 12px 20px; font-size: 15px; }
   .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; padding: 14px 20px; background: #fff; border-bottom: 1px solid #ddd; }
   .controls label { display: flex; flex-direction: column; font-size: 12px; color: #555; gap: 3px; }
-  .controls input, .controls select { padding: 5px 8px; font-size: 13px; min-width: 160px; }
-  .controls input#sampleId { min-width: 320px; }
-  button { padding: 7px 16px; font-size: 13px; cursor: pointer; }
+  .controls input, .controls select { padding: 5px 8px; font-size: 13px; min-width: 140px; }
+  .controls select#sampleId { min-width: 340px; max-width: 480px; }
+  button { padding: 6px 14px; font-size: 13px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: #f8f9fa; }
+  button:hover:not(:disabled) { background: #e9ecef; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .nav-group { display: flex; gap: 6px; align-items: center; }
   .survey { max-width: 1000px; margin: 24px auto; background: #fff; padding: 24px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
   .qtext { font-size: 15px; margin-bottom: 12px; }
   iframe { width: 100%; height: 900px; border: none; }
@@ -22,40 +25,48 @@
 
 <div class="controls">
   <label>App base URL (dev server incl. base path)
-    <input id="origin" value="http://localhost:5173/SimileXAIUserStudy" style="min-width:280px">
+    <input id="origin" value="http://localhost:5173/SimileXAIUserStudy" style="min-width:260px" onchange="onOriginChange()">
   </label>
   <label>Domain (lm://Field/2)
-    <input id="domain" value="lung">
+    <select id="domain" onchange="onDomainChange()">
+      <option value="lung" selected>lung</option>
+      <option value="bird">bird</option>
+    </select>
   </label>
   <label>Mode
-    <select id="mode">
+    <select id="mode" onchange="onModeChange()">
       <option value="test" selected>test</option>
       <option value="train">train</option>
     </select>
   </label>
-  <label>Sample ID (lm://Field/1, ignored in train mode)
-    <input id="sampleId" value="icbhi_156_8b3_Ar_mc_AKGC417L_0">
-  </label>
   <label>XAI type (lm://Field/3)
-    <input id="xai" value="similes" list="xaiOptions">
-    <datalist id="xaiOptions">
-      <option value="similes">
-      <option value="onomatopoeia">
-      <option value="similes_dualview">
-      <option value="onomatopoeia_dualview">
-      <option value="similes_dualview_approx">
-      <option value="onomatopoeia_dualview_approx">
-      <option value="rexnet">
-      <option value="examples">
-      <option value="noxai">
-    </datalist>
+    <select id="xai" onchange="load()">
+      <option value="similes" selected>similes</option>
+      <option value="onomatopoeia">onomatopoeia</option>
+      <option value="similes_dualview">similes_dualview</option>
+      <option value="onomatopoeia_dualview">onomatopoeia_dualview</option>
+      <option value="similes_dualview_approx">similes_dualview_approx</option>
+      <option value="onomatopoeia_dualview_approx">onomatopoeia_dualview_approx</option>
+      <option value="rexnet">rexnet</option>
+      <option value="examples">examples</option>
+      <option value="noxai">noxai</option>
+    </select>
   </label>
-  <!-- sample ids come from public/data_v1/<domain>/core_samples.json (see dev/loop-and-merge-*.tsv) -->
+  <!-- sample ids come from public/data_v1/<domain>/core_samples.json -->
+  <label>Sample ID (lm://Field/1, ignored in train mode)
+    <div class="nav-group">
+      <select id="sampleId" onchange="onSampleChange()">
+        <option value="sprsound_40985693_3.4_0_p2_8627_2">sprsound_40985693_3.4_0_p2_8627_2</option>
+      </select>
+      <button id="prevBtn" type="button" onclick="prevSample()" disabled>← Prev</button>
+      <button id="nextBtn" type="button" onclick="nextSample()" disabled>Next →</button>
+    </div>
+  </label>
   <label>pid (e://Field/PROLIFIC_PID)
-    <input id="pid" value="TEST123">
+    <input id="pid" value="TEST123" style="min-width:90px" onchange="load()">
   </label>
   <label>pos (loop position)
-    <input id="pos" value="1" style="min-width:60px">
+    <input id="pos" value="1" style="min-width:50px" onchange="load()">
   </label>
   <button onclick="load()">Load question</button>
 </div>
@@ -67,6 +78,115 @@
 </div>
 
 <script>
+let coreSamples = [];
+let currentIndex = -1;
+
+const DEFAULT_SAMPLES = {
+  lung: 'sprsound_40985693_3.4_0_p2_8627_2',
+  bird: 'bird_Recording_1_Recording_1_Segment_28_32'
+};
+
+async function fetchCoreSamples(keepSelected) {
+  const origin = document.getElementById('origin').value.replace(/\/$/, '');
+  const domain = document.getElementById('domain').value;
+  const select = document.getElementById('sampleId');
+  const currentVal = keepSelected ? select.value : DEFAULT_SAMPLES[domain];
+
+  try {
+    const res = await fetch(`${origin}/data_v1/${domain}/core_samples.json`);
+    if (res.ok) {
+      coreSamples = await res.json();
+      populateSampleSelect(currentVal);
+      return;
+    }
+  } catch (err) {
+    console.warn('Could not fetch core_samples.json automatically, using fallback sample', err);
+  }
+
+  coreSamples = [];
+  select.innerHTML = '';
+  const opt = document.createElement('option');
+  opt.value = DEFAULT_SAMPLES[domain];
+  opt.textContent = DEFAULT_SAMPLES[domain];
+  select.appendChild(opt);
+  select.value = DEFAULT_SAMPLES[domain];
+  updateNavButtons();
+}
+
+function populateSampleSelect(preferredId) {
+  const select = document.getElementById('sampleId');
+  select.innerHTML = '';
+
+  if (!coreSamples || coreSamples.length === 0) {
+    const defaultSample = DEFAULT_SAMPLES[document.getElementById('domain').value] || '';
+    const opt = document.createElement('option');
+    opt.value = defaultSample;
+    opt.textContent = defaultSample;
+    select.appendChild(opt);
+    select.value = defaultSample;
+  } else {
+    coreSamples.forEach((s) => {
+      const opt = document.createElement('option');
+      opt.value = s.sample_id;
+      opt.textContent = `${s.sample_id} — ${s.true_label}`;
+      select.appendChild(opt);
+    });
+    const exists = coreSamples.some(s => s.sample_id === preferredId);
+    select.value = exists ? preferredId : coreSamples[0].sample_id;
+  }
+  updateNavButtons();
+}
+
+function updateNavButtons() {
+  const select = document.getElementById('sampleId');
+  const mode = document.getElementById('mode').value;
+  const isTrain = mode === 'train';
+
+  currentIndex = coreSamples.findIndex(s => s.sample_id === select.value);
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  select.disabled = isTrain;
+  if (prevBtn) prevBtn.disabled = isTrain || currentIndex <= 0;
+  if (nextBtn) nextBtn.disabled = isTrain || currentIndex === -1 || currentIndex >= coreSamples.length - 1;
+}
+
+function prevSample() {
+  if (currentIndex > 0) {
+    document.getElementById('sampleId').value = coreSamples[currentIndex - 1].sample_id;
+    updateNavButtons();
+    load();
+  }
+}
+
+function nextSample() {
+  if (currentIndex >= 0 && currentIndex < coreSamples.length - 1) {
+    document.getElementById('sampleId').value = coreSamples[currentIndex + 1].sample_id;
+    updateNavButtons();
+    load();
+  }
+}
+
+function onSampleChange() {
+  updateNavButtons();
+  load();
+}
+
+async function onDomainChange() {
+  await fetchCoreSamples(false);
+  load();
+}
+
+function onModeChange() {
+  updateNavButtons();
+  load();
+}
+
+async function onOriginChange() {
+  await fetchCoreSamples(true);
+  load();
+}
+
 function load() {
   const origin = document.getElementById('origin').value.replace(/\/$/, '');
   const domain = encodeURIComponent(document.getElementById('domain').value);
@@ -80,7 +200,8 @@ function load() {
   document.getElementById('frame').src = url;
   document.getElementById('src').textContent = url;
 }
-load();
+
+fetchCoreSamples(false).then(() => load());
 </script>
 </body>
 </html>

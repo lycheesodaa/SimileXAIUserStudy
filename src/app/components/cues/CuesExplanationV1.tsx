@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { RexnetReport } from '../../study/dataV1';
+import { ClassBadge } from '../ClassBadge';
 
 // Study-mode cues (RExNet) explanation, fed by the structured report parsed
 // from data_v1's explanation_md. Like the other study conditions, it never
@@ -50,7 +51,7 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
           <p className="text-gray-500 italic">No cue comparisons available for this sample.</p>
         ) : (
           <>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
               <span className="text-gray-600 font-medium">Compare against:</span>
               <Select value={selected?.contrastClass} onValueChange={setSelectedClass}>
                 <SelectTrigger className="w-64" data-log-id="contrast-select">
@@ -64,6 +65,12 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
                   ))}
                 </SelectContent>
               </Select>
+              {selected?.contrastClass && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Counterfactual Class:</span>
+                  <ClassBadge className={selected.contrastClass} size="sm" />
+                </div>
+              )}
             </div>
 
             {selected && (
@@ -72,8 +79,8 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
                   <thead>
                     <tr>
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
-                      <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">This Sound</th>
-                      <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">{selected.contrastClass} Sound</th>
+                      {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">This Sound</th> */}
+                      {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">{selected.contrastClass} Sound</th> */}
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Measured Relation</th>
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">System Predicted</th>
                       <th className="px-4 py-2 text-center font-medium text-gray-500 uppercase">Match</th>
@@ -83,8 +90,8 @@ export function CuesExplanationV1({ audioUrl, report }: CuesExplanationV1Props) 
                     {selected.cues.map((cue) => (
                       <tr key={cue.cue}>
                         <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{cue.cue}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.targetValue}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.foilValue}</td>
+                        {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.targetValue}</td> */}
+                        {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.foilValue}</td> */}
                         <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.heuristicRelation}</td>
                         <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.predictedRelation}</td>
                         <td className={`px-4 py-2 whitespace-nowrap text-center font-semibold ${cue.agree ? 'text-emerald-600' : 'text-red-500'}`}>

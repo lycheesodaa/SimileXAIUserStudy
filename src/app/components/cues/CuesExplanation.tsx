@@ -8,6 +8,7 @@ import {
 } from '../ui/select';
 import { ReferenceTable } from './ReferenceTable';
 import { CUE_RELATIONS } from '../../cueRelations';
+import { ClassBadge } from '../ClassBadge';
 
 const BASELINE_TO_CLASS_INDEX: Record<string, string> = {
   'coarse-crackles': 'class0',
@@ -139,6 +140,7 @@ export function CuesExplanation({
                 ))}
               </SelectContent>
             </Select>
+            <ClassBadge className={selectedBaselineName} size="sm" extraClasses="mr-1" />
             <span className="text-gray-600">, the current recording has:</span>
           </div>
 

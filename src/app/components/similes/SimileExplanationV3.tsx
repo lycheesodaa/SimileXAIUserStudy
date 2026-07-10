@@ -1,6 +1,7 @@
 import { ReactNode, useState, useRef } from 'react';
 import { Play, Pause, HelpCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { SimilePractice } from './SimilePractice';
+import { ClassBadge, resolveConceptCategory } from '../ClassBadge';
 
 export interface SimileItem {
   id: string;
@@ -14,6 +15,7 @@ export interface SimileItem {
    *  displayValue must equal clapValue + beatsValue. */
   clapValue?: number;
   beatsValue?: number;
+  category?: string;
   withinClassAudioUrl?: string;
 }
 
@@ -75,10 +77,12 @@ export function SimileExplanationV3({
   threshold = 0.25,
   cheatsheet,
 }: SimileExplanationV3Props) {
+  const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
+
   // Filter and sort similes for the tornado plot
   const filteredSimiles = similes
     .filter((s) => Math.abs(s.confidence) >= threshold)
-    .sort((a, b) => Math.abs(b.confidence) - Math.abs(a.confidence));
+    .sort((a, b) => magnitude(b) - magnitude(a));
 
   const isDualView = filteredSimiles.some(
     (s) => s.clapValue !== undefined && s.beatsValue !== undefined
@@ -88,18 +92,24 @@ export function SimileExplanationV3({
   const OUTSIDE_LABEL_BELOW = 1.2;
   // Onomatopoeia tokens are much shorter than simile sentences; a narrower
   // plot and label column avoid a large empty gutter on the left.
-  const plotWidthClass = isOnomatopoeia ? 'max-w-2xl' : 'max-w-4xl';
-  const rowGridClass = isOnomatopoeia ? 'grid-cols-[10rem_1fr]' : 'grid-cols-[1fr_2fr]';
+  const plotWidthClass = isOnomatopoeia ? 'max-w-4xl' : 'max-w-4xl';
+  const rowGridClass = isOnomatopoeia ? 'grid-cols-[16rem_1fr]' : 'grid-cols-[1fr_2fr]';
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMinor, setShowMinor] = useState(false);
 
-  // Bars whose raw evidence magnitude is below this get tucked into a
-  // collapsible "Show more" section to keep the primary plot uncluttered.
+  // Bars whose raw evidence magnitude is below MINOR_BELOW get tucked into a
+  // collapsible "Show more" section, but ensure we show at least MIN_MAJOR_COUNT items
+  // in the major list (or the entire list if fewer than MIN_MAJOR_COUNT).
   const MINOR_BELOW = 1;
-  const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
-  const majorSimiles = filteredSimiles.filter((s) => magnitude(s) >= MINOR_BELOW);
-  const minorSimiles = filteredSimiles.filter((s) => magnitude(s) < MINOR_BELOW);
+  const MIN_MAJOR_COUNT = 10;
+  const aboveThresholdCount = filteredSimiles.filter((s) => magnitude(s) >= MINOR_BELOW).length;
+  const majorCount = Math.min(
+    filteredSimiles.length,
+    Math.max(MIN_MAJOR_COUNT, aboveThresholdCount)
+  );
+  const majorSimiles = filteredSimiles.slice(0, majorCount);
+  const minorSimiles = filteredSimiles.slice(majorCount);
 
   const getAudioUrl = (path: string | undefined) => {
     if (!path) return '';
@@ -171,13 +181,22 @@ export function SimileExplanationV3({
       </span>
     );
 
+    const categoryClass = resolveConceptCategory(s.text, s.category);
+
     return (
       <div key={s.id} className={`grid ${rowGridClass} gap-4 items-center mb-2`}>
-        <div className="flex justify-end items-center gap-2 text-right text-sm text-gray-700 leading-tight">
-          <span>{s.text}</span>
-          {s.withinClassAudioUrl && (
-            <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
-          )}
+        <div className="flex justify-between items-center gap-2 text-sm text-gray-700 leading-tight">
+          <div className="flex items-center flex-shrink-0">
+            {categoryClass && (
+              <ClassBadge className={categoryClass} useAbbrev size="xs" />
+            )}
+          </div>
+          <div className="flex justify-end items-center gap-2 text-right">
+            <span>{s.text}</span>
+            {s.withinClassAudioUrl && (
+              <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
+            )}
+          </div>
         </div>
         <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm">
           {/* Center line */}
@@ -234,7 +253,7 @@ export function SimileExplanationV3({
       {/* Tornado Plot Section */}
       <div className="mb-6">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Simile Evidence (Tornado Plot)</h2>
+          <h2 className="text-xl font-semibold mb-2">{isOnomatopoeia ? 'Onomatopoeia' : 'Simile'} Explanation</h2>
           <p className="text-gray-600">
             The system detects the following {isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} as positive or negative evidence for this classification.
           </p>

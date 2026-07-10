@@ -111,6 +111,7 @@ const fusedVariant = (
           {
             id: slugify(c.concept),
             text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+            category: c.category ?? conceptMap?.get(c.concept)?.category,
             confidence: c.contribution / maxAbs,
             displayValue: c.contribution,
             clapValue: a.clap_contribution,
@@ -145,6 +146,7 @@ const fusedVariant = (
           {
             id: slugify(c.concept),
             text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+            category: c.category ?? conceptMap?.get(c.concept)?.category,
             net: clap + beats,
             clapValue: clap,
             beatsValue: beats,
@@ -166,6 +168,7 @@ const fusedVariant = (
     const items: SimileItem[] = model.concepts.map((c) => ({
       id: slugify(c.concept),
       text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+      category: c.category ?? conceptMap?.get(c.concept)?.category,
       confidence: c.contribution / maxAbs,
       displayValue: c.contribution,
       withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
@@ -273,10 +276,10 @@ const makeV1Domain = (domain: string): StudyDomainConfig => ({
   defaultXai: 'similes',
   xaiVariants: {
     similes: fusedVariant(domain, 'similes'),
-    onomatopoeia: fusedVariant(domain, 'onomatopoeia'),
     similes_dualview: fusedVariant(domain, 'similes', 'beta'),
-    onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', 'beta'),
     similes_dualview_approx: fusedVariant(domain, 'similes', 'attr'),
+    onomatopoeia: fusedVariant(domain, 'onomatopoeia'),
+    onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', 'beta'),
     onomatopoeia_dualview_approx: fusedVariant(domain, 'onomatopoeia', 'attr'),
     rexnet: rexnetVariant(domain),
     examples: protoVariant(domain),
