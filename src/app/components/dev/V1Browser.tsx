@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { STUDY_DOMAINS } from '../../study/domainRegistry';
-import { CoreSampleInfo, loadCoreSamples } from '../../study/dataV1';
+import {
+  CoreSampleInfo,
+  V1ModelVerdict,
+  loadCoreSamples,
+  loadSample,
+  modelKeyForXai,
+} from '../../study/dataV1';
 
 // Dev-only browser for the v1 study conditions, mounted at
 //   /#/v1/:domain/test/:sampleId?xai=<condition>
@@ -53,6 +59,29 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
       cancelled = true;
     };
   }, [domain]);
+
+  // The selected condition's model verdict (predicted label / correct /
+  // faithful), read from the sample JSON. Cached by loadSample, so this shares
+  // the fetch V1DevView already issues. Dev-only — never shown to participants.
+  const [verdict, setVerdict] = useState<V1ModelVerdict | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setVerdict(null);
+    if (mode !== 'test' || !sampleId) return;
+    const key = modelKeyForXai(domain, xai);
+    if (!key) return; // noxai: no model verdict to show
+    loadSample(domain, sampleId).then((s) => {
+      if (cancelled || !s) return;
+      const m = s.models[key] as
+        | { predicted_label?: string; correct?: boolean; faithful?: number }
+        | undefined;
+      if (!m) return;
+      setVerdict({ predictedLabel: m.predicted_label, correct: m.correct, faithful: m.faithful });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [domain, sampleId, xai, mode]);
 
   const goTo = (d: string, m: string, id: string | undefined, x: string) => {
     const path = m === 'train' ? `/v1/${d}/train` : `/v1/${d}/test${id ? `/${encodeURIComponent(id)}` : ''}`;
@@ -127,6 +156,22 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
           {index >= 0 && (
             <span style={{ fontSize: '13px', color: '#0369a1' }}>
               True label: <b>{samples[index].true_label}</b>
+            </span>
+          )}
+          {verdict?.predictedLabel && (
+            <span style={{ fontSize: '13px', color: '#0369a1' }}>
+              AI predicted: <b>{verdict.predictedLabel}</b>
+              {verdict.correct != null && (
+                <b style={{ color: verdict.correct ? '#15803d' : '#b91c1c' }}>
+                  {' '}
+                  {verdict.correct ? '✓' : '✗'}
+                </b>
+              )}
+            </span>
+          )}
+          {verdict?.faithful != null && (
+            <span style={{ fontSize: '13px', color: '#0369a1' }}>
+              Faithfulness: <b>{Math.round(verdict.faithful * 5)}/5</b>
             </span>
           )}
           <div style={{ display: 'flex', gap: '6px', marginLeft: 'auto' }}>

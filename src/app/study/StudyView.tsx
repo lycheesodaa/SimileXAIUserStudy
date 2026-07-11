@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
+import { Loader2 } from 'lucide-react';
 import { STUDY_DOMAINS } from './domainRegistry';
 import { createStudyLogger } from './logger';
 import { useStudyInstrumentation } from './useStudyInstrumentation';
@@ -101,7 +102,15 @@ export function StudyView() {
   }
 
   if (load.status === 'loading') {
-    return <div className="min-h-[300px]" aria-busy="true" />;
+    return (
+      <div
+        className="flex flex-col items-center justify-center min-h-[400px] gap-3 text-gray-500"
+        aria-busy="true"
+      >
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        <span className="text-sm font-medium">Loading explanation...</span>
+      </div>
+    );
   }
 
   if (isTrain) {

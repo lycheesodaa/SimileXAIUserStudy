@@ -17,6 +17,11 @@ export interface V1FusedModel {
   family: string;
   concept_set: 'similes' | 'onomatopoeia';
   predicted_label: string;
+  /** Whether predicted_label == the clip's true label. */
+  correct?: boolean;
+  /** Fraction of top-5 highest-activation concepts whose category matches the
+   *  true label; quantized to k/5. See UI_GUIDELINES.md §4. */
+  faithful?: number;
   // Sorted by |contribution| descending in the bundle.
   concepts: V1FusedConcept[];
 }
@@ -118,6 +123,27 @@ export const attrBreakdownModelKey = (domain: string, set: ConceptSet): string =
   set === 'similes'
     ? `fused_attr_breakdown_simile_${domain}`
     : `fused_attr_breakdown_onomatopoeia_${domain}`;
+
+// Maps a study xai-condition key to the per-sample model key whose
+// predicted_label / correct / faithful fields back it. All three simile
+// conditions (plain, beta, attr) share the one fused simile model; likewise
+// onomatopoeia. noxai has no model. Used by the dev navbar to surface the
+// model's verdict — never shown to participants.
+export const modelKeyForXai = (domain: string, xai: string): string | undefined => {
+  if (xai.startsWith('onomatopoeia')) return fusedModelKey(domain, 'onomatopoeia');
+  if (xai.startsWith('similes')) return fusedModelKey(domain, 'similes');
+  if (xai === 'rexnet') return 'rexnet';
+  if (xai === 'examples') return 'proto';
+  return undefined; // noxai (audio only)
+};
+
+// The model's own decision + trust fields, as carried on each per-sample model
+// object. `faithful` is absent for rexnet; both are absent for noxai.
+export interface V1ModelVerdict {
+  predictedLabel?: string;
+  correct?: boolean;
+  faithful?: number;
+}
 
 // "rattle_rattle_rattle_gemini_tts" -> "rattle rattle rattle"
 export const prettifyOnomatopoeia = (concept: string): string =>
