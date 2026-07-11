@@ -516,7 +516,8 @@ export function AppRouter() {
 
             {/* Study mode (Qualtrics-embedded; no class labels in URL, no navbar).
                 train = practice descriptions, test = one sample's explanation */}
-            <Route path="/study/v1/:domain/:mode/:sampleId?" element={<StudyView />} />
+            <Route path="/study/v1" element={<Navigate to="/study/v1/lung/test" replace />} />
+            <Route path="/study/v1/:domain/:mode?/:sampleId?" element={<StudyView />} />
             <Route path="/study/v1/*" element={<StudyFallback />} />
             <Route path="/study/*" element={<StudyVersionRedirect />} />
 

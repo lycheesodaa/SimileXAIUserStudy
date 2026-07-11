@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { STUDY_DOMAINS } from './domainRegistry';
+import { loadCoreSamples } from './dataV1';
 import { createStudyLogger } from './logger';
 import { useStudyInstrumentation } from './useStudyInstrumentation';
 
@@ -27,16 +28,35 @@ type LoadState =
   | { status: 'missing' };
 
 export function StudyView() {
-  const { domain, mode, sampleId } = useParams<{ domain: string; mode: string; sampleId?: string }>();
+  const rawParams = useParams<{ domain: string; mode?: string; sampleId?: string }>();
   const [searchParams] = useSearchParams();
 
-  const pid = searchParams.get('pid') || 'unknown';
+  const domain = (rawParams.domain || 'lung').trim();
+  const mode = (rawParams.mode || 'test').trim();
+  const rawSampleId = rawParams.sampleId?.trim();
+
+  const pid = (searchParams.get('pid') || 'unknown').trim();
   const pos = searchParams.get('pos');
 
   const isTrain = mode === 'train';
-  const domainCfg = domain ? STUDY_DOMAINS[domain] : undefined;
-  const xaiType = searchParams.get('xai') || domainCfg?.defaultXai || 'similes';
+  const domainCfg = STUDY_DOMAINS[domain];
+  const xaiType = (searchParams.get('xai') || domainCfg?.defaultXai || 'similes').trim();
   const xaiCfg = domainCfg?.xaiVariants[xaiType];
+
+  const [resolvedSampleId, setResolvedSampleId] = useState<string | undefined>(rawSampleId);
+  useEffect(() => {
+    if (rawSampleId) {
+      setResolvedSampleId(rawSampleId);
+      return;
+    }
+    if (!isTrain && domain) {
+      loadCoreSamples(domain).then((list) => {
+        if (list?.[0]) {
+          setResolvedSampleId(list[0].sample_id);
+        }
+      });
+    }
+  }, [rawSampleId, isTrain, domain]);
 
   const [load, setLoad] = useState<LoadState>({ status: 'loading' });
   useEffect(() => {
@@ -44,20 +64,24 @@ export function StudyView() {
       setLoad({ status: 'ready' });
       return;
     }
-    if (!xaiCfg || !sampleId) {
-      setLoad({ status: 'missing' });
+    if (!xaiCfg || !resolvedSampleId) {
+      if (!xaiCfg) {
+        setLoad({ status: 'missing' });
+      } else {
+        setLoad({ status: 'loading' });
+      }
       return;
     }
     let cancelled = false;
     setLoad({ status: 'loading' });
-    xaiCfg.getSample(sampleId).then((sample) => {
+    xaiCfg.getSample(resolvedSampleId).then((sample) => {
       if (cancelled) return;
       setLoad(sample ? { status: 'ready', sample } : { status: 'missing' });
     });
     return () => {
       cancelled = true;
     };
-  }, [xaiCfg, sampleId, isTrain]);
+  }, [xaiCfg, resolvedSampleId, isTrain]);
 
   const lookupFailed = !xaiCfg || load.status === 'missing';
   const sample = load.status === 'ready' ? load.sample : undefined;
@@ -68,11 +92,11 @@ export function StudyView() {
         pid,
         domain: domain || 'unknown',
         mode: mode || 'unknown',
-        sampleId: sampleId || (isTrain ? 'none' : 'unknown'),
+        sampleId: resolvedSampleId || (isTrain ? 'none' : 'unknown'),
         xaiType,
       }),
     // one logger per mounted study page (domain/mode/sample change = new session)
-    [pid, domain, mode, sampleId, isTrain, xaiType]
+    [pid, domain, mode, resolvedSampleId, isTrain, xaiType]
   );
 
   // Instrumentation runs for both modes; skipped entirely on failed lookups
@@ -88,10 +112,10 @@ export function StudyView() {
   // but participants get a neutral message with no study details.
   useEffect(() => {
     if (!lookupFailed) return;
-    logger.log('lookup_error', { domain, mode, sampleId, xaiType });
+    logger.log('lookup_error', { domain, mode, sampleId: resolvedSampleId, xaiType });
     logger.flush();
     return () => logger.dispose();
-  }, [lookupFailed, logger, domain, mode, sampleId, xaiType]);
+  }, [lookupFailed, logger, domain, mode, resolvedSampleId, xaiType]);
 
   if (lookupFailed) {
     return (
