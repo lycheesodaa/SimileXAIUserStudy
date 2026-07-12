@@ -26,6 +26,30 @@ export interface V1FusedModel {
   concepts: V1FusedConcept[];
 }
 
+export interface V1ActivationsConcept {
+  concept: string;
+  category: string;
+  activation: number;
+  /** 0 for concepts the sparse head dropped. */
+  head_weight: number;
+  contribution: number;
+  used_by_head: boolean;
+}
+
+/** Full-concept activation card (manifest `view: "activation_only"`): every
+ *  concept's raw activation for the sample — including the ones the sparse
+ *  head zeroed out — sorted by activation, head-independent. Sibling of the
+ *  fused card under `<fusedKey>_activations`; `of` points back to it. */
+export interface V1ActivationsModel {
+  family: string;
+  concept_set: 'similes' | 'onomatopoeia';
+  view: string;
+  of: string;
+  predicted_label: string;
+  correct?: boolean;
+  concepts: V1ActivationsConcept[];
+}
+
 export interface V1BetaBreakdownConcept {
   concept: string;
   category: string;
@@ -114,6 +138,9 @@ export type ConceptSet = 'similes' | 'onomatopoeia';
 export const fusedModelKey = (domain: string, set: ConceptSet): string =>
   set === 'similes' ? `fused_simile_${domain}` : `fused_onomatopoeia_${domain}`;
 
+export const activationsModelKey = (domain: string, set: ConceptSet): string =>
+  `${fusedModelKey(domain, set)}_activations`;
+
 export const betaBreakdownModelKey = (domain: string, set: ConceptSet): string =>
   set === 'similes'
     ? `fused_beta_breakdown_simile_${domain}`
@@ -125,9 +152,9 @@ export const attrBreakdownModelKey = (domain: string, set: ConceptSet): string =
     : `fused_attr_breakdown_onomatopoeia_${domain}`;
 
 // Maps a study xai-condition key to the per-sample model key whose
-// predicted_label / correct / faithful fields back it. All three simile
-// conditions (plain, beta, attr) share the one fused simile model; likewise
-// onomatopoeia. noxai has no model. Used by the dev navbar to surface the
+// predicted_label / correct / faithful fields back it. All simile conditions
+// (plain, beta, attr, activation-only) share the one fused simile model;
+// likewise onomatopoeia. noxai has no model. Used by the dev navbar to surface the
 // model's verdict — never shown to participants.
 export const modelKeyForXai = (domain: string, xai: string): string | undefined => {
   if (xai.startsWith('onomatopoeia')) return fusedModelKey(domain, 'onomatopoeia');

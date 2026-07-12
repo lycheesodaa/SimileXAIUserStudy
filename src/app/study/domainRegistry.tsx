@@ -14,8 +14,10 @@ import {
   ConceptSet,
   DataRoot,
   RexnetReport,
+  V1ActivationsModel,
   V1AttrBreakdownModel,
   V1BetaBreakdownModel,
+  activationsModelKey,
   attrBreakdownModelKey,
   V1FusedModel,
   V1Sample,
@@ -90,7 +92,11 @@ interface FusedView {
 const fusedVariant = (
   domain: string,
   set: ConceptSet,
-  dualview?: 'beta' | 'attr'
+  // 'beta' / 'attr' split the contribution bars by fusion branch; 'actv' shows
+  // the head-independent activation card (all concepts, incl. sparsity-dropped
+  // ones); 'actv_dual' additionally splits each kept concept's activation into
+  // its clap/beats attributions.
+  mode?: 'beta' | 'attr' | 'actv' | 'actv_dual'
 ): StudyXaiVariant<FusedView> => ({
   getSample: async (sampleId, root) => {
     const [sample, conceptMap] = await Promise.all([
@@ -100,7 +106,41 @@ const fusedVariant = (
     const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
     if (!sample || !model?.concepts?.length) return undefined;
 
-    if (dualview === 'attr') {
+    if (mode === 'actv' || mode === 'actv_dual') {
+      // Activation-only card: the full concept list (not just the sparse
+      // head's subset), bar = raw activation. usedByHead lets the UI mark
+      // which of the firing concepts the classifier actually relied on. In
+      // the dual variant, concepts the head kept also get the attr
+      // breakdown's branch split (clap_attribution + beats_attribution ==
+      // activation exactly); dropped concepts have no branch data and render
+      // as plain bars.
+      const actv = sample.models[activationsModelKey(domain, set)] as
+        | V1ActivationsModel
+        | undefined;
+      if (!actv?.concepts?.length) return undefined;
+      const attr =
+        mode === 'actv_dual'
+          ? (sample.models[attrBreakdownModelKey(domain, set)] as V1AttrBreakdownModel | undefined)
+          : undefined;
+      const attrByConcept = new Map((attr?.concepts ?? []).map((c) => [c.concept, c]));
+      const maxAbs = Math.max(...actv.concepts.map((c) => Math.abs(c.activation)), 1e-9);
+      const items: SimileItem[] = actv.concepts.map((c) => {
+        const a = attrByConcept.get(c.concept);
+        return {
+          id: slugify(c.concept),
+          text: set === 'onomatopoeia' ? prettifyOnomatopoeia(c.concept) : c.concept,
+          category: c.category ?? conceptMap?.get(c.concept)?.category,
+          confidence: c.activation / maxAbs,
+          displayValue: c.activation,
+          usedByHead: c.used_by_head,
+          ...(a ? { clapValue: a.clap_attribution, beatsValue: a.beats_attribution } : {}),
+          withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
+        };
+      });
+      return { sample, items, predictedLabel: actv.predicted_label };
+    }
+
+    if (mode === 'attr') {
       // Approximate branch attribution of the deployed activation: the bundle
       // ships clap/beats contributions that sum exactly to the plain view's
       // contribution, so bars, order and net labels match the plain condition;
@@ -131,7 +171,7 @@ const fusedVariant = (
       return { sample, items, predictedLabel: model.predicted_label };
     }
 
-    if (dualview === 'beta') {
+    if (mode === 'beta') {
       // Beta-breakdown view: per-concept evidence is decomposed into the two
       // fusion branches. Branch evidence = mixing weight × branch z × the
       // predicted-class head weight (taken from the fused model), so
@@ -195,6 +235,7 @@ const fusedVariant = (
       originalAudioUrl={view.sample.audio}
       isOnomatopoeia={set === 'onomatopoeia'}
       threshold={0}
+      activationView={mode === 'actv' || mode === 'actv_dual'}
       cheatsheet={<ConceptCheatsheet domain={domain} set={set} />}
     />
   ),
@@ -206,7 +247,7 @@ const fusedVariant = (
       similes={view.items}
       originalAudioUrl={view.sample.audio}
       isOnomatopoeia={set === 'onomatopoeia'}
-      dualview={dualview !== undefined}
+      dualview={mode === 'beta' || mode === 'attr' || mode === 'actv_dual'}
     />
   ),
 });
@@ -313,11 +354,17 @@ const makeV1Domain = (domain: string): StudyDomainConfig => ({
   defaultXai: 'similes',
   xaiVariants: {
     similes: fusedVariant(domain, 'similes'),
-    similes_dualview: fusedVariant(domain, 'similes', 'beta'),
+    // The beta-breakdown dual view is redundant now that the activation views
+    // exist; the 'beta' branch in fusedVariant stays for easy reinstatement.
+    // similes_dualview: fusedVariant(domain, 'similes', 'beta'),
     similes_dualview_approx: fusedVariant(domain, 'similes', 'attr'),
+    similes_actv: fusedVariant(domain, 'similes', 'actv'),
+    similes_dualview_actv: fusedVariant(domain, 'similes', 'actv_dual'),
     onomatopoeia: fusedVariant(domain, 'onomatopoeia'),
-    onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', 'beta'),
+    // onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', 'beta'),
     onomatopoeia_dualview_approx: fusedVariant(domain, 'onomatopoeia', 'attr'),
+    onomatopoeia_actv: fusedVariant(domain, 'onomatopoeia', 'actv'),
+    onomatopoeia_dualview_actv: fusedVariant(domain, 'onomatopoeia', 'actv_dual'),
     rexnet: rexnetVariant(domain),
     examples: protoVariant(domain),
     noxai: noXaiVariant(domain),

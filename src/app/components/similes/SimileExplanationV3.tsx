@@ -15,6 +15,9 @@ export interface SimileItem {
    *  displayValue must equal clapValue + beatsValue. */
   clapValue?: number;
   beatsValue?: number;
+  /** Activation-only view: whether the classifier's sparse head actually uses
+   *  this concept (non-zero head weight). Undefined outside that view. */
+  usedByHead?: boolean;
   category?: string;
   withinClassAudioUrl?: string;
 }
@@ -27,6 +30,10 @@ interface SimileExplanationV3Props {
   isOnomatopoeia?: boolean;
   /** Minimum |confidence| for a simile to appear in the tornado plot. */
   threshold?: number;
+  /** Bars are raw activations (head-independent match strength), not signed
+   *  evidence for the prediction: swaps the copy/axis wording and shows the
+   *  per-item usedByHead badge. */
+  activationView?: boolean;
   /** Drawer content; defaults to the legacy hardcoded SimilePractice. */
   cheatsheet?: ReactNode;
 }
@@ -76,13 +83,18 @@ export function SimileExplanationV3({
   originalAudioUrl,
   isOnomatopoeia = false,
   threshold = 0.25,
+  activationView = false,
   cheatsheet,
 }: SimileExplanationV3Props) {
   const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
 
+  // Raw evidence values this close to 0 are effectively no evidence; drop them
+  // rather than render a sliver bar with a "0.00" label.
+  const MIN_EVIDENCE = 0.001;
+
   // Filter and sort similes for the tornado plot
   const filteredSimiles = similes
-    .filter((s) => Math.abs(s.confidence) >= threshold)
+    .filter((s) => Math.abs(s.confidence) >= threshold && magnitude(s) >= MIN_EVIDENCE)
     .sort((a, b) => magnitude(b) - magnitude(a));
 
   const isDualView = filteredSimiles.some(
@@ -90,7 +102,10 @@ export function SimileExplanationV3({
   );
   // Raw evidence values below this magnitude get a bar too short to hold the
   // label, so the label sits outside the bar (grey) instead of inside (white).
-  const OUTSIDE_LABEL_BELOW = 1.2;
+  // Adaptive: bars under 1/5 of the largest raw value in the plot are the
+  // ones too short to fit the label.
+  const maxRawMagnitude = Math.max(...filteredSimiles.map(magnitude), 0);
+  const OUTSIDE_LABEL_BELOW = maxRawMagnitude / 5;
   // Onomatopoeia tokens are much shorter than simile sentences; a narrower
   // plot and label column avoid a large empty gutter on the left.
   const plotWidthClass = isOnomatopoeia ? 'max-w-4xl' : 'max-w-4xl';
@@ -99,18 +114,11 @@ export function SimileExplanationV3({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMinor, setShowMinor] = useState(false);
 
-  // Bars whose raw evidence magnitude is below MINOR_BELOW get tucked into a
-  // collapsible "Show more" section, but ensure we show at least MIN_MAJOR_COUNT items
-  // in the major list (or the entire list if fewer than MIN_MAJOR_COUNT).
-  const MINOR_BELOW = 1;
-  const MIN_MAJOR_COUNT = 10;
-  const aboveThresholdCount = filteredSimiles.filter((s) => magnitude(s) >= MINOR_BELOW).length;
-  const majorCount = Math.min(
-    filteredSimiles.length,
-    Math.max(MIN_MAJOR_COUNT, aboveThresholdCount)
-  );
-  const majorSimiles = filteredSimiles.slice(0, majorCount);
-  const minorSimiles = filteredSimiles.slice(majorCount);
+  // Only the top MAX_MAJOR_COUNT bars are visible by default; everything else
+  // gets tucked into the collapsible "weaker evidence" section.
+  const MAX_MAJOR_COUNT = 5;
+  const majorSimiles = filteredSimiles.slice(0, MAX_MAJOR_COUNT);
+  const minorSimiles = filteredSimiles.slice(MAX_MAJOR_COUNT);
 
   const getAudioUrl = (path: string | undefined) => {
     if (!path) return '';
@@ -197,6 +205,15 @@ export function SimileExplanationV3({
             )}
           </div>
           <div className="flex justify-end items-center gap-2 text-right">
+            {s.usedByHead && (
+              <span
+                className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700 bg-cyan-50 border border-cyan-200 rounded px-1 flex-shrink-0"
+                title="The classifier uses this concept in its decision"
+                data-tutorial="used-badge"
+              >
+                used
+              </span>
+            )}
             <span>{s.text}</span>
             {s.withinClassAudioUrl && (
               <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
@@ -260,11 +277,13 @@ export function SimileExplanationV3({
         <div className="mb-4" data-tutorial="explanation-header">
           <h2 className="text-xl font-semibold mb-2">{isOnomatopoeia ? 'Onomatopoeia' : 'Simile'} Explanation</h2>
           <p className="text-gray-600">
-            The system detects the following {isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} as positive or negative evidence for this classification.
+            {activationView
+              ? `Each bar shows how strongly the system hears each ${isOnomatopoeia ? 'onomatopoeia' : 'simile'} in this recording — including ones the classifier does not use in its decision.`
+              : `The system detects the following ${isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} as positive or negative evidence for this classification.`}
           </p>
           {isDualView && (
             <p className="text-sm text-gray-500 mt-2 italic" data-tutorial="dualview-legend">
-              Each bar splits the evidence between the system's two listening branches:{' '}
+              Each bar splits the {activationView ? 'match' : 'evidence'} between the system's two listening branches:{' '}
               <span className="inline-block w-3 h-3 rounded-sm bg-blue-400 align-middle ml-0.5 mb-0.5" />
               <span className="inline-block w-3 h-3 rounded-sm bg-red-400 align-middle ml-0.5 mr-0.5 mb-0.5" />{' '}
               lighter = language,{' '}
@@ -273,7 +292,7 @@ export function SimileExplanationV3({
               darker = acoustic.
               <br/>
               When the two branches disagree, only the net
-              evidence is shown, in the shade of the branch that dominates.
+              {activationView ? ' match' : ' evidence'} is shown, in the shade of the branch that dominates.
             </p>
           )}
         </div>
@@ -285,8 +304,8 @@ export function SimileExplanationV3({
             <div className={`grid ${rowGridClass} gap-4 items-center mb-2`}>
               <div></div>
               <div className="relative w-full flex text-xs font-semibold text-gray-500 uppercase tracking-wider" data-tutorial="evidence-axis">
-                <div className="w-1/2 text-right pr-2">Negative Evidence</div>
-                <div className="w-1/2 text-left pl-2">Positive Evidence</div>
+                <div className="w-1/2 text-right pr-2">{activationView ? 'Negative Match' : 'Negative Evidence'}</div>
+                <div className="w-1/2 text-left pl-2">{activationView ? 'Positive Match' : 'Positive Evidence'}</div>
               </div>
             </div>
 
