@@ -5,12 +5,12 @@
   "true_label": "Wood Thrush",
   "meta": {
     "band": "ambiguous",
-    "typicality": -1.4474,
+    "typicality": -1.4512,
     "source": "all",
     "source_tier": 0,
     "label_mismatch": false,
-    "agreement": 6,
-    "n_methods": 10
+    "agreement": 80,
+    "n_methods": 86
   },
   "audio": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/data_v1/bird/audio/bird_Recording_1_Recording_1_Segment_16_52.wav",
   "models": {
@@ -261,878 +261,590 @@
     "fused_simile_bird": {
       "family": "Fused-LF-CBM",
       "concept_set": "similes",
-      "beta": 1.0,
+      "beta": 0.5,
       "predicted_label": "Wood Thrush",
       "correct": true,
       "faithful": 0.2,
       "concepts": [
         {
-          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
-          "category": "Black-capped Chickadee",
-          "activation": -0.572089,
-          "head_weight": 3.18452,
-          "contribution": -1.82183
-        },
-        {
-          "concept": "Like a rhythmic, high-pitched hiccup.",
-          "category": "Black-capped Chickadee",
-          "activation": -1.101154,
-          "head_weight": -1.541434,
-          "contribution": 1.697356
-        },
-        {
-          "concept": "Like a small, persistent alarm clock chiming a two-note pattern.",
+          "concept": "Like a high-pitched, rhythmic squeak from a bicycle pedal.",
           "category": "Tufted Titmouse",
-          "activation": -0.558293,
-          "head_weight": 1.936674,
-          "contribution": -1.081231
-        },
-        {
-          "concept": "Like an electronic synthesizer playing a smooth, liquid chime.",
-          "category": "Wood Thrush",
-          "activation": -0.559115,
-          "head_weight": -1.846964,
-          "contribution": 1.032665
-        },
-        {
-          "concept": "Like a pan flute playing a haunting, three-note melody.",
-          "category": "Wood Thrush",
-          "activation": 0.716363,
-          "head_weight": -1.324091,
-          "contribution": -0.948529
-        },
-        {
-          "concept": "Like a person enthusiastically ordering a cup of tea.",
-          "category": "Eastern Towhee",
-          "activation": 0.924661,
-          "head_weight": 0.917005,
-          "contribution": 0.847919
-        },
-        {
-          "concept": "Like flicking a stretched rubber band twice, then letting it buzz against the table.",
-          "category": "Eastern Towhee",
-          "activation": -0.560007,
-          "head_weight": 1.351885,
-          "contribution": -0.757065
+          "activation": -0.653672,
+          "head_weight": -4.751804,
+          "contribution": 3.10612
         },
         {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "activation": -1.200712,
-          "head_weight": -0.528653,
-          "contribution": 0.634759
+          "activation": -1.017729,
+          "head_weight": 2.107894,
+          "contribution": -2.145264
         },
         {
-          "concept": "Like a series of crystal glasses being gently struck with a spoon.",
+          "concept": "Like a squeaky dog toy being pressed several times in quick succession.",
+          "category": "Black-capped Chickadee",
+          "activation": -0.9825,
+          "head_weight": -2.021097,
+          "contribution": 1.985728
+        },
+        {
+          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
+          "category": "Black-capped Chickadee",
+          "activation": -1.156596,
+          "head_weight": 0.860806,
+          "contribution": -0.995605
+        },
+        {
+          "concept": "Like a swing with a consistent, two-part creak.",
+          "category": "Tufted Titmouse",
+          "activation": -0.497437,
+          "head_weight": 1.338176,
+          "contribution": -0.665659
+        },
+        {
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
           "category": "Wood Thrush",
-          "activation": -0.826183,
-          "head_weight": 0.761429,
-          "contribution": -0.629079
+          "activation": 0.180782,
+          "head_weight": 1.076208,
+          "contribution": 0.194559
+        },
+        {
+          "concept": "Like a metronome ticking with a distinct high and low tone.",
+          "category": "Tufted Titmouse",
+          "activation": -0.370724,
+          "head_weight": 0.517505,
+          "contribution": -0.191852
+        },
+        {
+          "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
+          "category": "Ovenbird",
+          "activation": 0.13195,
+          "head_weight": -1.312987,
+          "contribution": -0.173248
+        },
+        {
+          "concept": "Like a child's recorder piping the same two clear notes again and again.",
+          "category": "Tufted Titmouse",
+          "activation": -0.059286,
+          "head_weight": 1.826653,
+          "contribution": -0.108295
         },
         {
           "concept": "Like water trickling into a deep, resonant hollow log.",
           "category": "Wood Thrush",
-          "activation": -0.504751,
-          "head_weight": 1.210671,
-          "contribution": -0.611088
-        },
-        {
-          "concept": "Like a clear, whistling breeze harmonizing with itself.",
-          "category": "Wood Thrush",
-          "activation": 0.754576,
-          "head_weight": 0.644282,
-          "contribution": 0.48616
-        },
-        {
-          "concept": "Like the rhythmic squeak of a wet shoe on a polished floor.",
-          "category": "Tufted Titmouse",
-          "activation": -0.232669,
-          "head_weight": -1.795816,
-          "contribution": 0.417831
-        },
-        {
-          "concept": "Like glass wind chimes softly clinking in a gentle breeze.",
-          "category": "Wood Thrush",
-          "activation": -0.619015,
-          "head_weight": 0.540444,
-          "contribution": -0.334543
-        },
-        {
-          "concept": "Like a rhythmic, escalating squeal of a rusty hinge being forced open.",
-          "category": "Ovenbird",
-          "activation": 0.435616,
-          "head_weight": -0.659301,
-          "contribution": -0.287202
-        },
-        {
-          "concept": "Like a small pebble bouncing twice on ice and skittering away.",
-          "category": "Eastern Towhee",
-          "activation": -0.931458,
-          "head_weight": -0.234023,
-          "contribution": 0.217982
-        },
-        {
-          "concept": "Like someone striking two small metal pipes together, hitting harder each time.",
-          "category": "Ovenbird",
-          "activation": -0.759257,
-          "head_weight": 0.214245,
-          "contribution": -0.162667
-        },
-        {
-          "concept": "Like a sudden, sharp intake of breath followed by a vibrating exhalation.",
-          "category": "Eastern Towhee",
-          "activation": 0.520899,
-          "head_weight": 0.119552,
-          "contribution": 0.062274
-        },
-        {
-          "concept": "Like a metallic zipper being pulled closed in three distinct jerks.",
-          "category": "Eastern Towhee",
-          "activation": -0.236681,
-          "head_weight": 0.166945,
-          "contribution": -0.039513
+          "activation": -0.27911,
+          "head_weight": 0.343232,
+          "contribution": -0.095799
         }
       ]
     },
     "fused_beta_breakdown_simile_bird": {
-      "beta": 1.0,
-      "clap_weight": 1.0,
-      "beats_weight": 0.0,
+      "beta": 0.5,
+      "clap_weight": 0.5,
+      "beats_weight": 0.5,
       "concepts": [
         {
-          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
-          "category": "Black-capped Chickadee",
-          "clap_z": -1.093396,
-          "beats_z": -0.169806,
-          "fused": -1.093396
-        },
-        {
-          "concept": "Like a rhythmic, high-pitched hiccup.",
-          "category": "Black-capped Chickadee",
-          "clap_z": -2.281452,
-          "beats_z": -0.066421,
-          "fused": -2.281452
-        },
-        {
-          "concept": "Like a small, persistent alarm clock chiming a two-note pattern.",
+          "concept": "Like a high-pitched, rhythmic squeak from a bicycle pedal.",
           "category": "Tufted Titmouse",
-          "clap_z": -1.885905,
-          "beats_z": -0.032684,
-          "fused": -1.885905
-        },
-        {
-          "concept": "Like an electronic synthesizer playing a smooth, liquid chime.",
-          "category": "Wood Thrush",
-          "clap_z": -0.685531,
-          "beats_z": 0.464388,
-          "fused": -0.685531
-        },
-        {
-          "concept": "Like a pan flute playing a haunting, three-note melody.",
-          "category": "Wood Thrush",
-          "clap_z": 1.898359,
-          "beats_z": 1.468,
-          "fused": 1.898359
-        },
-        {
-          "concept": "Like a person enthusiastically ordering a cup of tea.",
-          "category": "Eastern Towhee",
-          "clap_z": 1.293845,
-          "beats_z": 0.656166,
-          "fused": 1.293845
-        },
-        {
-          "concept": "Like flicking a stretched rubber band twice, then letting it buzz against the table.",
-          "category": "Eastern Towhee",
-          "clap_z": -0.614681,
-          "beats_z": -0.232551,
-          "fused": -0.614681
+          "clap_z": -2.137328,
+          "beats_z": 0.164718,
+          "fused": -0.986305
         },
         {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "clap_z": -1.600408,
-          "beats_z": -0.039832,
-          "fused": -1.600408
+          "clap_z": -0.958773,
+          "beats_z": 0.028454,
+          "fused": -0.46516
         },
         {
-          "concept": "Like a series of crystal glasses being gently struck with a spoon.",
+          "concept": "Like a squeaky dog toy being pressed several times in quick succession.",
+          "category": "Black-capped Chickadee",
+          "clap_z": -2.134173,
+          "beats_z": -0.721533,
+          "fused": -1.427853
+        },
+        {
+          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
+          "category": "Black-capped Chickadee",
+          "clap_z": -0.84246,
+          "beats_z": -0.193402,
+          "fused": -0.517931
+        },
+        {
+          "concept": "Like a swing with a consistent, two-part creak.",
+          "category": "Tufted Titmouse",
+          "clap_z": -1.671226,
+          "beats_z": -0.194563,
+          "fused": -0.932895
+        },
+        {
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
           "category": "Wood Thrush",
-          "clap_z": -2.048137,
-          "beats_z": 0.087648,
-          "fused": -2.048137
+          "clap_z": 1.128652,
+          "beats_z": 0.051028,
+          "fused": 0.58984
+        },
+        {
+          "concept": "Like a metronome ticking with a distinct high and low tone.",
+          "category": "Tufted Titmouse",
+          "clap_z": -1.089801,
+          "beats_z": 0.117129,
+          "fused": -0.486336
+        },
+        {
+          "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
+          "category": "Ovenbird",
+          "clap_z": 2.26772,
+          "beats_z": -0.681569,
+          "fused": 0.793075
+        },
+        {
+          "concept": "Like a child's recorder piping the same two clear notes again and again.",
+          "category": "Tufted Titmouse",
+          "clap_z": 0.151626,
+          "beats_z": -0.305655,
+          "fused": -0.077015
         },
         {
           "concept": "Like water trickling into a deep, resonant hollow log.",
           "category": "Wood Thrush",
-          "clap_z": -2.127825,
-          "beats_z": -0.971259,
-          "fused": -2.127825
-        },
-        {
-          "concept": "Like a clear, whistling breeze harmonizing with itself.",
-          "category": "Wood Thrush",
-          "clap_z": 0.963406,
-          "beats_z": 0.385475,
-          "fused": 0.963406
-        },
-        {
-          "concept": "Like the rhythmic squeak of a wet shoe on a polished floor.",
-          "category": "Tufted Titmouse",
-          "clap_z": -1.4973,
-          "beats_z": -0.266264,
-          "fused": -1.4973
-        },
-        {
-          "concept": "Like glass wind chimes softly clinking in a gentle breeze.",
-          "category": "Wood Thrush",
-          "clap_z": -1.923716,
-          "beats_z": 0.192619,
-          "fused": -1.923716
-        },
-        {
-          "concept": "Like a rhythmic, escalating squeal of a rusty hinge being forced open.",
-          "category": "Ovenbird",
-          "clap_z": 1.514919,
-          "beats_z": 0.706907,
-          "fused": 1.514919
-        },
-        {
-          "concept": "Like a small pebble bouncing twice on ice and skittering away.",
-          "category": "Eastern Towhee",
-          "clap_z": -2.0349,
-          "beats_z": 0.044051,
-          "fused": -2.0349
-        },
-        {
-          "concept": "Like someone striking two small metal pipes together, hitting harder each time.",
-          "category": "Ovenbird",
-          "clap_z": -2.422677,
-          "beats_z": 0.4982,
-          "fused": -2.422677
-        },
-        {
-          "concept": "Like a sudden, sharp intake of breath followed by a vibrating exhalation.",
-          "category": "Eastern Towhee",
-          "clap_z": 0.861959,
-          "beats_z": 0.257485,
-          "fused": 0.861959
-        },
-        {
-          "concept": "Like a metallic zipper being pulled closed in three distinct jerks.",
-          "category": "Eastern Towhee",
-          "clap_z": -0.690464,
-          "beats_z": -0.101122,
-          "fused": -0.690464
+          "clap_z": -0.514933,
+          "beats_z": -0.519802,
+          "fused": -0.517367
         }
       ]
     },
     "fused_attr_breakdown_simile_bird": {
-      "beta": 1.0,
-      "clap_weight": 1.0,
-      "beats_weight": 0.0,
+      "beta": 0.5,
+      "clap_weight": 0.5,
+      "beats_weight": 0.5,
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
-          "category": "Black-capped Chickadee",
-          "activation": -0.572089,
-          "clap_attribution": -0.572089,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -1.821829,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like a rhythmic, high-pitched hiccup.",
-          "category": "Black-capped Chickadee",
-          "activation": -1.101154,
-          "clap_attribution": -1.101154,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 1.697356,
-          "beats_contribution": -0.0
-        },
-        {
-          "concept": "Like a small, persistent alarm clock chiming a two-note pattern.",
+          "concept": "Like a high-pitched, rhythmic squeak from a bicycle pedal.",
           "category": "Tufted Titmouse",
-          "activation": -0.558293,
-          "clap_attribution": -0.558293,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -1.081232,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like an electronic synthesizer playing a smooth, liquid chime.",
-          "category": "Wood Thrush",
-          "activation": -0.559115,
-          "clap_attribution": -0.559115,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 1.032665,
-          "beats_contribution": -0.0
-        },
-        {
-          "concept": "Like a pan flute playing a haunting, three-note melody.",
-          "category": "Wood Thrush",
-          "activation": 0.716363,
-          "clap_attribution": 0.716363,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.94853,
-          "beats_contribution": -0.0
-        },
-        {
-          "concept": "Like a person enthusiastically ordering a cup of tea.",
-          "category": "Eastern Towhee",
-          "activation": 0.924661,
-          "clap_attribution": 0.924661,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 0.847919,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like flicking a stretched rubber band twice, then letting it buzz against the table.",
-          "category": "Eastern Towhee",
-          "activation": -0.560007,
-          "clap_attribution": -0.560007,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.757065,
-          "beats_contribution": 0.0
+          "activation": -0.653672,
+          "clap_attribution": -0.709082,
+          "beats_attribution": 0.05541,
+          "clap_share": 1.084767,
+          "clap_contribution": 3.369419,
+          "beats_contribution": -0.263297
         },
         {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "activation": -1.200712,
-          "clap_attribution": -1.200712,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 0.63476,
-          "beats_contribution": -0.0
+          "activation": -1.017729,
+          "clap_attribution": -1.050304,
+          "beats_attribution": 0.032576,
+          "clap_share": 1.032008,
+          "clap_contribution": -2.213929,
+          "beats_contribution": 0.068667
         },
         {
-          "concept": "Like a series of crystal glasses being gently struck with a spoon.",
+          "concept": "Like a squeaky dog toy being pressed several times in quick succession.",
+          "category": "Black-capped Chickadee",
+          "activation": -0.9825,
+          "clap_attribution": -0.734787,
+          "beats_attribution": -0.247713,
+          "clap_share": 0.747875,
+          "clap_contribution": 1.485076,
+          "beats_contribution": 0.500652
+        },
+        {
+          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
+          "category": "Black-capped Chickadee",
+          "activation": -1.156596,
+          "clap_attribution": -0.94165,
+          "beats_attribution": -0.214946,
+          "clap_share": 0.814156,
+          "clap_contribution": -0.810578,
+          "beats_contribution": -0.185027
+        },
+        {
+          "concept": "Like a swing with a consistent, two-part creak.",
+          "category": "Tufted Titmouse",
+          "activation": -0.497437,
+          "clap_attribution": -0.445944,
+          "beats_attribution": -0.051494,
+          "clap_share": 0.896482,
+          "clap_contribution": -0.596752,
+          "beats_contribution": -0.068908
+        },
+        {
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
           "category": "Wood Thrush",
-          "activation": -0.826183,
-          "clap_attribution": -0.826183,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.62908,
-          "beats_contribution": 0.0
+          "activation": 0.180782,
+          "clap_attribution": 0.172387,
+          "beats_attribution": 0.008395,
+          "clap_share": 0.953563,
+          "clap_contribution": 0.185524,
+          "beats_contribution": 0.009035
+        },
+        {
+          "concept": "Like a metronome ticking with a distinct high and low tone.",
+          "category": "Tufted Titmouse",
+          "activation": -0.370724,
+          "clap_attribution": -0.417438,
+          "beats_attribution": 0.046714,
+          "clap_share": 1.126007,
+          "clap_contribution": -0.216026,
+          "beats_contribution": 0.024175
+        },
+        {
+          "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
+          "category": "Ovenbird",
+          "activation": 0.13195,
+          "clap_attribution": 0.188953,
+          "beats_attribution": -0.057003,
+          "clap_share": 1.432006,
+          "clap_contribution": -0.248093,
+          "beats_contribution": 0.074844
+        },
+        {
+          "concept": "Like a child's recorder piping the same two clear notes again and again.",
+          "category": "Tufted Titmouse",
+          "activation": -0.059286,
+          "clap_attribution": 0.059286,
+          "beats_attribution": -0.118572,
+          "clap_share": -1.0,
+          "clap_contribution": 0.108295,
+          "beats_contribution": -0.21659
         },
         {
           "concept": "Like water trickling into a deep, resonant hollow log.",
           "category": "Wood Thrush",
-          "activation": -0.504751,
-          "clap_attribution": -0.504751,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.611087,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like a clear, whistling breeze harmonizing with itself.",
-          "category": "Wood Thrush",
-          "activation": 0.754576,
-          "clap_attribution": 0.754576,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 0.48616,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like the rhythmic squeak of a wet shoe on a polished floor.",
-          "category": "Tufted Titmouse",
-          "activation": -0.232669,
-          "clap_attribution": -0.232669,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 0.417831,
-          "beats_contribution": -0.0
-        },
-        {
-          "concept": "Like glass wind chimes softly clinking in a gentle breeze.",
-          "category": "Wood Thrush",
-          "activation": -0.619015,
-          "clap_attribution": -0.619015,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.334543,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like a rhythmic, escalating squeal of a rusty hinge being forced open.",
-          "category": "Ovenbird",
-          "activation": 0.435616,
-          "clap_attribution": 0.435616,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.287202,
-          "beats_contribution": -0.0
-        },
-        {
-          "concept": "Like a small pebble bouncing twice on ice and skittering away.",
-          "category": "Eastern Towhee",
-          "activation": -0.931458,
-          "clap_attribution": -0.931458,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 0.217983,
-          "beats_contribution": -0.0
-        },
-        {
-          "concept": "Like someone striking two small metal pipes together, hitting harder each time.",
-          "category": "Ovenbird",
-          "activation": -0.759257,
-          "clap_attribution": -0.759257,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.162667,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like a sudden, sharp intake of breath followed by a vibrating exhalation.",
-          "category": "Eastern Towhee",
-          "activation": 0.520899,
-          "clap_attribution": 0.520899,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": 0.062275,
-          "beats_contribution": 0.0
-        },
-        {
-          "concept": "Like a metallic zipper being pulled closed in three distinct jerks.",
-          "category": "Eastern Towhee",
-          "activation": -0.236681,
-          "clap_attribution": -0.236681,
-          "beats_attribution": 0.0,
-          "clap_share": 1.0,
-          "clap_contribution": -0.039513,
-          "beats_contribution": 0.0
+          "activation": -0.27911,
+          "clap_attribution": -0.138403,
+          "beats_attribution": -0.140706,
+          "clap_share": 0.495875,
+          "clap_contribution": -0.047504,
+          "beats_contribution": -0.048295
         }
       ]
     },
     "fused_onomatopoeia_bird": {
       "family": "Fused-LF-CBM",
       "concept_set": "onomatopoeia",
-      "beta": 0.25,
+      "beta": 0.5,
       "predicted_label": "Wood Thrush",
       "correct": true,
       "faithful": 0.0,
       "concepts": [
         {
-          "concept": "ay_oo_wheee_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.699117,
-          "head_weight": 6.821234,
-          "contribution": 4.768841
-        },
-        {
-          "concept": "wit_CHEER_wit_CHEER_WIT_CHEEEER_gemini_tts",
-          "category": "Ovenbird",
-          "activation": 0.803094,
-          "head_weight": -2.5232,
-          "contribution": -2.026366
-        },
-        {
           "concept": "tee_CHER_tee_CHER_TEEEE_CHER_gemini_tts",
           "category": "Ovenbird",
-          "activation": 0.943821,
-          "head_weight": 1.169646,
-          "contribution": 1.103936
-        },
-        {
-          "concept": "wee_oh_LEEE_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.829436,
-          "head_weight": 1.300313,
-          "contribution": 1.078526
-        },
-        {
-          "concept": "FWEET_ur_FWEET_ur_gemini_tts",
-          "category": "Tufted Titmouse",
-          "activation": 0.756883,
-          "head_weight": -1.221542,
-          "contribution": -0.924564
-        },
-        {
-          "concept": "ooo_eee_layyy_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.497883,
-          "head_weight": -1.508611,
-          "contribution": -0.751112
-        },
-        {
-          "concept": "eee_oh_wheeeee_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.487781,
-          "head_weight": -1.518032,
-          "contribution": -0.740467
-        },
-        {
-          "concept": "tek_TEK_treeeeeee_gemini_tts",
-          "category": "Eastern Towhee",
-          "activation": 0.257558,
-          "head_weight": -2.269122,
-          "contribution": -0.58443
+          "activation": 1.06646,
+          "head_weight": 2.167566,
+          "contribution": 2.311622
         },
         {
           "concept": "chick_a_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
-          "activation": -0.308423,
-          "head_weight": -1.106411,
-          "contribution": 0.341243
+          "activation": -1.025011,
+          "head_weight": 1.458044,
+          "contribution": -1.494511
         },
         {
-          "concept": "chk_chk_dee_dee_dee_dee_gemini_tts",
-          "category": "Black-capped Chickadee",
-          "activation": -0.304834,
-          "head_weight": 0.804414,
-          "contribution": -0.245213
-        },
-        {
-          "concept": "twee_twee_twee_twee_gemini_tts",
+          "concept": "PEET_peet_PEET_peet_gemini_tts",
           "category": "Tufted Titmouse",
-          "activation": 0.199447,
-          "head_weight": 0.895245,
-          "contribution": 0.178554
-        },
-        {
-          "concept": "chik_a_deeeee_dee_dee_gemini_tts",
-          "category": "Black-capped Chickadee",
-          "activation": -0.956351,
-          "head_weight": -0.108287,
-          "contribution": 0.103561
-        },
-        {
-          "concept": "ee_oh_LAY_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.664817,
-          "head_weight": 0.11808,
-          "contribution": 0.078502
+          "activation": -0.220044,
+          "head_weight": -4.340886,
+          "contribution": 0.955184
         },
         {
           "concept": "chik_ik_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
-          "activation": -0.107794,
-          "head_weight": 0.430529,
-          "contribution": -0.046408
+          "activation": -0.728985,
+          "head_weight": 0.543134,
+          "contribution": -0.395937
+        },
+        {
+          "concept": "TEE_chur_TEE_chur_TEE_CHUR_gemini_tts",
+          "category": "Ovenbird",
+          "activation": 0.931394,
+          "head_weight": 0.369737,
+          "contribution": 0.344371
+        },
+        {
+          "concept": "eee_oo_leeee_gemini_tts",
+          "category": "Wood Thrush",
+          "activation": -0.187589,
+          "head_weight": -1.130546,
+          "contribution": 0.212078
         },
         {
           "concept": "wit_WIT_wheeeee_gemini_tts",
           "category": "Eastern Towhee",
-          "activation": 0.041992,
-          "head_weight": 0.500069,
-          "contribution": 0.020999
+          "activation": -0.167785,
+          "head_weight": 1.068924,
+          "contribution": -0.179349
         },
         {
-          "concept": "tik_tik_FREEEE_gemini_tts",
-          "category": "Eastern Towhee",
-          "activation": 0.256068,
-          "head_weight": 0.01221,
-          "contribution": 0.003127
+          "concept": "twee_twee_twee_twee_gemini_tts",
+          "category": "Tufted Titmouse",
+          "activation": -0.07809,
+          "head_weight": 2.098545,
+          "contribution": -0.163875
+        },
+        {
+          "concept": "tchi_TCHI_TCHII_gemini_tts",
+          "category": "Ovenbird",
+          "activation": -0.044477,
+          "head_weight": -1.566587,
+          "contribution": 0.069678
+        },
+        {
+          "concept": "tsik_a_dee_dee_dee_gemini_tts",
+          "category": "Black-capped Chickadee",
+          "activation": -0.451826,
+          "head_weight": 0.1128,
+          "contribution": -0.050966
+        },
+        {
+          "concept": "tcher_TCHER_TCHEER_gemini_tts",
+          "category": "Ovenbird",
+          "activation": 0.76197,
+          "head_weight": -0.061903,
+          "contribution": -0.047168
+        },
+        {
+          "concept": "tee_WIT_tee_WIT_tee_WIT_gemini_tts",
+          "category": "Tufted Titmouse",
+          "activation": 0.062412,
+          "head_weight": 0.042866,
+          "contribution": 0.002675
         }
       ]
     },
     "fused_beta_breakdown_onomatopoeia_bird": {
-      "beta": 0.25,
-      "clap_weight": 0.25,
-      "beats_weight": 0.75,
+      "beta": 0.5,
+      "clap_weight": 0.5,
+      "beats_weight": 0.5,
       "concepts": [
-        {
-          "concept": "ay_oo_wheee_gemini_tts",
-          "category": "Wood Thrush",
-          "clap_z": 1.080344,
-          "beats_z": 2.02875,
-          "fused": 1.791648
-        },
-        {
-          "concept": "wit_CHEER_wit_CHEER_WIT_CHEEEER_gemini_tts",
-          "category": "Ovenbird",
-          "clap_z": 2.353053,
-          "beats_z": 2.458968,
-          "fused": 2.43249
-        },
         {
           "concept": "tee_CHER_tee_CHER_TEEEE_CHER_gemini_tts",
           "category": "Ovenbird",
-          "clap_z": 2.363094,
-          "beats_z": 2.197647,
-          "fused": 2.239009
-        },
-        {
-          "concept": "wee_oh_LEEE_gemini_tts",
-          "category": "Wood Thrush",
-          "clap_z": -0.035372,
-          "beats_z": 2.55432,
-          "fused": 1.906897
-        },
-        {
-          "concept": "FWEET_ur_FWEET_ur_gemini_tts",
-          "category": "Tufted Titmouse",
-          "clap_z": -2.21243,
-          "beats_z": 2.375113,
-          "fused": 1.228228
-        },
-        {
-          "concept": "ooo_eee_layyy_gemini_tts",
-          "category": "Wood Thrush",
-          "clap_z": 1.842971,
-          "beats_z": 1.822459,
-          "fused": 1.827587
-        },
-        {
-          "concept": "eee_oh_wheeeee_gemini_tts",
-          "category": "Wood Thrush",
-          "clap_z": 0.706893,
-          "beats_z": 1.600088,
-          "fused": 1.376789
-        },
-        {
-          "concept": "tek_TEK_treeeeeee_gemini_tts",
-          "category": "Eastern Towhee",
-          "clap_z": 1.44573,
-          "beats_z": 2.247743,
-          "fused": 2.047239
+          "clap_z": 2.549549,
+          "beats_z": 1.899119,
+          "fused": 2.224334
         },
         {
           "concept": "chick_a_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
-          "clap_z": -1.957354,
-          "beats_z": 0.9394,
-          "fused": 0.215212
+          "clap_z": -1.964706,
+          "beats_z": 0.67157,
+          "fused": -0.646568
         },
         {
-          "concept": "chk_chk_dee_dee_dee_dee_gemini_tts",
-          "category": "Black-capped Chickadee",
-          "clap_z": 0.267988,
-          "beats_z": 0.119311,
-          "fused": 0.15648
-        },
-        {
-          "concept": "twee_twee_twee_twee_gemini_tts",
+          "concept": "PEET_peet_PEET_peet_gemini_tts",
           "category": "Tufted Titmouse",
-          "clap_z": -1.454652,
-          "beats_z": 1.435205,
-          "fused": 0.712741
-        },
-        {
-          "concept": "chik_a_deeeee_dee_dee_gemini_tts",
-          "category": "Black-capped Chickadee",
-          "clap_z": -1.39476,
-          "beats_z": -0.512235,
-          "fused": -0.732866
-        },
-        {
-          "concept": "ee_oh_LAY_gemini_tts",
-          "category": "Wood Thrush",
-          "clap_z": 1.213904,
-          "beats_z": 1.979405,
-          "fused": 1.78803
+          "clap_z": -1.282542,
+          "beats_z": 0.972413,
+          "fused": -0.155065
         },
         {
           "concept": "chik_ik_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
-          "clap_z": -0.403579,
-          "beats_z": 0.21743,
-          "fused": 0.062178
+          "clap_z": -1.421033,
+          "beats_z": -0.166125,
+          "fused": -0.793579
+        },
+        {
+          "concept": "TEE_chur_TEE_chur_TEE_CHUR_gemini_tts",
+          "category": "Ovenbird",
+          "clap_z": 0.759949,
+          "beats_z": 2.139277,
+          "fused": 1.449613
+        },
+        {
+          "concept": "eee_oo_leeee_gemini_tts",
+          "category": "Wood Thrush",
+          "clap_z": 0.129466,
+          "beats_z": 0.578059,
+          "fused": 0.353763
         },
         {
           "concept": "wit_WIT_wheeeee_gemini_tts",
           "category": "Eastern Towhee",
-          "clap_z": 0.75759,
-          "beats_z": 1.55101,
-          "fused": 1.352655
+          "clap_z": -0.801552,
+          "beats_z": 1.393232,
+          "fused": 0.29584
         },
         {
-          "concept": "tik_tik_FREEEE_gemini_tts",
-          "category": "Eastern Towhee",
-          "clap_z": 0.613076,
-          "beats_z": 2.085026,
-          "fused": 1.717038
+          "concept": "twee_twee_twee_twee_gemini_tts",
+          "category": "Tufted Titmouse",
+          "clap_z": -1.134826,
+          "beats_z": 1.047408,
+          "fused": -0.043709
+        },
+        {
+          "concept": "tchi_TCHI_TCHII_gemini_tts",
+          "category": "Ovenbird",
+          "clap_z": -0.349147,
+          "beats_z": 1.432108,
+          "fused": 0.54148
+        },
+        {
+          "concept": "tsik_a_dee_dee_dee_gemini_tts",
+          "category": "Black-capped Chickadee",
+          "clap_z": -0.372641,
+          "beats_z": 0.158633,
+          "fused": -0.107004
+        },
+        {
+          "concept": "tcher_TCHER_TCHEER_gemini_tts",
+          "category": "Ovenbird",
+          "clap_z": 1.603655,
+          "beats_z": 2.009589,
+          "fused": 1.806622
+        },
+        {
+          "concept": "tee_WIT_tee_WIT_tee_WIT_gemini_tts",
+          "category": "Tufted Titmouse",
+          "clap_z": -1.938266,
+          "beats_z": 1.758222,
+          "fused": -0.090022
         }
       ]
     },
     "fused_attr_breakdown_onomatopoeia_bird": {
-      "beta": 0.25,
-      "clap_weight": 0.25,
-      "beats_weight": 0.75,
+      "beta": 0.5,
+      "clap_weight": 0.5,
+      "beats_weight": 0.5,
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "ay_oo_wheee_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.699117,
-          "clap_attribution": 0.105656,
-          "beats_attribution": 0.593461,
-          "clap_share": 0.151128,
-          "clap_contribution": 0.720704,
-          "beats_contribution": 4.048136
-        },
-        {
-          "concept": "wit_CHEER_wit_CHEER_WIT_CHEEEER_gemini_tts",
-          "category": "Ovenbird",
-          "activation": 0.803094,
-          "clap_attribution": 0.194374,
-          "beats_attribution": 0.60872,
-          "clap_share": 0.242032,
-          "clap_contribution": -0.490444,
-          "beats_contribution": -1.535922
-        },
-        {
           "concept": "tee_CHER_tee_CHER_TEEEE_CHER_gemini_tts",
           "category": "Ovenbird",
-          "activation": 0.943821,
-          "clap_attribution": 0.249284,
-          "beats_attribution": 0.694536,
-          "clap_share": 0.264123,
-          "clap_contribution": 0.291574,
-          "beats_contribution": 0.812361
-        },
-        {
-          "concept": "wee_oh_LEEE_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.829436,
-          "clap_attribution": -0.00361,
-          "beats_attribution": 0.833045,
-          "clap_share": -0.004352,
-          "clap_contribution": -0.004694,
-          "beats_contribution": 1.083219
-        },
-        {
-          "concept": "FWEET_ur_FWEET_ur_gemini_tts",
-          "category": "Tufted Titmouse",
-          "activation": 0.756883,
-          "clap_attribution": -0.340513,
-          "beats_attribution": 1.097395,
-          "clap_share": -0.449889,
-          "clap_contribution": 0.415951,
-          "beats_contribution": -1.340514
-        },
-        {
-          "concept": "ooo_eee_layyy_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.497883,
-          "clap_attribution": 0.125557,
-          "beats_attribution": 0.372326,
-          "clap_share": 0.252182,
-          "clap_contribution": -0.189417,
-          "beats_contribution": -0.561695
-        },
-        {
-          "concept": "eee_oh_wheeeee_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.487781,
-          "clap_attribution": 0.062732,
-          "beats_attribution": 0.425048,
-          "clap_share": 0.128608,
-          "clap_contribution": -0.095229,
-          "beats_contribution": -0.645236
-        },
-        {
-          "concept": "tek_TEK_treeeeeee_gemini_tts",
-          "category": "Eastern Towhee",
-          "activation": 0.257558,
-          "clap_attribution": 0.045403,
-          "beats_attribution": 0.212154,
-          "clap_share": 0.176284,
-          "clap_contribution": -0.103025,
-          "beats_contribution": -0.481403
+          "activation": 1.06646,
+          "clap_attribution": 0.611379,
+          "beats_attribution": 0.455081,
+          "clap_share": 0.573279,
+          "clap_contribution": 1.325204,
+          "beats_contribution": 0.986418
         },
         {
           "concept": "chick_a_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
-          "activation": -0.308423,
-          "clap_attribution": 0.308423,
-          "beats_attribution": -0.616846,
-          "clap_share": -1.0,
-          "clap_contribution": -0.341243,
-          "beats_contribution": 0.682485
+          "activation": -1.025011,
+          "clap_attribution": -1.55585,
+          "beats_attribution": 0.530839,
+          "clap_share": 1.517886,
+          "clap_contribution": -2.268498,
+          "beats_contribution": 0.773987
         },
         {
-          "concept": "chk_chk_dee_dee_dee_dee_gemini_tts",
-          "category": "Black-capped Chickadee",
-          "activation": -0.304834,
-          "clap_attribution": -0.129582,
-          "beats_attribution": -0.175252,
-          "clap_share": 0.42509,
-          "clap_contribution": -0.104238,
-          "beats_contribution": -0.140975
-        },
-        {
-          "concept": "twee_twee_twee_twee_gemini_tts",
+          "concept": "PEET_peet_PEET_peet_gemini_tts",
           "category": "Tufted Titmouse",
-          "activation": 0.199447,
-          "clap_attribution": -0.101328,
-          "beats_attribution": 0.300775,
-          "clap_share": -0.508043,
-          "clap_contribution": -0.090713,
-          "beats_contribution": 0.269267
-        },
-        {
-          "concept": "chik_a_deeeee_dee_dee_gemini_tts",
-          "category": "Black-capped Chickadee",
-          "activation": -0.956351,
-          "clap_attribution": -0.454325,
-          "beats_attribution": -0.502027,
-          "clap_share": 0.475061,
-          "clap_contribution": 0.049197,
-          "beats_contribution": 0.054363
-        },
-        {
-          "concept": "ee_oh_LAY_gemini_tts",
-          "category": "Wood Thrush",
-          "activation": 0.664817,
-          "clap_attribution": 0.112878,
-          "beats_attribution": 0.551939,
-          "clap_share": 0.169789,
-          "clap_contribution": 0.013329,
-          "beats_contribution": 0.065173
+          "activation": -0.220044,
+          "clap_attribution": -0.440087,
+          "beats_attribution": 0.220044,
+          "clap_share": 2.0,
+          "clap_contribution": 1.910367,
+          "beats_contribution": -0.955186
         },
         {
           "concept": "chik_ik_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
-          "activation": -0.107794,
-          "clap_attribution": 0.107794,
-          "beats_attribution": -0.215587,
-          "clap_share": -1.0,
-          "clap_contribution": 0.046408,
-          "beats_contribution": -0.092816
+          "activation": -0.728985,
+          "clap_attribution": -0.652246,
+          "beats_attribution": -0.076739,
+          "clap_share": 0.894732,
+          "clap_contribution": -0.354257,
+          "beats_contribution": -0.04168
+        },
+        {
+          "concept": "TEE_chur_TEE_chur_TEE_CHUR_gemini_tts",
+          "category": "Ovenbird",
+          "activation": 0.931394,
+          "clap_attribution": 0.245425,
+          "beats_attribution": 0.685969,
+          "clap_share": 0.263503,
+          "clap_contribution": 0.090743,
+          "beats_contribution": 0.253628
+        },
+        {
+          "concept": "eee_oo_leeee_gemini_tts",
+          "category": "Wood Thrush",
+          "activation": -0.187589,
+          "clap_attribution": -0.034767,
+          "beats_attribution": -0.152822,
+          "clap_share": 0.185336,
+          "clap_contribution": 0.039306,
+          "beats_contribution": 0.172772
         },
         {
           "concept": "wit_WIT_wheeeee_gemini_tts",
           "category": "Eastern Towhee",
-          "activation": 0.041992,
-          "clap_attribution": 0.005838,
-          "beats_attribution": 0.036154,
-          "clap_share": 0.139028,
-          "clap_contribution": 0.002919,
-          "beats_contribution": 0.018079
+          "activation": -0.167785,
+          "clap_attribution": 0.167785,
+          "beats_attribution": -0.33557,
+          "clap_share": -1.0,
+          "clap_contribution": 0.179349,
+          "beats_contribution": -0.358699
         },
         {
-          "concept": "tik_tik_FREEEE_gemini_tts",
-          "category": "Eastern Towhee",
-          "activation": 0.256068,
-          "clap_attribution": 0.022696,
-          "beats_attribution": 0.233371,
-          "clap_share": 0.088635,
-          "clap_contribution": 0.000277,
-          "beats_contribution": 0.002849
+          "concept": "twee_twee_twee_twee_gemini_tts",
+          "category": "Tufted Titmouse",
+          "activation": -0.07809,
+          "clap_attribution": -0.156179,
+          "beats_attribution": 0.07809,
+          "clap_share": 2.0,
+          "clap_contribution": -0.327749,
+          "beats_contribution": 0.163875
+        },
+        {
+          "concept": "tchi_TCHI_TCHII_gemini_tts",
+          "category": "Ovenbird",
+          "activation": -0.044477,
+          "clap_attribution": 0.014798,
+          "beats_attribution": -0.059275,
+          "clap_share": -0.332703,
+          "clap_contribution": -0.023182,
+          "beats_contribution": 0.092859
+        },
+        {
+          "concept": "tsik_a_dee_dee_dee_gemini_tts",
+          "category": "Black-capped Chickadee",
+          "activation": -0.451826,
+          "clap_attribution": -0.770465,
+          "beats_attribution": 0.318639,
+          "clap_share": 1.705225,
+          "clap_contribution": -0.086908,
+          "beats_contribution": 0.035942
+        },
+        {
+          "concept": "tcher_TCHER_TCHEER_gemini_tts",
+          "category": "Ovenbird",
+          "activation": 0.76197,
+          "clap_attribution": 0.337929,
+          "beats_attribution": 0.424041,
+          "clap_share": 0.443494,
+          "clap_contribution": -0.020919,
+          "beats_contribution": -0.026249
+        },
+        {
+          "concept": "tee_WIT_tee_WIT_tee_WIT_gemini_tts",
+          "category": "Tufted Titmouse",
+          "activation": 0.062412,
+          "clap_attribution": 0.124823,
+          "beats_attribution": -0.062412,
+          "clap_share": 2.0,
+          "clap_contribution": 0.005351,
+          "beats_contribution": -0.002675
         }
       ]
     },
     "rexnet": {
       "family": "RExNet",
-      "predicted_label": "Ovenbird",
-      "consensus_label": "Ovenbird",
-      "correct": false,
-      "confidence": 0.4776401221752167,
-      "cf_hits": null,
-      "cf_total": null,
-      "explanation_md": "# RexNet Contrastive Audio XAI Report\n        \nThis report presents an example-based, concept-grounded contrastive explanation of the model's classification of the given audio sample.\n\n---\n\n## Classification Overview\n\n* **Target File**: `bird_Recording_1_Recording_1_Segment_15_165.wav`\n* **True Target Concept**: `Wood Thrush`\n* **Base CNN Prediction**: `Wood Thrush` (Confidence: **57.37%**)\n* **RexNet Contrastive Prediction (Consensus)**: `Wood Thrush`\n* **Prediction Correctness**: **CORRECT**\n\n---\n\n## Multi-Contrast Explanations\n\nTo fully explain this sound, we compared it against representative **contrast/foil concepts** in the `bird_sounds` domain. \nBelow are the detailed side-by-side acoustic cue comparison tables and the model's NNRank ordinal predictions.\n\n\n### Target vs. Contrast Concept: `Black-capped Chickadee`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_22_1.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **47.46%**)\n* **NNRank Relation Predictor Accuracy**: **6/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Black-capped Chickadee`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Black-capped Chickadee)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_22_1_class0_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class0_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `5104.3870` | `4739.7559` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **High-Pitch Shrillness** | `0.6356` | `0.3754` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `4648.7146` | `4934.6574` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n| **Vocal Inflection Speed** | `188.1593` | `224.4363` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n\n***\n\n### Target vs. Contrast Concept: `Eastern Towhee`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_11_1.wav`\n* **Contrastive Prediction**: `Ovenbird` (Confidence: **49.44%**)\n* **NNRank Relation Predictor Accuracy**: **6/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Eastern Towhee`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Eastern Towhee)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_11_1_class1_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class1_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `5104.3870` | `3390.9203` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **High-Pitch Shrillness** | `0.6356` | `0.5466` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `4648.7146` | `4941.9214` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n| **Vocal Inflection Speed** | `188.1593` | `460.7348` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n\n***\n\n### Target vs. Contrast Concept: `Ovenbird`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_11_5.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **48.27%**)\n* **NNRank Relation Predictor Accuracy**: **6/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Ovenbird`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Ovenbird)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_11_5_class2_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class2_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `5104.3870` | `3725.6327` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **High-Pitch Shrillness** | `0.6356` | `0.7380` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `4648.7146` | `4421.4641` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **Vocal Inflection Speed** | `188.1593` | `320.9664` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n\n***\n\n### Target vs. Contrast Concept: `Tufted Titmouse`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_11_18.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **51.72%**)\n* **NNRank Relation Predictor Accuracy**: **4/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Tufted Titmouse`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Tufted Titmouse)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_11_18_class3_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class3_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `5104.3870` | `4515.1930` | `Target is HIGHER` | `Target is SIMILAR` | **DISAGREE** |\n| **High-Pitch Shrillness** | `0.6356` | `0.5636` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `4648.7146` | `4781.4717` | `Target is LOWER` | `Target is SIMILAR` | **DISAGREE** |\n| **Vocal Inflection Speed** | `188.1593` | `376.7191` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n\n***\n"
+      "predicted_label": "Wood Thrush",
+      "consensus_label": "Wood Thrush",
+      "correct": true,
+      "confidence": 0.9986034035682678,
+      "cf_hits": 4,
+      "cf_total": 4,
+      "explanation_md": "# RexNet Contrastive Audio XAI Report\n        \nThis report presents an example-based, concept-grounded contrastive explanation of the model's classification of the given audio sample.\n\n---\n\n## Classification Overview\n\n* **Target File**: `bird_Recording_1_Recording_1_Segment_09_33.wav`\n* **True Target Concept**: `Wood Thrush`\n* **Base CNN Prediction**: `Wood Thrush` (Confidence: **99.88%**)\n* **RexNet Contrastive Prediction (Consensus)**: `Wood Thrush`\n* **Prediction Correctness**: **CORRECT**\n\n---\n\n## Multi-Contrast Explanations\n\nTo fully explain this sound, we compared it against representative **contrast/foil concepts** in the `bird_sounds` domain. \nBelow are the detailed side-by-side acoustic cue comparison tables and the model's NNRank ordinal predictions.\n\n\n### Target vs. Contrast Concept: `Black-capped Chickadee`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_22_1.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **99.94%**)\n* **NNRank Relation Predictor Accuracy**: **4/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Black-capped Chickadee`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Black-capped Chickadee)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_22_1_class0_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class0_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `4751.0605` | `4739.7559` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **High-Pitch Shrillness** | `0.2642` | `0.3754` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `5011.2572` | `4934.6574` | `Target is SIMILAR` | `Target is HIGHER` | **DISAGREE** |\n| **Vocal Inflection Speed** | `181.5698` | `224.4363` | `Target is SIMILAR` | `Target is LOWER` | **DISAGREE** |\n\n***\n\n### Target vs. Contrast Concept: `Eastern Towhee`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_11_1.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **99.96%**)\n* **NNRank Relation Predictor Accuracy**: **5/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Eastern Towhee`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Eastern Towhee)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_11_1_class1_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class1_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `4751.0605` | `3390.9203` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **High-Pitch Shrillness** | `0.2642` | `0.5466` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `5011.2572` | `4941.9214` | `Target is SIMILAR` | `Target is HIGHER` | **DISAGREE** |\n| **Vocal Inflection Speed** | `181.5698` | `460.7348` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n\n***\n\n### Target vs. Contrast Concept: `Ovenbird`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_11_5.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **99.98%**)\n* **NNRank Relation Predictor Accuracy**: **6/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Ovenbird`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Ovenbird)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_11_5_class2_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class2_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `4751.0605` | `3725.6327` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **High-Pitch Shrillness** | `0.2642` | `0.7380` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `5011.2572` | `4421.4641` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **Vocal Inflection Speed** | `181.5698` | `320.9664` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n\n***\n\n### Target vs. Contrast Concept: `Tufted Titmouse`\n\n* **Contrast Exemplar Sound**: `bird_Recording_1_Recording_1_Segment_11_18.wav`\n* **Contrastive Prediction**: `Wood Thrush` (Confidence: **99.97%**)\n* **NNRank Relation Predictor Accuracy**: **6/6 Cues Correct**\n\n#### Side-by-Side Audio Comparison (Full Context)\nListen to the target sample against the representative grounded exemplar of class `Tufted Titmouse`:\n\n<table>\n  <tr>\n    <th align=\"center\">Target Sound Sample (Wood Thrush)</th>\n    <th align=\"center\">Original Foil Exemplar (Tufted Titmouse)</th>\n    <th align=\"center\">Generated Foil Contrast</th>\n  </tr>\n  <tr>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_target.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_Recording_1_Segment_11_18_class3_exemplar.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n    <td align=\"center\">\n      <audio controls>\n        <source src=\"audio/bird_Recording_1_vs_class3_contrast.wav\" type=\"audio/wav\">\n        Your browser does not support the audio element.\n      </audio>\n    </td>\n  </tr>\n</table>\n\n#### Acoustic Concept Cue Relation Predictions\nThe model predicts the ordinal relationship of 6 DSP heuristic concepts between the target and foil.\n\n| Concept Cue | Target Value | Foil Value | Heuristic Relation | Model predicted relation | Match |\n| :--- | :---: | :---: | :---: | :---: | :---: |\n| **Average Song Pitch** | `4751.0605` | `4515.1930` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **High-Pitch Shrillness** | `0.2642` | `0.5636` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n| **Trill Rate / Note Tempo** | `0.2000` | `0.2000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Gap Ratio / Pause Duration** | `0.0000` | `0.0000` | `Target is SIMILAR` | `Target is SIMILAR` | **AGREE** |\n| **Note Frequency Span** | `5011.2572` | `4781.4717` | `Target is HIGHER` | `Target is HIGHER` | **AGREE** |\n| **Vocal Inflection Speed** | `181.5698` | `376.7191` | `Target is LOWER` | `Target is LOWER` | **AGREE** |\n\n***\n"
     },
     "proto": {
       "family": "Proto",
