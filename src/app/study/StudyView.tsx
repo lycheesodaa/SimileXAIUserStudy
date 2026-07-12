@@ -2,14 +2,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { STUDY_DOMAINS } from './domainRegistry';
-import { loadCoreSamples } from './dataV1';
+import { DATA_V1_TRAIN_ROOT, loadCoreSamples } from './dataV1';
 import { createStudyLogger } from './logger';
 import { useStudyInstrumentation } from './useStudyInstrumentation';
 
 // Study-mode entry point, embedded in Qualtrics as an iframe:
-//   test:  /#/study/v1/:domain/test/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
-//   train: /#/study/v1/:domain/train?pid=<participant>&xai=<condition>
+//   test:     /#/study/v1/:domain/test/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
+//   train:    /#/study/v1/:domain/train?pid=<participant>&xai=<condition>
+//   tutorial: /#/study/v1/:domain/tutorial/:sampleId??pid=<participant>&xai=<condition>
 // (unversioned /#/study/... redirects here; /#/v1/... is the navbar'd dev twin)
+// tutorial mode renders the condition's explanation UI from a real sample
+// (defaulting to the first core sample) as a static guided tour; train mode
+// shows the practice descriptions plus, when public/data_v1_train/<domain>
+// exists, an explanation UI for each sample in that practice subset.
 // The URL carries no class labels; Qualtrics Loop & Merge decides which
 // sample (and in what order) each participant sees. The xai param selects the
 // condition (similes, onomatopoeia, similes_dualview, onomatopoeia_dualview,
@@ -39,6 +44,7 @@ export function StudyView() {
   const pos = searchParams.get('pos');
 
   const isTrain = mode === 'train';
+  const isTutorial = mode === 'tutorial';
   const domainCfg = STUDY_DOMAINS[domain];
   const xaiType = (searchParams.get('xai') || domainCfg?.defaultXai || 'similes').trim();
   const xaiCfg = domainCfg?.xaiVariants[xaiType];
@@ -83,7 +89,29 @@ export function StudyView() {
     };
   }, [xaiCfg, resolvedSampleId, isTrain]);
 
-  const lookupFailed = !xaiCfg || load.status === 'missing';
+  // Optional practice subset for train mode: every sample found in the
+  // data_v1_train bundle, mapped through the active condition. Missing bundle
+  // (404) resolves undefined and leaves the list empty — train renders as
+  // descriptions-only, exactly as before the subset existed.
+  const [trainViews, setTrainViews] = useState<unknown[]>([]);
+  useEffect(() => {
+    if (!isTrain || !xaiCfg) return;
+    let cancelled = false;
+    setTrainViews([]);
+    loadCoreSamples(domain, DATA_V1_TRAIN_ROOT).then(async (list) => {
+      if (!list || cancelled) return;
+      const views = await Promise.all(
+        list.map((s) => xaiCfg.getSample(s.sample_id, DATA_V1_TRAIN_ROOT))
+      );
+      if (!cancelled) setTrainViews(views.filter((v) => v !== undefined));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isTrain, xaiCfg, domain]);
+
+  const lookupFailed =
+    !xaiCfg || load.status === 'missing' || (isTutorial && !xaiCfg.renderTutorial);
   const sample = load.status === 'ready' ? load.sample : undefined;
 
   const logger = useMemo(
@@ -138,7 +166,20 @@ export function StudyView() {
   }
 
   if (isTrain) {
-    return <>{xaiCfg.renderTrain()}</>;
+    return (
+      <>
+        {xaiCfg.renderTrain()}
+        {trainViews.map((v, i) => (
+          <div key={i} className="mt-8 pt-4 border-t border-gray-200">
+            {xaiCfg.render(v, { isStudy: true })}
+          </div>
+        ))}
+      </>
+    );
+  }
+
+  if (isTutorial) {
+    return <>{xaiCfg.renderTutorial!(sample)}</>;
   }
 
   return <>{xaiCfg.render(sample, { isStudy: true })}</>;

@@ -4,12 +4,15 @@ import { CuesExplanationV1 } from '../components/cues/CuesExplanationV1';
 import { CuesPractice } from '../components/cues/CuesPractice';
 import { ExampleExplanation } from '../components/examples/ExampleExplanation';
 import { ExampleItem } from '../components/examples/ExampleList';
-import { ExamplesPractice } from '../components/examples/ExamplesPractice';
+import { ExamplesTutorial } from '../components/tutorial/ExamplesTutorial';
+import { SimileTutorial } from '../components/tutorial/SimileTutorial';
+import { CuesTutorial } from '../components/tutorial/CuesTutorial';
 import { NoXaiExplanation } from '../components/noxai/NoXaiExplanation';
 import { NoXaiPractice } from '../components/noxai/NoXaiPractice';
 import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
 import {
   ConceptSet,
+  DataRoot,
   RexnetReport,
   V1AttrBreakdownModel,
   V1BetaBreakdownModel,
@@ -37,13 +40,17 @@ export interface StudyXaiVariant<S = unknown> {
   logging?: 'full' | 'minimal';
   /** Sample ids exposed here end up in Qualtrics URLs — they must be opaque
    *  (no class labels). Resolves undefined on missing sample/model/fetch
-   *  failure, which StudyView surfaces as lookup_error. */
-  getSample(sampleId: string): Promise<S | undefined>;
+   *  failure, which StudyView surfaces as lookup_error. `root` selects the
+   *  bundle (default data_v1; data_v1_train for the practice subset). */
+  getSample(sampleId: string, root?: DataRoot): Promise<S | undefined>;
   /** Resolve which audio a media event belongs to, from the element's src. */
   audioIdForSrc(sample: S, src: string): string;
   render(sample: S, ctx?: { isStudy?: boolean }): ReactNode;
   /** Training/practice descriptions shown before the test items (no sample). */
   renderTrain(): ReactNode;
+  /** Guided tour of the explanation UI (tutorial mode), rendered from a real
+   *  sample but static/non-interactable. Absent = no tutorial (e.g. noxai). */
+  renderTutorial?(sample: S): ReactNode;
 }
 
 export interface StudyDomainConfig {
@@ -85,9 +92,9 @@ const fusedVariant = (
   set: ConceptSet,
   dualview?: 'beta' | 'attr'
 ): StudyXaiVariant<FusedView> => ({
-  getSample: async (sampleId) => {
+  getSample: async (sampleId, root) => {
     const [sample, conceptMap] = await Promise.all([
-      loadSample(domain, sampleId),
+      loadSample(domain, sampleId, root),
       loadConcepts(domain, set),
     ]);
     const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
@@ -192,6 +199,16 @@ const fusedVariant = (
     />
   ),
   renderTrain: () => <ConceptCheatsheet domain={domain} set={set} />,
+  renderTutorial: (view) => (
+    <SimileTutorial
+      audioName={view.sample.sample_id}
+      classification={view.predictedLabel}
+      similes={view.items}
+      originalAudioUrl={view.sample.audio}
+      isOnomatopoeia={set === 'onomatopoeia'}
+      dualview={dualview !== undefined}
+    />
+  ),
 });
 
 // ─── RexNet (cues) condition ──────────────────────────────────────────────────
@@ -202,8 +219,8 @@ interface RexnetView {
 }
 
 const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
-  getSample: async (sampleId) => {
-    const sample = await loadSample(domain, sampleId);
+  getSample: async (sampleId, root) => {
+    const sample = await loadSample(domain, sampleId, root);
     const model = sample?.models.rexnet;
     if (!sample || !model?.explanation_md) return undefined;
     // Parsing (rather than rendering the report markdown raw) keeps the true
@@ -225,6 +242,14 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
     />
   ),
   renderTrain: () => <CuesPractice />,
+  renderTutorial: (view) => (
+    <CuesTutorial
+      audioUrl={view.sample.audio}
+      report={view.report}
+      sampleId={view.sample.sample_id}
+      domain={domain}
+    />
+  ),
 });
 
 // ─── Proto (examples) condition ───────────────────────────────────────────────
@@ -237,8 +262,8 @@ interface ProtoView {
 }
 
 const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
-  getSample: async (sampleId) => {
-    const sample = await loadSample(domain, sampleId);
+  getSample: async (sampleId, root) => {
+    const sample = await loadSample(domain, sampleId, root);
     const model = sample?.models.proto;
     if (!sample || !model?.prototypes?.length) return undefined;
     const examples: ExampleItem[] = model.prototypes.map((p) => ({
@@ -265,14 +290,17 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
       originalAudioUrl={view.sample.audio}
     />
   ),
-  renderTrain: () => <ExamplesPractice />,
+  renderTrain: () => <ExamplesTutorial />,
+  renderTutorial: (view) => (
+    <ExamplesTutorial examples={view.examples} originalAudioUrl={view.sample.audio} />
+  ),
 });
 
 // ─── noxai (control — audio only, no explanation) ─────────────────────────────
 
 const noXaiVariant = (domain: string): StudyXaiVariant<V1Sample> => ({
   logging: 'minimal',
-  getSample: (sampleId) => loadSample(domain, sampleId),
+  getSample: (sampleId, root) => loadSample(domain, sampleId, root),
   audioIdForSrc: (sample, src) =>
     audioIdOrFallback(src, (s) => (s === sample.audio ? 'original' : undefined)),
   render: (sample) => <NoXaiExplanation originalAudioUrl={sample.audio} />,

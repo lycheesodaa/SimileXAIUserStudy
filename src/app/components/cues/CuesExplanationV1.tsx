@@ -82,10 +82,10 @@ export function CuesExplanationV1({
   const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
 
   return (
-    <div className="w-full space-y-6 mx-3">
+    <div className="w-full space-y-6 px-3">
       {/* Audio Player Section */}
       <div className="mb-6 pt-6">
-        <div className="flex flex-col gap-2 max-w-md">
+        <div className="flex flex-col gap-2 max-w-md" data-tutorial="original-audio">
           <span className="text-gray-600">Play this sound recording:</span>
           <audio controls className="w-full h-10" src={audioUrl} data-log-id="original-audio">
             Your browser does not support the audio element.
@@ -95,7 +95,7 @@ export function CuesExplanationV1({
 
       {/* Cue Relations Section */}
       <div className="mb-6">
-        <div className="mb-4">
+        <div className="mb-4" data-tutorial="cues-header">
           <h2 className="text-xl font-semibold mb-2">Acoustic Cue Comparison</h2>
           <p className="text-gray-600">
             The system compares this sound against a representative example of each
@@ -108,7 +108,7 @@ export function CuesExplanationV1({
           <p className="text-gray-500 italic">No cue comparisons available for this sample.</p>
         ) : (
           <>
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <div className="flex items-center gap-3 mb-4 flex-wrap" data-tutorial="contrast-class">
               {hideDropdown ? (
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600 font-medium">
@@ -145,7 +145,7 @@ export function CuesExplanationV1({
 
             {selected && (
               <div className="overflow-x-auto">
-                <table className="divide-y divide-gray-400 text-sm border-b border-gray-400">
+                <table className="divide-y divide-gray-400 text-sm border-b border-gray-400" data-tutorial="cue-table">
                   <thead>
                     <tr>
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
@@ -172,7 +172,7 @@ export function CuesExplanationV1({
                   </tbody>
                 </table>
                 {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-gray-500 mt-2" data-tutorial="cue-match-summary">
                     The system's predicted relations match the measured relations for{' '}
                     {visibleCuesCorrect} of {visibleCues.length} cues.
                   </p>
@@ -184,7 +184,7 @@ export function CuesExplanationV1({
       </div>
 
       {/* Reference Table Section */}
-      <div className="mt-8 pt-4 border-t border-gray-200">
+      <div className="mt-8 pt-4 border-t border-gray-200" data-tutorial="reference-table">
         <h3 className="text-lg font-semibold mb-2">Acoustic Cues Reference Table</h3>
         <p className="text-sm text-gray-600 mb-4">
           Reference table summarizing the ranking of each acoustic attribute across{' '}
@@ -293,25 +293,25 @@ export function ReferenceTableV1({ domain = 'lung' }: { domain?: string }) {
 
   return (
     <div className="mb-6">
-      <div className="overflow-x-auto">
-        <table className="divide-y divide-gray-400 text-sm border-b border-gray-400 w-full">
+      <div className="w-full">
+        <table className="divide-y divide-gray-400 text-sm border-b border-gray-400 w-full table-fixed">
           <thead>
             <tr>
-              <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Description</th>
+              <th className="w-1/4 px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
+              <th className="w-2/5 px-4 py-2 text-left font-medium text-gray-500 uppercase">Description</th>
               <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Class Ranking (low → high)</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-400">
             {rows.map((row) => (
               <tr key={row.cue}>
-                <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">
+                <td className="px-4 py-2 font-medium text-gray-900">
                   {row.cue}
                 </td>
                 <td className="px-4 py-2 text-gray-600">
                   {row.description}
                 </td>
-                <td className="px-4 py-2 text-gray-800 font-medium min-w-[320px]">
+                <td className="px-4 py-2 text-gray-800 font-medium">
                   {row.ranking}
                 </td>
               </tr>

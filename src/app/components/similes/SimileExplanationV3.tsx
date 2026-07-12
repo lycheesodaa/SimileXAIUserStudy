@@ -53,6 +53,7 @@ export function SimileAudioPlayer({ url, logId }: { url: string; logId?: string 
         className="p-1.5 rounded-full text-blue-600 hover:bg-blue-50 transition-colors"
         title={isPlaying ? "Pause" : "Play"}
         data-log-id={logId}
+        data-tutorial="concept-play"
       >
         {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
       </button>
@@ -162,6 +163,7 @@ export function SimileExplanationV3({
       <div
         className={`h-6 ${isPositive ? 'rounded-r-sm' : 'rounded-l-sm'} flex overflow-hidden relative flex-shrink-0`}
         style={{ width: barWidth, minWidth: '4px' }}
+        data-tutorial={orderedSegments.length > 1 ? 'split-bar' : undefined}
       >
         {orderedSegments.map((seg, i) => (
           <div key={i} className={`h-full ${seg.cls}`} style={{ width: `${seg.frac * 100}%` }} />
@@ -184,9 +186,12 @@ export function SimileExplanationV3({
     const categoryClass = resolveConceptCategory(s.text, s.category);
 
     return (
-      <div key={s.id} className={`grid ${rowGridClass} gap-4 items-center mb-2`}>
+      <div key={s.id} className={`grid ${rowGridClass} gap-4 items-center mb-2`} data-tutorial="evidence-row">
         <div className="flex justify-between items-center gap-2 text-sm text-gray-700 leading-tight">
-          <div className="flex items-center flex-shrink-0">
+          <div
+            className="flex items-center flex-shrink-0"
+            data-tutorial={categoryClass ? 'category-badge' : undefined}
+          >
             {categoryClass && (
               <ClassBadge className={categoryClass} useAbbrev size="xs" />
             )}
@@ -198,7 +203,7 @@ export function SimileExplanationV3({
             )}
           </div>
         </div>
-        <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm">
+        <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm" data-tutorial="evidence-bar">
           {/* Center line */}
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-400 z-10" />
 
@@ -232,7 +237,7 @@ export function SimileExplanationV3({
       {/* Audio Player Section */}
       <div className="mb-6">
         <div className="pt-6">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2" data-tutorial="original-audio">
             <span className="text-gray-600">Play this lung sound recording:</span>
             {originalAudioUrl ? (
               <audio
@@ -252,13 +257,13 @@ export function SimileExplanationV3({
 
       {/* Tornado Plot Section */}
       <div className="mb-6">
-        <div className="mb-4">
+        <div className="mb-4" data-tutorial="explanation-header">
           <h2 className="text-xl font-semibold mb-2">{isOnomatopoeia ? 'Onomatopoeia' : 'Simile'} Explanation</h2>
           <p className="text-gray-600">
             The system detects the following {isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} as positive or negative evidence for this classification.
           </p>
           {isDualView && (
-            <p className="text-sm text-gray-500 mt-2 italic">
+            <p className="text-sm text-gray-500 mt-2 italic" data-tutorial="dualview-legend">
               Each bar splits the evidence between the system's two listening branches:{' '}
               <span className="inline-block w-3 h-3 rounded-sm bg-blue-400 align-middle ml-0.5 mb-0.5" />
               <span className="inline-block w-3 h-3 rounded-sm bg-red-400 align-middle ml-0.5 mr-0.5 mb-0.5" />{' '}
@@ -279,7 +284,7 @@ export function SimileExplanationV3({
           <div className={`w-full ${plotWidthClass} flex flex-col gap-3 mt-6`}>
             <div className={`grid ${rowGridClass} gap-4 items-center mb-2`}>
               <div></div>
-              <div className="relative w-full flex text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <div className="relative w-full flex text-xs font-semibold text-gray-500 uppercase tracking-wider" data-tutorial="evidence-axis">
                 <div className="w-1/2 text-right pr-2">Negative Evidence</div>
                 <div className="w-1/2 text-left pl-2">Positive Evidence</div>
               </div>
@@ -293,6 +298,7 @@ export function SimileExplanationV3({
                   onClick={() => setShowMinor((v) => !v)}
                   className="flex items-center justify-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors py-1"
                   data-log-id="minor-evidence-toggle"
+                  data-tutorial="weaker-toggle"
                 >
                   {showMinor ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   {showMinor
@@ -314,6 +320,7 @@ export function SimileExplanationV3({
         className="fixed bottom-6 right-6 w-14 h-14 bg-cyan-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-cyan-700 transition-colors z-40"
         title="Open Simile Cheatsheet"
         data-log-id="cheatsheet-open"
+        data-tutorial="cheatsheet-button"
       >
         <HelpCircle size={28} />
       </button>

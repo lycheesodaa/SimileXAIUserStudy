@@ -20,7 +20,7 @@ export function ExampleExplanation({
       {/* Audio Player Section */}
       <div className="mb-6">
         <div className="pt-6">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2" data-tutorial="original-audio">
             <span className="text-gray-600">Play this lung sound recording:</span>
             {originalAudioUrl ? (
               <audio
@@ -42,7 +42,7 @@ export function ExampleExplanation({
 
       {/* Example-Based Explanations */}
       <div className="mb-6">
-        <div className="mb-4">
+        <div className="mb-4" data-tutorial="examples-header">
           <p className="text-gray-600">
             The system identifies the following similar training example(s) to help explain this classification.
           </p>

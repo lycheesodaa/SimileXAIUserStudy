@@ -32,13 +32,14 @@ export function ExampleList({ examples }: ExampleListProps) {
           <div
             key={example.id}
             className="border-2 border-gray-200 bg-white transition-all rounded-md"
+            data-tutorial="example-card"
           >
             <div className="px-4 py-3">
               <div className="space-y-2">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-start gap-4">
-                      <div className="flex flex-col items-center justify-center mt-2">
+                      <div className="flex flex-col items-center justify-center mt-2" data-tutorial="example-rank">
                         <div className="h-8 w-8 rounded-full flex items-center justify-center font-semibold text-sm border bg-indigo-50 border-indigo-200 text-indigo-600">
                           {example.rank}
                         </div>
@@ -48,7 +49,7 @@ export function ExampleList({ examples }: ExampleListProps) {
                           Similar Training Example {example.prototypeIdx !== undefined ? `(Prototype #${example.prototypeIdx})` : `#${example.rank}`}
                         </p>
                         <div className="flex flex-wrap gap-2 mb-2 items-center">
-                          <div className="flex items-center gap-1.5 mr-2">
+                          <div className="flex items-center gap-1.5 mr-2" data-tutorial="example-class">
                             <span className="text-sm text-gray-500">True Class:</span>
                             <ClassBadge className={example.className} size="sm" />
                           </div>
@@ -60,7 +61,7 @@ export function ExampleList({ examples }: ExampleListProps) {
                               </Badge>
                             </div>
                           )}
-                          <div>
+                          <div data-tutorial="example-weight">
                             <span className="text-sm text-gray-500">Similarity Weight: </span>
                             <Badge variant="outline" className="text-gray-600 font-medium">
                               {example.weight.toFixed(4)}
@@ -79,7 +80,7 @@ export function ExampleList({ examples }: ExampleListProps) {
                     </div>
                   </div>
 
-                  <div className="ml-4 flex items-center justify-center pt-2">
+                  <div className="ml-4 flex items-center justify-center pt-2" data-tutorial="example-audio">
                     <audio
                       controls
                       className="h-8 w-48"

@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { STUDY_DOMAINS } from '../../study/domainRegistry';
 import {
   CoreSampleInfo,
+  DATA_V1_TRAIN_ROOT,
   V1ModelVerdict,
   loadCoreSamples,
   loadSample,
@@ -12,6 +13,7 @@ import {
 // Dev-only browser for the v1 study conditions, mounted at
 //   /#/v1/:domain/test/:sampleId?xai=<condition>
 //   /#/v1/:domain/train?xai=<condition>
+//   /#/v1/:domain/tutorial/:sampleId?xai=<condition>   (guided UI tour)
 // It renders exactly what participants see via /#/study/v1/... but adds the
 // navigation bar (true labels included — this is for audio quality checks)
 // and creates NO study logger, so browsing never spams the /log endpoint.
@@ -67,7 +69,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   useEffect(() => {
     let cancelled = false;
     setVerdict(null);
-    if (mode !== 'test' || !sampleId) return;
+    if (mode === 'train' || !sampleId) return;
     const key = modelKeyForXai(domain, xai);
     if (!key) return; // noxai: no model verdict to show
     loadSample(domain, sampleId).then((s) => {
@@ -84,7 +86,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   }, [domain, sampleId, xai, mode]);
 
   const goTo = (d: string, m: string, id: string | undefined, x: string) => {
-    const path = m === 'train' ? `/v1/${d}/train` : `/v1/${d}/test${id ? `/${encodeURIComponent(id)}` : ''}`;
+    const path = m === 'train' ? `/v1/${d}/train` : `/v1/${d}/${m}${id ? `/${encodeURIComponent(id)}` : ''}`;
     navigate(`${path}?xai=${encodeURIComponent(x)}`);
   };
 
@@ -129,11 +131,12 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
           <select value={mode} onChange={(e) => goTo(domain, e.target.value, sampleId, xai)} style={selectStyle}>
             <option value="train">train</option>
             <option value="test">test</option>
+            <option value="tutorial">tutorial</option>
           </select>
         </label>
       </div>
 
-      {mode === 'test' && (
+      {mode !== 'train' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', paddingTop: '8px', marginTop: '8px', borderTop: '1px dashed #bae6fd' }}>
           <span style={{ fontSize: '13px', color: '#0369a1', fontWeight: 600 }}>
             Navigate sample{index >= 0 ? ` (${index + 1}/${samples.length})` : ''}:
@@ -142,7 +145,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
             Sample&nbsp;
             <select
               value={sampleId ?? ''}
-              onChange={(e) => goTo(domain, 'test', e.target.value, xai)}
+              onChange={(e) => goTo(domain, mode, e.target.value, xai)}
               style={{ ...selectStyle, maxWidth: '420px' }}
             >
               {sampleId && index === -1 && <option value={sampleId}>{sampleId}</option>}
@@ -178,7 +181,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
             {[{ label: '← Prev', target: prev }, { label: 'Next →', target: next }].map(({ label, target }) => (
               <button
                 key={label}
-                onClick={() => target && goTo(domain, 'test', target.sample_id, xai)}
+                onClick={() => target && goTo(domain, mode, target.sample_id, xai)}
                 disabled={!target}
                 style={{
                   fontSize: '12px',
@@ -208,16 +211,18 @@ export function V1DevView() {
   const xai = searchParams.get('xai') || domainCfg?.defaultXai || 'similes';
   const xaiCfg = domainCfg?.xaiVariants[xai];
   const isTrain = mode === 'train';
+  const isTutorial = mode === 'tutorial';
 
-  // /v1/<domain>/test without a sample id: jump to the first core sample.
+  // /v1/<domain>/test (or /tutorial) without a sample id: jump to the first
+  // core sample, keeping the mode.
   useEffect(() => {
     if (isTrain || sampleId || !domainCfg) return;
     loadCoreSamples(domain!).then((list) => {
       if (list?.[0]) {
-        navigate(`/v1/${domain}/test/${encodeURIComponent(list[0].sample_id)}?xai=${encodeURIComponent(xai)}`, { replace: true });
+        navigate(`/v1/${domain}/${mode ?? 'test'}/${encodeURIComponent(list[0].sample_id)}?xai=${encodeURIComponent(xai)}`, { replace: true });
       }
     });
-  }, [isTrain, sampleId, domain, domainCfg, xai, navigate]);
+  }, [isTrain, sampleId, domain, domainCfg, mode, xai, navigate]);
 
   const [load, setLoad] = useState<{ status: 'loading' | 'ready' | 'missing'; view?: unknown }>({ status: 'loading' });
   useEffect(() => {
@@ -239,6 +244,25 @@ export function V1DevView() {
     };
   }, [xaiCfg, sampleId, isTrain]);
 
+  // Optional practice subset from public/data_v1_train (mirrors StudyView):
+  // absent bundle = empty list = descriptions-only train mode.
+  const [trainViews, setTrainViews] = useState<unknown[]>([]);
+  useEffect(() => {
+    if (!isTrain || !xaiCfg) return;
+    let cancelled = false;
+    setTrainViews([]);
+    loadCoreSamples(domain!, DATA_V1_TRAIN_ROOT).then(async (list) => {
+      if (!list || cancelled) return;
+      const views = await Promise.all(
+        list.map((s) => xaiCfg.getSample(s.sample_id, DATA_V1_TRAIN_ROOT))
+      );
+      if (!cancelled) setTrainViews(views.filter((v) => v !== undefined));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isTrain, xaiCfg, domain]);
+
   if (!xaiCfg || load.status === 'missing') {
     return (
       <div className="flex items-center justify-center min-h-[300px] text-gray-500 text-center p-8">
@@ -252,7 +276,26 @@ export function V1DevView() {
     return <div className="min-h-[300px]" aria-busy="true" />;
   }
   if (isTrain) {
-    return <>{xaiCfg.renderTrain()}</>;
+    return (
+      <>
+        {xaiCfg.renderTrain()}
+        {trainViews.map((v, i) => (
+          <div key={i} className="mt-8 pt-4 border-t border-gray-200">
+            {xaiCfg.render(v, { isStudy: false })}
+          </div>
+        ))}
+      </>
+    );
+  }
+  if (isTutorial) {
+    if (!xaiCfg.renderTutorial) {
+      return (
+        <div className="flex items-center justify-center min-h-[300px] text-gray-500 text-center p-8">
+          No tutorial available for condition: {xai}
+        </div>
+      );
+    }
+    return <>{xaiCfg.renderTutorial(load.view)}</>;
   }
   return <>{xaiCfg.render(load.view, { isStudy: false })}</>;
 }

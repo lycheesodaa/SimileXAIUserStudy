@@ -5,7 +5,7 @@ import { SimileExplanation } from './components/similes/SimileExplanation';
 import { CuesPractice } from './components/cues/CuesPractice';
 import { CuesExplanation } from './components/cues/CuesExplanation';
 import { ExampleExplanation } from './components/examples/ExampleExplanation';
-import { ExamplesPractice } from './components/examples/ExamplesPractice';
+import { ExamplesTutorial } from './components/tutorial/ExamplesTutorial';
 import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
 import { LUNG_SOUND_DATA_V3 } from './data_v3';
 import { SimileExplanationV3 } from './components/similes/SimileExplanationV3';
@@ -17,7 +17,7 @@ export const SettingsContext = createContext<{
   setRandomFoil: (val: boolean) => void;
 }>({
   randomFoil: false,
-  setRandomFoil: () => {},
+  setRandomFoil: () => { },
 });
 
 // ─── Versioned dev route spaces ────────────────────────────────────────────────
@@ -515,7 +515,9 @@ export function AppRouter() {
             <Route path="/" element={<Navigate to="/v1/lung/test" replace />} />
 
             {/* Study mode (Qualtrics-embedded; no class labels in URL, no navbar).
-                train = practice descriptions, test = one sample's explanation */}
+                train = practice descriptions (+ optional data_v1_train samples),
+                test = one sample's explanation,
+                tutorial = static guided tour of the explanation UI */}
             <Route path="/study/v1" element={<Navigate to="/study/v1/lung/test" replace />} />
             <Route path="/study/v1/:domain/:mode?/:sampleId?" element={<StudyView />} />
             <Route path="/study/v1/*" element={<StudyFallback />} />
@@ -539,7 +541,7 @@ export function AppRouter() {
             <Route path="/v0.1/onomatopoeia/test" element={<Navigate to={`/v0.1/onomatopoeia/test/${FIRST_PATHOLOGY}/1`} replace />} />
             <Route path="/v0.1/onomatopoeia/test/:pathology/:localIndex" element={<OnomatopoeiaExplanationWrapper />} />
 
-            <Route path="/v0.1/examples/practice" element={<ExamplesPractice />} />
+            <Route path="/v0.1/examples/practice" element={<ExamplesTutorial />} />
             <Route path="/v0.1/examples/test" element={<Navigate to={`/v0.1/examples/test/${FIRST_PATHOLOGY}/1`} replace />} />
             <Route path="/v0.1/examples/test/:pathology/:localIndex" element={<ExampleExplanationWrapper />} />
 

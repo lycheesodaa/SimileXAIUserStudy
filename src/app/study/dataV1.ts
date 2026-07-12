@@ -149,8 +149,16 @@ export interface V1ModelVerdict {
 export const prettifyOnomatopoeia = (concept: string): string =>
   concept.replace(/_gemini_tts$/, '').replace(/_/g, ' ');
 
-const dataV1Url = (path: string): string =>
-  `${import.meta.env.BASE_URL.replace(/\/$/, '')}/data_v1/${path}`;
+// Bundle roots under public/. DATA_V1_TRAIN_ROOT is an optional sibling bundle
+// with the same per-domain layout (samples/ + core_samples.json) holding the
+// small practice subset shown in train mode; it may simply not exist yet, in
+// which case its loaders resolve undefined and train mode shows no samples.
+export const DATA_V1_ROOT = 'data_v1';
+export const DATA_V1_TRAIN_ROOT = 'data_v1_train';
+export type DataRoot = typeof DATA_V1_ROOT | typeof DATA_V1_TRAIN_ROOT;
+
+const dataV1Url = (path: string, root: DataRoot = DATA_V1_ROOT): string =>
+  `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${root}/${path}`;
 
 // ─── Cached fetchers ─────────────────────────────────────────────────────────
 
@@ -174,8 +182,14 @@ function fetchJson<T>(url: string): Promise<T | undefined> {
   return pending as Promise<T | undefined>;
 }
 
-export function loadSample(domain: string, sampleId: string): Promise<V1Sample | undefined> {
-  return fetchJson<V1Sample>(dataV1Url(`${domain}/samples/${encodeURIComponent(sampleId)}.json`));
+export function loadSample(
+  domain: string,
+  sampleId: string,
+  root: DataRoot = DATA_V1_ROOT
+): Promise<V1Sample | undefined> {
+  return fetchJson<V1Sample>(
+    dataV1Url(`${domain}/samples/${encodeURIComponent(sampleId)}.json`, root)
+  );
 }
 
 // core_samples.json rows carry more (meta, per-model flags); the dev browser
@@ -185,8 +199,11 @@ export interface CoreSampleInfo {
   true_label: string;
 }
 
-export function loadCoreSamples(domain: string): Promise<CoreSampleInfo[] | undefined> {
-  return fetchJson<CoreSampleInfo[]>(dataV1Url(`${domain}/core_samples.json`));
+export function loadCoreSamples(
+  domain: string,
+  root: DataRoot = DATA_V1_ROOT
+): Promise<CoreSampleInfo[] | undefined> {
+  return fetchJson<CoreSampleInfo[]>(dataV1Url(`${domain}/core_samples.json`, root));
 }
 
 export async function loadConcepts(
