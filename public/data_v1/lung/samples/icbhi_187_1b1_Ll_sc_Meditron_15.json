@@ -1268,14 +1268,56 @@
       "beta": 0.5,
       "predicted_label": "Normal",
       "correct": true,
-      "faithful": 0.8,
+      "faithful": 0.4,
       "concepts": [
+        {
+          "concept": "Like a quiet, steady breath during deep sleep.",
+          "category": "Normal",
+          "activation": 1.010962,
+          "head_weight": 1.068402,
+          "contribution": 1.080114
+        },
         {
           "concept": "Like a rhythmic, clear airflow with no interruptions.",
           "category": "Normal",
-          "activation": 1.05467,
-          "head_weight": 2.03068,
-          "contribution": 2.141698
+          "activation": 1.104273,
+          "head_weight": 0.706245,
+          "contribution": 0.779887
+        },
+        {
+          "concept": "Like the soft rustling of silk fabric in the air.",
+          "category": "Normal",
+          "activation": 1.462389,
+          "head_weight": 0.501303,
+          "contribution": 0.733101
+        },
+        {
+          "concept": "Like the soft, steady hum of a distant cooling fan.",
+          "category": "Normal",
+          "activation": 0.834505,
+          "head_weight": 0.623549,
+          "contribution": 0.520355
+        },
+        {
+          "concept": "Like the sound of a soft summer wind through pine trees.",
+          "category": "Normal",
+          "activation": 0.942863,
+          "head_weight": 0.146096,
+          "contribution": 0.137748
+        },
+        {
+          "concept": "Like air bubbling through thick plumbing pipes.",
+          "category": "Rhonchi",
+          "activation": 0.608886,
+          "head_weight": 0.064872,
+          "contribution": 0.039499
+        },
+        {
+          "concept": "Like a seal barking.",
+          "category": "Stridor",
+          "activation": 0.117213,
+          "head_weight": 0.260696,
+          "contribution": 0.030557
         }
       ]
     },
@@ -1291,79 +1333,23 @@
         {
           "concept": "Like the soft rustling of silk fabric in the air.",
           "category": "Normal",
-          "activation": 1.393519,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like the soft, steady hum of a distant cooling fan.",
-          "category": "Normal",
-          "activation": 1.06747,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "activation": 1.462389,
+          "head_weight": 0.501303,
+          "contribution": 0.733101,
+          "used_by_head": true
         },
         {
           "concept": "Like a rhythmic, clear airflow with no interruptions.",
           "category": "Normal",
-          "activation": 1.05467,
-          "head_weight": 2.03068,
-          "contribution": 2.141698,
+          "activation": 1.104273,
+          "head_weight": 0.706245,
+          "contribution": 0.779887,
           "used_by_head": true
-        },
-        {
-          "concept": "Like the sound of a soft summer wind through pine trees.",
-          "category": "Normal",
-          "activation": 0.957914,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like wood popping and snapping in a distant campfire.",
-          "category": "Crackle",
-          "activation": 0.873299,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like wind whistling through a tunnel or under a door.",
-          "category": "Wheeze",
-          "activation": 0.774309,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a clean, unobstructed sigh.",
-          "category": "Normal",
-          "activation": 0.76157,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
         },
         {
           "concept": "Like salt crackling on a hot frying pan.",
           "category": "Crackle",
-          "activation": 0.632398,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like air bubbling through thick plumbing pipes.",
-          "category": "Rhonchi",
-          "activation": 0.362954,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like water boiling vigorously in a pot.",
-          "category": "Crackle",
-          "activation": 0.327884,
+          "activation": 1.038362,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1371,7 +1357,79 @@
         {
           "concept": "Like pulling apart a strip of Velcro slowly.",
           "category": "Crackle",
-          "activation": 0.205442,
+          "activation": 1.022937,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like wind whistling through a tunnel or under a door.",
+          "category": "Wheeze",
+          "activation": 1.011952,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a quiet, steady breath during deep sleep.",
+          "category": "Normal",
+          "activation": 1.010962,
+          "head_weight": 1.068402,
+          "contribution": 1.080114,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like the sound of a soft summer wind through pine trees.",
+          "category": "Normal",
+          "activation": 0.942863,
+          "head_weight": 0.146096,
+          "contribution": 0.137748,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like water boiling vigorously in a pot.",
+          "category": "Crackle",
+          "activation": 0.876614,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like the soft, steady hum of a distant cooling fan.",
+          "category": "Normal",
+          "activation": 0.834505,
+          "head_weight": 0.623549,
+          "contribution": 0.520355,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like wood popping and snapping in a distant campfire.",
+          "category": "Crackle",
+          "activation": 0.655052,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like air bubbling through thick plumbing pipes.",
+          "category": "Rhonchi",
+          "activation": 0.608886,
+          "head_weight": 0.064872,
+          "contribution": 0.039499,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a seal barking.",
+          "category": "Stridor",
+          "activation": 0.117213,
+          "head_weight": 0.260696,
+          "contribution": 0.030557,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a mosquito buzzing near your ear.",
+          "category": "Wheeze",
+          "activation": 0.097061,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1401,16 +1459,16 @@
           "used_by_head": false
         },
         {
-          "concept": "Like a low note played on a cello or bassoon.",
-          "category": "Rhonchi",
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
           "activation": 0.0,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
         },
         {
-          "concept": "Like a mosquito buzzing near your ear.",
-          "category": "Wheeze",
+          "concept": "Like a low note played on a cello or bassoon.",
+          "category": "Rhonchi",
           "activation": 0.0,
           "head_weight": 0.0,
           "contribution": 0.0,
@@ -1441,24 +1499,8 @@
           "used_by_head": false
         },
         {
-          "concept": "Like a seal barking.",
-          "category": "Stridor",
-          "activation": 0.0,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
           "concept": "Like mud bubbling in a swamp.",
           "category": "Crackle",
-          "activation": 0.0,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like sawing through a metal pipe.",
-          "category": "Stridor",
           "activation": 0.0,
           "head_weight": 0.0,
           "contribution": 0.0,
@@ -1496,11 +1538,53 @@
       "beats_weight": 0.5,
       "concepts": [
         {
+          "concept": "Like a quiet, steady breath during deep sleep.",
+          "category": "Normal",
+          "clap_z": 0.378462,
+          "beats_z": 0.881964,
+          "fused": 0.630213
+        },
+        {
           "concept": "Like a rhythmic, clear airflow with no interruptions.",
           "category": "Normal",
-          "clap_z": 0.424753,
-          "beats_z": 0.767625,
-          "fused": 0.596189
+          "clap_z": 0.434331,
+          "beats_z": 0.595099,
+          "fused": 0.514715
+        },
+        {
+          "concept": "Like the soft rustling of silk fabric in the air.",
+          "category": "Normal",
+          "clap_z": 0.57934,
+          "beats_z": 0.660656,
+          "fused": 0.619998
+        },
+        {
+          "concept": "Like the soft, steady hum of a distant cooling fan.",
+          "category": "Normal",
+          "clap_z": 0.142704,
+          "beats_z": 0.656804,
+          "fused": 0.399754
+        },
+        {
+          "concept": "Like the sound of a soft summer wind through pine trees.",
+          "category": "Normal",
+          "clap_z": 0.369925,
+          "beats_z": 1.00281,
+          "fused": 0.686367
+        },
+        {
+          "concept": "Like air bubbling through thick plumbing pipes.",
+          "category": "Rhonchi",
+          "clap_z": -0.583129,
+          "beats_z": 0.862733,
+          "fused": 0.139802
+        },
+        {
+          "concept": "Like a seal barking.",
+          "category": "Stridor",
+          "clap_z": -1.640375,
+          "beats_z": 1.065235,
+          "fused": -0.28757
         }
       ]
     },
@@ -1511,14 +1595,74 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
+          "concept": "Like a quiet, steady breath during deep sleep.",
+          "category": "Normal",
+          "activation": 1.010962,
+          "clap_attribution": 0.303344,
+          "beats_attribution": 0.707618,
+          "clap_share": 0.300055,
+          "clap_contribution": 0.324093,
+          "beats_contribution": 0.75602
+        },
+        {
           "concept": "Like a rhythmic, clear airflow with no interruptions.",
           "category": "Normal",
-          "activation": 1.05467,
-          "clap_attribution": 0.376034,
-          "beats_attribution": 0.678637,
-          "clap_share": 0.356541,
-          "clap_contribution": 0.763605,
-          "beats_contribution": 1.378095
+          "activation": 1.104273,
+          "clap_attribution": 0.46735,
+          "beats_attribution": 0.636923,
+          "clap_share": 0.42322,
+          "clap_contribution": 0.330064,
+          "beats_contribution": 0.449824
+        },
+        {
+          "concept": "Like the soft rustling of silk fabric in the air.",
+          "category": "Normal",
+          "activation": 1.462389,
+          "clap_attribution": 0.683534,
+          "beats_attribution": 0.778855,
+          "clap_share": 0.467409,
+          "clap_contribution": 0.342658,
+          "beats_contribution": 0.390442
+        },
+        {
+          "concept": "Like the soft, steady hum of a distant cooling fan.",
+          "category": "Normal",
+          "activation": 0.834505,
+          "clap_attribution": 0.147574,
+          "beats_attribution": 0.686931,
+          "clap_share": 0.17684,
+          "clap_contribution": 0.09202,
+          "beats_contribution": 0.428335
+        },
+        {
+          "concept": "Like the sound of a soft summer wind through pine trees.",
+          "category": "Normal",
+          "activation": 0.942863,
+          "clap_attribution": 0.253978,
+          "beats_attribution": 0.688885,
+          "clap_share": 0.269369,
+          "clap_contribution": 0.037105,
+          "beats_contribution": 0.100643
+        },
+        {
+          "concept": "Like air bubbling through thick plumbing pipes.",
+          "category": "Rhonchi",
+          "activation": 0.608886,
+          "clap_attribution": -0.608886,
+          "beats_attribution": 1.217772,
+          "clap_share": -1.0,
+          "clap_contribution": -0.0395,
+          "beats_contribution": 0.078999
+        },
+        {
+          "concept": "Like a seal barking.",
+          "category": "Stridor",
+          "activation": 0.117213,
+          "clap_attribution": 0.234426,
+          "beats_attribution": -0.117213,
+          "clap_share": 2.0,
+          "clap_contribution": 0.061114,
+          "beats_contribution": -0.030557
         }
       ]
     },
@@ -1531,25 +1675,39 @@
       "faithful": 0.6,
       "concepts": [
         {
-          "concept": "fwooo_gemini_tts",
-          "category": "Normal",
-          "activation": 0.795795,
-          "head_weight": 1.081186,
-          "contribution": 0.860402
-        },
-        {
           "concept": "whoosh_gemini_tts",
           "category": "Normal",
           "activation": 1.085277,
-          "head_weight": 0.619913,
-          "contribution": 0.672778
+          "head_weight": 0.700353,
+          "contribution": 0.760077
+        },
+        {
+          "concept": "fwooo_gemini_tts",
+          "category": "Normal",
+          "activation": 0.795795,
+          "head_weight": 0.954359,
+          "contribution": 0.759473
         },
         {
           "concept": "shhh_gemini_tts",
           "category": "Normal",
           "activation": 1.021926,
-          "head_weight": 0.309136,
-          "contribution": 0.315915
+          "head_weight": 0.538826,
+          "contribution": 0.55064
+        },
+        {
+          "concept": "fwsh_fwsh_gemini_tts",
+          "category": "Normal",
+          "activation": 1.182342,
+          "head_weight": 0.432598,
+          "contribution": 0.511479
+        },
+        {
+          "concept": "shhhhh_gemini_tts",
+          "category": "Wheeze",
+          "activation": 1.293629,
+          "head_weight": 0.096513,
+          "contribution": 0.124852
         }
       ]
     },
@@ -1566,9 +1724,9 @@
           "concept": "shhhhh_gemini_tts",
           "category": "Wheeze",
           "activation": 1.293629,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "head_weight": 0.096513,
+          "contribution": 0.124852,
+          "used_by_head": true
         },
         {
           "concept": "snap_snap_snap_gemini_tts",
@@ -1582,32 +1740,32 @@
           "concept": "fwsh_fwsh_gemini_tts",
           "category": "Normal",
           "activation": 1.182342,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "head_weight": 0.432598,
+          "contribution": 0.511479,
+          "used_by_head": true
         },
         {
           "concept": "whoosh_gemini_tts",
           "category": "Normal",
           "activation": 1.085277,
-          "head_weight": 0.619913,
-          "contribution": 0.672778,
+          "head_weight": 0.700353,
+          "contribution": 0.760077,
           "used_by_head": true
         },
         {
           "concept": "shhh_gemini_tts",
           "category": "Normal",
           "activation": 1.021926,
-          "head_weight": 0.309136,
-          "contribution": 0.315915,
+          "head_weight": 0.538826,
+          "contribution": 0.55064,
           "used_by_head": true
         },
         {
           "concept": "fwooo_gemini_tts",
           "category": "Normal",
           "activation": 0.795795,
-          "head_weight": 1.081186,
-          "contribution": 0.860402,
+          "head_weight": 0.954359,
+          "contribution": 0.759473,
           "used_by_head": true
         },
         {
@@ -1770,13 +1928,6 @@
       "beats_weight": 0.5,
       "concepts": [
         {
-          "concept": "fwooo_gemini_tts",
-          "category": "Normal",
-          "clap_z": 0.792666,
-          "beats_z": 0.551068,
-          "fused": 0.671867
-        },
-        {
           "concept": "whoosh_gemini_tts",
           "category": "Normal",
           "clap_z": 1.180875,
@@ -1784,11 +1935,32 @@
           "fused": 1.019529
         },
         {
+          "concept": "fwooo_gemini_tts",
+          "category": "Normal",
+          "clap_z": 0.792666,
+          "beats_z": 0.551068,
+          "fused": 0.671867
+        },
+        {
           "concept": "shhh_gemini_tts",
           "category": "Normal",
           "clap_z": 0.699052,
           "beats_z": 0.725864,
           "fused": 0.712458
+        },
+        {
+          "concept": "fwsh_fwsh_gemini_tts",
+          "category": "Normal",
+          "clap_z": 1.168269,
+          "beats_z": 0.904698,
+          "fused": 1.036484
+        },
+        {
+          "concept": "shhhhh_gemini_tts",
+          "category": "Wheeze",
+          "clap_z": 0.63733,
+          "beats_z": 0.691393,
+          "fused": 0.664362
         }
       ]
     },
@@ -1799,24 +1971,24 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "fwooo_gemini_tts",
-          "category": "Normal",
-          "activation": 0.795795,
-          "clap_attribution": 0.468906,
-          "beats_attribution": 0.326888,
-          "clap_share": 0.58923,
-          "clap_contribution": 0.506975,
-          "beats_contribution": 0.353427
-        },
-        {
           "concept": "whoosh_gemini_tts",
           "category": "Normal",
           "activation": 1.085277,
           "clap_attribution": 0.627926,
           "beats_attribution": 0.457351,
           "clap_share": 0.578586,
-          "clap_contribution": 0.389259,
-          "beats_contribution": 0.283518
+          "clap_contribution": 0.43977,
+          "beats_contribution": 0.320307
+        },
+        {
+          "concept": "fwooo_gemini_tts",
+          "category": "Normal",
+          "activation": 0.795795,
+          "clap_attribution": 0.468906,
+          "beats_attribution": 0.326888,
+          "clap_share": 0.58923,
+          "clap_contribution": 0.447505,
+          "beats_contribution": 0.311969
         },
         {
           "concept": "shhh_gemini_tts",
@@ -1825,8 +1997,28 @@
           "clap_attribution": 0.501454,
           "beats_attribution": 0.520472,
           "clap_share": 0.490695,
-          "clap_contribution": 0.155017,
-          "beats_contribution": 0.160897
+          "clap_contribution": 0.270196,
+          "beats_contribution": 0.280444
+        },
+        {
+          "concept": "fwsh_fwsh_gemini_tts",
+          "category": "Normal",
+          "activation": 1.182342,
+          "clap_attribution": 0.666208,
+          "beats_attribution": 0.516134,
+          "clap_share": 0.563464,
+          "clap_contribution": 0.2882,
+          "beats_contribution": 0.223279
+        },
+        {
+          "concept": "shhhhh_gemini_tts",
+          "category": "Wheeze",
+          "activation": 1.293629,
+          "clap_attribution": 0.621331,
+          "beats_attribution": 0.672298,
+          "clap_share": 0.480301,
+          "clap_contribution": 0.059967,
+          "beats_contribution": 0.064885
         }
       ]
     },

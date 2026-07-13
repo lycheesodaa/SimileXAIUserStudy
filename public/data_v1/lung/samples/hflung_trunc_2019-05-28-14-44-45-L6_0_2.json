@@ -1058,21 +1058,35 @@
       "beta": 0.5,
       "predicted_label": "Stridor",
       "correct": true,
-      "faithful": 1.0,
+      "faithful": 0.8,
       "concepts": [
+        {
+          "concept": "Like a rooster crowing.",
+          "category": "Stridor",
+          "activation": 2.596953,
+          "head_weight": 0.77901,
+          "contribution": 2.023054
+        },
+        {
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
+          "activation": 2.462217,
+          "head_weight": 0.75612,
+          "contribution": 1.86173
+        },
         {
           "concept": "Like a rusty, heavy gate being forced open.",
           "category": "Stridor",
-          "activation": 4.18278,
-          "head_weight": 0.930806,
-          "contribution": 3.893357
+          "activation": 2.754141,
+          "head_weight": 0.296567,
+          "contribution": 0.816788
         },
         {
-          "concept": "Like a seal barking.",
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
           "category": "Stridor",
-          "activation": 3.161087,
-          "head_weight": 0.394267,
-          "contribution": 1.246313
+          "activation": 2.136171,
+          "head_weight": 0.167972,
+          "contribution": 0.358817
         }
       ]
     },
@@ -1088,15 +1102,39 @@
         {
           "concept": "Like a rusty, heavy gate being forced open.",
           "category": "Stridor",
-          "activation": 4.18278,
-          "head_weight": 0.930806,
-          "contribution": 3.893357,
+          "activation": 2.754141,
+          "head_weight": 0.296567,
+          "contribution": 0.816788,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a rooster crowing.",
+          "category": "Stridor",
+          "activation": 2.596953,
+          "head_weight": 0.77901,
+          "contribution": 2.023054,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
+          "activation": 2.462217,
+          "head_weight": 0.75612,
+          "contribution": 1.86173,
           "used_by_head": true
         },
         {
           "concept": "Like the sound of someone choking or gasping desperately for air.",
           "category": "Stridor",
-          "activation": 3.35144,
+          "activation": 2.136171,
+          "head_weight": 0.167972,
+          "contribution": 0.358817,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a flute or piccolo playing a sustained, discordant note.",
+          "category": "Wheeze",
+          "activation": 0.979599,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1104,31 +1142,7 @@
         {
           "concept": "Like a seal barking.",
           "category": "Stridor",
-          "activation": 3.161087,
-          "head_weight": 0.394267,
-          "contribution": 1.246313,
-          "used_by_head": true
-        },
-        {
-          "concept": "Like a rooster crowing.",
-          "category": "Stridor",
-          "activation": 2.825177,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like sawing through a metal pipe.",
-          "category": "Stridor",
-          "activation": 2.438124,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
-          "category": "Wheeze",
-          "activation": 1.629692,
+          "activation": 0.791253,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1136,23 +1150,7 @@
         {
           "concept": "Like the whistle of a tea kettle reaching a boil.",
           "category": "Wheeze",
-          "activation": 1.091119,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a flute or piccolo playing a sustained, discordant note.",
-          "category": "Wheeze",
-          "activation": 1.072406,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a clean, unobstructed sigh.",
-          "category": "Normal",
-          "activation": 0.517088,
+          "activation": 0.160286,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1192,6 +1190,14 @@
         {
           "concept": "Like a person snoring deeply.",
           "category": "Rhonchi",
+          "activation": 0.0,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a quiet, steady breath during deep sleep.",
+          "category": "Normal",
           "activation": 0.0,
           "head_weight": 0.0,
           "contribution": 0.0,
@@ -1254,6 +1260,14 @@
           "used_by_head": false
         },
         {
+          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
+          "category": "Wheeze",
+          "activation": 0.0,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
           "concept": "Like the sound of a soft summer wind through pine trees.",
           "category": "Normal",
           "activation": 0.0,
@@ -1293,18 +1307,32 @@
       "beats_weight": 0.5,
       "concepts": [
         {
-          "concept": "Like a rusty, heavy gate being forced open.",
+          "concept": "Like a rooster crowing.",
           "category": "Stridor",
-          "clap_z": 2.706366,
-          "beats_z": 1.696254,
-          "fused": 2.20131
+          "clap_z": 1.99972,
+          "beats_z": 2.15623,
+          "fused": 2.077975
         },
         {
-          "concept": "Like a seal barking.",
+          "concept": "Like a foghorn in the distance (if lower pitched).",
           "category": "Stridor",
-          "clap_z": 2.524706,
-          "beats_z": -0.138456,
-          "fused": 1.193125
+          "clap_z": 2.442004,
+          "beats_z": 1.963802,
+          "fused": 2.202903
+        },
+        {
+          "concept": "Like a rusty, heavy gate being forced open.",
+          "category": "Stridor",
+          "clap_z": 2.585389,
+          "beats_z": 0.853553,
+          "fused": 1.719471
+        },
+        {
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
+          "category": "Stridor",
+          "clap_z": 1.543438,
+          "beats_z": 1.060475,
+          "fused": 1.301957
         }
       ]
     },
@@ -1315,24 +1343,44 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "Like a rusty, heavy gate being forced open.",
+          "concept": "Like a rooster crowing.",
           "category": "Stridor",
-          "activation": 4.18278,
-          "clap_attribution": 2.571115,
-          "beats_attribution": 1.611665,
-          "clap_share": 0.61469,
-          "clap_contribution": 2.393209,
-          "beats_contribution": 1.500147
+          "activation": 2.596953,
+          "clap_attribution": 1.250865,
+          "beats_attribution": 1.346088,
+          "clap_share": 0.481666,
+          "clap_contribution": 0.974436,
+          "beats_contribution": 1.048616
         },
         {
-          "concept": "Like a seal barking.",
+          "concept": "Like a foghorn in the distance (if lower pitched).",
           "category": "Stridor",
-          "activation": 3.161087,
-          "clap_attribution": 3.335947,
-          "beats_attribution": -0.17486,
-          "clap_share": 1.055316,
-          "clap_contribution": 1.315254,
-          "beats_contribution": -0.068942
+          "activation": 2.462217,
+          "clap_attribution": 1.362911,
+          "beats_attribution": 1.099306,
+          "clap_share": 0.55353,
+          "clap_contribution": 1.030524,
+          "beats_contribution": 0.831207
+        },
+        {
+          "concept": "Like a rusty, heavy gate being forced open.",
+          "category": "Stridor",
+          "activation": 2.754141,
+          "clap_attribution": 2.071074,
+          "beats_attribution": 0.683067,
+          "clap_share": 0.751985,
+          "clap_contribution": 0.614212,
+          "beats_contribution": 0.202575
+        },
+        {
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
+          "category": "Stridor",
+          "activation": 2.136171,
+          "clap_attribution": 1.267046,
+          "beats_attribution": 0.869125,
+          "clap_share": 0.593139,
+          "clap_contribution": 0.212828,
+          "beats_contribution": 0.145989
         }
       ]
     },
@@ -1345,18 +1393,25 @@
       "faithful": 1.0,
       "concepts": [
         {
-          "concept": "rawk_gemini_tts",
-          "category": "Stridor",
-          "activation": 3.659514,
-          "head_weight": 0.736353,
-          "contribution": 2.694696
-        },
-        {
           "concept": "shrieek_gemini_tts",
           "category": "Stridor",
           "activation": 4.201479,
-          "head_weight": 0.573899,
-          "contribution": 2.411225
+          "head_weight": 0.6885,
+          "contribution": 2.892718
+        },
+        {
+          "concept": "rawk_gemini_tts",
+          "category": "Stridor",
+          "activation": 3.659514,
+          "head_weight": 0.785824,
+          "contribution": 2.875733
+        },
+        {
+          "concept": "krrrow_gemini_tts",
+          "category": "Stridor",
+          "activation": 2.24834,
+          "head_weight": 0.129089,
+          "contribution": 0.290235
         }
       ]
     },
@@ -1373,16 +1428,16 @@
           "concept": "shrieek_gemini_tts",
           "category": "Stridor",
           "activation": 4.201479,
-          "head_weight": 0.573899,
-          "contribution": 2.411225,
+          "head_weight": 0.6885,
+          "contribution": 2.892718,
           "used_by_head": true
         },
         {
           "concept": "rawk_gemini_tts",
           "category": "Stridor",
           "activation": 3.659514,
-          "head_weight": 0.736353,
-          "contribution": 2.694696,
+          "head_weight": 0.785824,
+          "contribution": 2.875733,
           "used_by_head": true
         },
         {
@@ -1405,9 +1460,9 @@
           "concept": "krrrow_gemini_tts",
           "category": "Stridor",
           "activation": 2.24834,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "head_weight": 0.129089,
+          "contribution": 0.290235,
+          "used_by_head": true
         },
         {
           "concept": "eeee_gemini_tts",
@@ -1577,6 +1632,13 @@
       "beats_weight": 0.5,
       "concepts": [
         {
+          "concept": "shrieek_gemini_tts",
+          "category": "Stridor",
+          "clap_z": 2.664961,
+          "beats_z": 1.622856,
+          "fused": 2.143909
+        },
+        {
           "concept": "rawk_gemini_tts",
           "category": "Stridor",
           "clap_z": 2.556161,
@@ -1584,11 +1646,11 @@
           "fused": 1.861659
         },
         {
-          "concept": "shrieek_gemini_tts",
+          "concept": "krrrow_gemini_tts",
           "category": "Stridor",
-          "clap_z": 2.664961,
-          "beats_z": 1.622856,
-          "fused": 2.143909
+          "clap_z": 2.500001,
+          "beats_z": 1.600975,
+          "fused": 2.050488
         }
       ]
     },
@@ -1599,24 +1661,34 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "rawk_gemini_tts",
-          "category": "Stridor",
-          "activation": 3.659514,
-          "clap_attribution": 2.509709,
-          "beats_attribution": 1.149806,
-          "clap_share": 0.685804,
-          "clap_contribution": 1.848032,
-          "beats_contribution": 0.846663
-        },
-        {
           "concept": "shrieek_gemini_tts",
           "category": "Stridor",
           "activation": 4.201479,
           "clap_attribution": 2.608109,
           "beats_attribution": 1.59337,
           "clap_share": 0.62076,
-          "clap_contribution": 1.496791,
-          "beats_contribution": 0.914433
+          "clap_contribution": 1.795683,
+          "beats_contribution": 1.097035
+        },
+        {
+          "concept": "rawk_gemini_tts",
+          "category": "Stridor",
+          "activation": 3.659514,
+          "clap_attribution": 2.509709,
+          "beats_attribution": 1.149806,
+          "clap_share": 0.685804,
+          "clap_contribution": 1.97219,
+          "beats_contribution": 0.903545
+        },
+        {
+          "concept": "krrrow_gemini_tts",
+          "category": "Stridor",
+          "activation": 2.24834,
+          "clap_attribution": 1.369524,
+          "beats_attribution": 0.878816,
+          "clap_share": 0.609127,
+          "clap_contribution": 0.17679,
+          "beats_contribution": 0.113445
         }
       ]
     },

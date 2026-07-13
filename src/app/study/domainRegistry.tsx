@@ -354,16 +354,16 @@ const makeV1Domain = (domain: string): StudyDomainConfig => ({
   defaultXai: 'similes',
   xaiVariants: {
     similes: fusedVariant(domain, 'similes'),
+    similes_actv: fusedVariant(domain, 'similes', 'actv'),
     // The beta-breakdown dual view is redundant now that the activation views
     // exist; the 'beta' branch in fusedVariant stays for easy reinstatement.
     // similes_dualview: fusedVariant(domain, 'similes', 'beta'),
     similes_dualview_approx: fusedVariant(domain, 'similes', 'attr'),
-    similes_actv: fusedVariant(domain, 'similes', 'actv'),
     similes_dualview_actv: fusedVariant(domain, 'similes', 'actv_dual'),
     onomatopoeia: fusedVariant(domain, 'onomatopoeia'),
+    onomatopoeia_actv: fusedVariant(domain, 'onomatopoeia', 'actv'),
     // onomatopoeia_dualview: fusedVariant(domain, 'onomatopoeia', 'beta'),
     onomatopoeia_dualview_approx: fusedVariant(domain, 'onomatopoeia', 'attr'),
-    onomatopoeia_actv: fusedVariant(domain, 'onomatopoeia', 'actv'),
     onomatopoeia_dualview_actv: fusedVariant(domain, 'onomatopoeia', 'actv_dual'),
     rexnet: rexnetVariant(domain),
     examples: protoVariant(domain),

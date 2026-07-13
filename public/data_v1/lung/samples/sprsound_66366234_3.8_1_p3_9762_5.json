@@ -1240,21 +1240,56 @@
       "beta": 0.5,
       "predicted_label": "Wheeze",
       "correct": true,
-      "faithful": 0.8,
+      "faithful": 0.6,
       "concepts": [
-        {
-          "concept": "Like the whistle of a tea kettle reaching a boil.",
-          "category": "Wheeze",
-          "activation": 1.166304,
-          "head_weight": 0.770887,
-          "contribution": 0.899088
-        },
         {
           "concept": "Like a mosquito buzzing near your ear.",
           "category": "Wheeze",
-          "activation": 1.025094,
-          "head_weight": 0.824518,
-          "contribution": 0.845209
+          "activation": 1.306531,
+          "head_weight": 1.134369,
+          "contribution": 1.482089
+        },
+        {
+          "concept": "Like the whistle of a tea kettle reaching a boil.",
+          "category": "Wheeze",
+          "activation": 0.598302,
+          "head_weight": 0.427468,
+          "contribution": 0.255755
+        },
+        {
+          "concept": "Like a flute or piccolo playing a sustained, discordant note.",
+          "category": "Wheeze",
+          "activation": 0.796778,
+          "head_weight": 0.139348,
+          "contribution": 0.111029
+        },
+        {
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
+          "category": "Stridor",
+          "activation": 0.59787,
+          "head_weight": -0.087461,
+          "contribution": -0.05229
+        },
+        {
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
+          "activation": 0.51685,
+          "head_weight": -0.006153,
+          "contribution": -0.00318
+        },
+        {
+          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
+          "category": "Wheeze",
+          "activation": 0.0,
+          "head_weight": 0.426356,
+          "contribution": 0.0
+        },
+        {
+          "concept": "Like wind whistling through a tunnel or under a door.",
+          "category": "Wheeze",
+          "activation": 0.0,
+          "head_weight": 0.089082,
+          "contribution": 0.0
         }
       ]
     },
@@ -1268,33 +1303,17 @@
       "correct": true,
       "concepts": [
         {
-          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
-          "category": "Wheeze",
-          "activation": 1.462489,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like the whistle of a tea kettle reaching a boil.",
-          "category": "Wheeze",
-          "activation": 1.166304,
-          "head_weight": 0.770887,
-          "contribution": 0.899088,
-          "used_by_head": true
-        },
-        {
           "concept": "Like a mosquito buzzing near your ear.",
           "category": "Wheeze",
-          "activation": 1.025094,
-          "head_weight": 0.824518,
-          "contribution": 0.845209,
+          "activation": 1.306531,
+          "head_weight": 1.134369,
+          "contribution": 1.482089,
           "used_by_head": true
         },
         {
-          "concept": "Like the sound of someone choking or gasping desperately for air.",
+          "concept": "Like a rooster crowing.",
           "category": "Stridor",
-          "activation": 0.804959,
+          "activation": 0.917789,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1302,42 +1321,42 @@
         {
           "concept": "Like a flute or piccolo playing a sustained, discordant note.",
           "category": "Wheeze",
-          "activation": 0.705755,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "activation": 0.796778,
+          "head_weight": 0.139348,
+          "contribution": 0.111029,
+          "used_by_head": true
         },
         {
-          "concept": "Like a clean, unobstructed sigh.",
-          "category": "Normal",
-          "activation": 0.689294,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "concept": "Like the whistle of a tea kettle reaching a boil.",
+          "category": "Wheeze",
+          "activation": 0.598302,
+          "head_weight": 0.427468,
+          "contribution": 0.255755,
+          "used_by_head": true
         },
         {
-          "concept": "Like a rusty, heavy gate being forced open.",
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
           "category": "Stridor",
-          "activation": 0.682783,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a rooster crowing.",
-          "category": "Stridor",
-          "activation": 0.594944,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "activation": 0.59787,
+          "head_weight": -0.087461,
+          "contribution": -0.05229,
+          "used_by_head": true
         },
         {
           "concept": "Like a seal barking.",
           "category": "Stridor",
-          "activation": 0.127696,
+          "activation": 0.580216,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
+        },
+        {
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
+          "activation": 0.51685,
+          "head_weight": -0.006153,
+          "contribution": -0.00318,
+          "used_by_head": true
         },
         {
           "concept": "Like a diesel engine idling nearby.",
@@ -1372,8 +1391,24 @@
           "used_by_head": false
         },
         {
+          "concept": "Like a quiet, steady breath during deep sleep.",
+          "category": "Normal",
+          "activation": 0.0,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
           "concept": "Like a rhythmic, clear airflow with no interruptions.",
           "category": "Normal",
+          "activation": 0.0,
+          "head_weight": 0.0,
+          "contribution": 0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a rusty, heavy gate being forced open.",
+          "category": "Stridor",
           "activation": 0.0,
           "head_weight": 0.0,
           "contribution": 0.0,
@@ -1412,14 +1447,6 @@
           "used_by_head": false
         },
         {
-          "concept": "Like sawing through a metal pipe.",
-          "category": "Stridor",
-          "activation": 0.0,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
           "concept": "Like the soft rustling of silk fabric in the air.",
           "category": "Normal",
           "activation": 0.0,
@@ -1434,6 +1461,14 @@
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
+        },
+        {
+          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
+          "category": "Wheeze",
+          "activation": 0.0,
+          "head_weight": 0.426356,
+          "contribution": 0.0,
+          "used_by_head": true
         },
         {
           "concept": "Like the sound of a soft summer wind through pine trees.",
@@ -1455,9 +1490,9 @@
           "concept": "Like wind whistling through a tunnel or under a door.",
           "category": "Wheeze",
           "activation": 0.0,
-          "head_weight": 0.0,
+          "head_weight": 0.089082,
           "contribution": 0.0,
-          "used_by_head": false
+          "used_by_head": true
         },
         {
           "concept": "Like wood popping and snapping in a distant campfire.",
@@ -1475,18 +1510,53 @@
       "beats_weight": 0.5,
       "concepts": [
         {
-          "concept": "Like the whistle of a tea kettle reaching a boil.",
-          "category": "Wheeze",
-          "clap_z": -0.092927,
-          "beats_z": 0.215345,
-          "fused": 0.061209
-        },
-        {
           "concept": "Like a mosquito buzzing near your ear.",
           "category": "Wheeze",
-          "clap_z": 1.439598,
-          "beats_z": 0.433432,
-          "fused": 0.936515
+          "clap_z": 1.774642,
+          "beats_z": 0.71933,
+          "fused": 1.246986
+        },
+        {
+          "concept": "Like the whistle of a tea kettle reaching a boil.",
+          "category": "Wheeze",
+          "clap_z": -0.202072,
+          "beats_z": 0.075126,
+          "fused": -0.063473
+        },
+        {
+          "concept": "Like a flute or piccolo playing a sustained, discordant note.",
+          "category": "Wheeze",
+          "clap_z": 0.362123,
+          "beats_z": 0.501398,
+          "fused": 0.43176
+        },
+        {
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
+          "category": "Stridor",
+          "clap_z": 0.43349,
+          "beats_z": -0.463,
+          "fused": -0.014755
+        },
+        {
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
+          "clap_z": 1.404951,
+          "beats_z": -0.663256,
+          "fused": 0.370848
+        },
+        {
+          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
+          "category": "Wheeze",
+          "clap_z": 0.226952,
+          "beats_z": -0.317695,
+          "fused": -0.045371
+        },
+        {
+          "concept": "Like wind whistling through a tunnel or under a door.",
+          "category": "Wheeze",
+          "clap_z": 1.027105,
+          "beats_z": -1.274802,
+          "fused": -0.123848
         }
       ]
     },
@@ -1497,24 +1567,74 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "Like the whistle of a tea kettle reaching a boil.",
-          "category": "Wheeze",
-          "activation": 1.166304,
-          "clap_attribution": -0.87627,
-          "beats_attribution": 2.042574,
-          "clap_share": -0.751323,
-          "clap_contribution": -0.675505,
-          "beats_contribution": 1.574594
-        },
-        {
           "concept": "Like a mosquito buzzing near your ear.",
           "category": "Wheeze",
-          "activation": 1.025094,
-          "clap_attribution": 0.790156,
-          "beats_attribution": 0.234938,
-          "clap_share": 0.770813,
-          "clap_contribution": 0.651498,
-          "beats_contribution": 0.193711
+          "activation": 1.306531,
+          "clap_attribution": 0.932268,
+          "beats_attribution": 0.374263,
+          "clap_share": 0.713544,
+          "clap_contribution": 1.057536,
+          "beats_contribution": 0.424552
+        },
+        {
+          "concept": "Like the whistle of a tea kettle reaching a boil.",
+          "category": "Wheeze",
+          "activation": 0.598302,
+          "clap_attribution": 0.934841,
+          "beats_attribution": -0.336539,
+          "clap_share": 1.562489,
+          "clap_contribution": 0.399615,
+          "beats_contribution": -0.14386
+        },
+        {
+          "concept": "Like a flute or piccolo playing a sustained, discordant note.",
+          "category": "Wheeze",
+          "activation": 0.796778,
+          "clap_attribution": 0.335948,
+          "beats_attribution": 0.46083,
+          "clap_share": 0.421633,
+          "clap_contribution": 0.046814,
+          "beats_contribution": 0.064216
+        },
+        {
+          "concept": "Like the sound of someone choking or gasping desperately for air.",
+          "category": "Stridor",
+          "activation": 0.59787,
+          "clap_attribution": 0.298935,
+          "beats_attribution": 0.298935,
+          "clap_share": 0.5,
+          "clap_contribution": -0.026145,
+          "beats_contribution": -0.026145
+        },
+        {
+          "concept": "Like a foghorn in the distance (if lower pitched).",
+          "category": "Stridor",
+          "activation": 0.51685,
+          "clap_attribution": 0.979504,
+          "beats_attribution": -0.462654,
+          "clap_share": 1.895142,
+          "clap_contribution": -0.006027,
+          "beats_contribution": 0.002847
+        },
+        {
+          "concept": "Like the sound of a deflating balloon when the neck is stretched.",
+          "category": "Wheeze",
+          "activation": 0.0,
+          "clap_attribution": -0.0,
+          "beats_attribution": 0.0,
+          "clap_share": -1.0,
+          "clap_contribution": -0.0,
+          "beats_contribution": 0.0
+        },
+        {
+          "concept": "Like wind whistling through a tunnel or under a door.",
+          "category": "Wheeze",
+          "activation": 0.0,
+          "clap_attribution": -0.0,
+          "beats_attribution": 0.0,
+          "clap_share": -1.0,
+          "clap_contribution": -0.0,
+          "beats_contribution": 0.0
         }
       ]
     },
@@ -1530,15 +1650,29 @@
           "concept": "wheee_wheee_gemini_tts",
           "category": "Wheeze",
           "activation": 1.538819,
-          "head_weight": 1.238897,
-          "contribution": 1.906438
+          "head_weight": 1.087355,
+          "contribution": 1.673242
         },
         {
           "concept": "zeeeeee_gemini_tts",
           "category": "Wheeze",
           "activation": 0.338677,
-          "head_weight": 0.485298,
-          "contribution": 0.164359
+          "head_weight": 0.798277,
+          "contribution": 0.270358
+        },
+        {
+          "concept": "eeee_gemini_tts",
+          "category": "Wheeze",
+          "activation": 0.285595,
+          "head_weight": 0.111622,
+          "contribution": 0.031879
+        },
+        {
+          "concept": "snap_snap_snap_gemini_tts",
+          "category": "Crackle",
+          "activation": 0.0,
+          "head_weight": -0.049752,
+          "contribution": -0.0
         }
       ]
     },
@@ -1555,8 +1689,8 @@
           "concept": "wheee_wheee_gemini_tts",
           "category": "Wheeze",
           "activation": 1.538819,
-          "head_weight": 1.238897,
-          "contribution": 1.906438,
+          "head_weight": 1.087355,
+          "contribution": 1.673242,
           "used_by_head": true
         },
         {
@@ -1587,17 +1721,17 @@
           "concept": "zeeeeee_gemini_tts",
           "category": "Wheeze",
           "activation": 0.338677,
-          "head_weight": 0.485298,
-          "contribution": 0.164359,
+          "head_weight": 0.798277,
+          "contribution": 0.270358,
           "used_by_head": true
         },
         {
           "concept": "eeee_gemini_tts",
           "category": "Wheeze",
           "activation": 0.285595,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "head_weight": 0.111622,
+          "contribution": 0.031879,
+          "used_by_head": true
         },
         {
           "concept": "shrieek_gemini_tts",
@@ -1723,9 +1857,9 @@
           "concept": "snap_snap_snap_gemini_tts",
           "category": "Crackle",
           "activation": 0.0,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "head_weight": -0.049752,
+          "contribution": -0.0,
+          "used_by_head": true
         },
         {
           "concept": "snorrr_snorrr_gemini_tts",
@@ -1771,6 +1905,20 @@
           "clap_z": 0.726431,
           "beats_z": 0.721178,
           "fused": 0.723804
+        },
+        {
+          "concept": "eeee_gemini_tts",
+          "category": "Wheeze",
+          "clap_z": 0.201638,
+          "beats_z": 0.602081,
+          "fused": 0.401859
+        },
+        {
+          "concept": "snap_snap_snap_gemini_tts",
+          "category": "Crackle",
+          "clap_z": -0.185599,
+          "beats_z": -1.770854,
+          "fused": -0.978227
         }
       ]
     },
@@ -1787,8 +1935,8 @@
           "clap_attribution": 0.995349,
           "beats_attribution": 0.54347,
           "clap_share": 0.646826,
-          "clap_contribution": 1.233135,
-          "beats_contribution": 0.673303
+          "clap_contribution": 1.082298,
+          "beats_contribution": 0.590945
         },
         {
           "concept": "zeeeeee_gemini_tts",
@@ -1797,8 +1945,28 @@
           "clap_attribution": 0.169884,
           "beats_attribution": 0.168793,
           "clap_share": 0.501611,
-          "clap_contribution": 0.082444,
-          "beats_contribution": 0.081915
+          "clap_contribution": 0.135614,
+          "beats_contribution": 0.134744
+        },
+        {
+          "concept": "eeee_gemini_tts",
+          "category": "Wheeze",
+          "activation": 0.285595,
+          "clap_attribution": 0.071496,
+          "beats_attribution": 0.214099,
+          "clap_share": 0.250342,
+          "clap_contribution": 0.007981,
+          "beats_contribution": 0.023898
+        },
+        {
+          "concept": "snap_snap_snap_gemini_tts",
+          "category": "Crackle",
+          "activation": 0.0,
+          "clap_attribution": 0.0,
+          "beats_attribution": 0.0,
+          "clap_share": 0.094893,
+          "clap_contribution": -0.0,
+          "beats_contribution": -0.0
         }
       ]
     },

@@ -1030,35 +1030,49 @@
       "beta": 0.5,
       "predicted_label": "Ovenbird",
       "correct": true,
-      "faithful": 0.8,
+      "faithful": 1.0,
       "concepts": [
-        {
-          "concept": "Like an enthusiastic, two-note chant increasing in urgency.",
-          "category": "Ovenbird",
-          "activation": 2.140971,
-          "head_weight": 0.738006,
-          "contribution": 1.58005
-        },
         {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "activation": -1.994008,
-          "head_weight": -0.474626,
-          "contribution": 0.946408
+          "activation": -2.142056,
+          "head_weight": -0.748629,
+          "contribution": 1.603605
         },
         {
-          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
+          "concept": "Like a fast-paced, ascending trill from a small wooden flute.",
+          "category": "Ovenbird",
+          "activation": 1.285263,
+          "head_weight": 1.092649,
+          "contribution": 1.40434
+        },
+        {
+          "concept": "Like a small ratchet wrench clicking rapidly.",
           "category": "Black-capped Chickadee",
-          "activation": -1.382993,
-          "head_weight": -0.044782,
-          "contribution": 0.061933
+          "activation": -1.652611,
+          "head_weight": -0.244887,
+          "contribution": 0.404702
         },
         {
-          "concept": "Like a person enthusiastically ordering a cup of tea.",
+          "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
+          "category": "Ovenbird",
+          "activation": 1.076758,
+          "head_weight": 0.116105,
+          "contribution": 0.125017
+        },
+        {
+          "concept": "Like a child's toy whistle blown twice shortly, then held for a trill.",
           "category": "Eastern Towhee",
-          "activation": -0.06273,
-          "head_weight": -0.557713,
-          "contribution": 0.034986
+          "activation": -0.688969,
+          "head_weight": -0.089392,
+          "contribution": 0.061588
+        },
+        {
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
+          "category": "Wood Thrush",
+          "activation": 0.026777,
+          "head_weight": -0.420029,
+          "contribution": -0.011247
         }
       ]
     },
@@ -1072,33 +1086,41 @@
       "correct": true,
       "concepts": [
         {
-          "concept": "Like an enthusiastic, two-note chant increasing in urgency.",
-          "category": "Ovenbird",
-          "activation": 2.140971,
-          "head_weight": 0.738006,
-          "contribution": 1.58005,
-          "used_by_head": true
-        },
-        {
           "concept": "Like a siren slowly winding up and increasing in volume.",
           "category": "Ovenbird",
-          "activation": 1.753594,
+          "activation": 1.655122,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
         },
         {
-          "concept": "Like a student desperately calling out to their instructor, getting louder each time.",
+          "concept": "Like a small, energetic engine revving up to a higher gear.",
           "category": "Ovenbird",
-          "activation": 1.669335,
+          "activation": 1.302308,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
+        },
+        {
+          "concept": "Like a fast-paced, ascending trill from a small wooden flute.",
+          "category": "Ovenbird",
+          "activation": 1.285263,
+          "head_weight": 1.092649,
+          "contribution": 1.40434,
+          "used_by_head": true
         },
         {
           "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
           "category": "Ovenbird",
-          "activation": 0.695119,
+          "activation": 1.076758,
+          "head_weight": 0.116105,
+          "contribution": 0.125017,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a student desperately calling out to their instructor, getting louder each time.",
+          "category": "Ovenbird",
+          "activation": 1.033204,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1106,31 +1128,7 @@
         {
           "concept": "Like a tiny, enthusiastic cheerleader chanting a two-syllable phrase.",
           "category": "Tufted Titmouse",
-          "activation": 0.465255,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like someone striking two small metal pipes together, hitting harder each time.",
-          "category": "Ovenbird",
-          "activation": 0.455919,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a rapid, alternating high-low whistle growing progressively louder.",
-          "category": "Ovenbird",
-          "activation": 0.394381,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
-          "category": "Wood Thrush",
-          "activation": 0.053528,
+          "activation": 0.482672,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1138,15 +1136,23 @@
         {
           "concept": "Like a clear, whistling breeze harmonizing with itself.",
           "category": "Wood Thrush",
-          "activation": 0.043427,
+          "activation": 0.082354,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
         },
         {
-          "concept": "Like a pure, clear bell ringing in a quiet, empty cathedral.",
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
           "category": "Wood Thrush",
-          "activation": 0.0332,
+          "activation": 0.026777,
+          "head_weight": -0.420029,
+          "contribution": -0.011247,
+          "used_by_head": true
+        },
+        {
+          "concept": "Like a person rhythmically whistling to call a dog.",
+          "category": "Tufted Titmouse",
+          "activation": 0.011703,
           "head_weight": 0.0,
           "contribution": 0.0,
           "used_by_head": false
@@ -1154,23 +1160,23 @@
         {
           "concept": "Like a person enthusiastically ordering a cup of tea.",
           "category": "Eastern Towhee",
-          "activation": -0.06273,
-          "head_weight": -0.557713,
-          "contribution": 0.034986,
-          "used_by_head": true
-        },
-        {
-          "concept": "Like a child's recorder piping the same two clear notes again and again.",
-          "category": "Tufted Titmouse",
-          "activation": -0.143885,
+          "activation": -0.088983,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
         },
         {
-          "concept": "Like a repetitive, clear whistle from a referee.",
+          "concept": "Like a child's recorder piping the same two clear notes again and again.",
           "category": "Tufted Titmouse",
-          "activation": -0.276343,
+          "activation": -0.311951,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a pure, clear bell ringing in a quiet, empty cathedral.",
+          "category": "Wood Thrush",
+          "activation": -0.381343,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
@@ -1178,63 +1184,31 @@
         {
           "concept": "Like glass wind chimes softly clinking in a gentle breeze.",
           "category": "Wood Thrush",
-          "activation": -0.514706,
+          "activation": -0.473465,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
         },
         {
-          "concept": "Like a quick, bright double-chime followed by a sustained buzz.",
+          "concept": "Like someone striking two small metal pipes together, hitting harder each time.",
+          "category": "Ovenbird",
+          "activation": -0.618915,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a child's toy whistle blown twice shortly, then held for a trill.",
           "category": "Eastern Towhee",
-          "activation": -0.690768,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
+          "activation": -0.688969,
+          "head_weight": -0.089392,
+          "contribution": 0.061588,
+          "used_by_head": true
         },
         {
-          "concept": "Like a metronome ticking with a distinct high and low tone.",
-          "category": "Tufted Titmouse",
-          "activation": -0.724987,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a swing with a consistent, two-part creak.",
-          "category": "Tufted Titmouse",
-          "activation": -0.877028,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a high-pitched, rhythmic squeak from a bicycle pedal.",
-          "category": "Tufted Titmouse",
-          "activation": -0.881393,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a metallic zipper being pulled closed in three distinct jerks.",
-          "category": "Eastern Towhee",
-          "activation": -1.000603,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like water trickling into a deep, resonant hollow log.",
-          "category": "Wood Thrush",
-          "activation": -1.003128,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a thumbnail flicked rapidly down the teeth of a pocket comb.",
+          "concept": "Like someone rapidly tapping a small wooden block on a hollow box.",
           "category": "Black-capped Chickadee",
-          "activation": -1.003557,
+          "activation": -0.756942,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
@@ -1242,31 +1216,31 @@
         {
           "concept": "Like a quick sniffle followed by three rapid sneezes.",
           "category": "Black-capped Chickadee",
-          "activation": -1.039578,
+          "activation": -0.974637,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
         },
         {
-          "concept": "Like a small, metallic bell ringing twice and then vibrating.",
+          "concept": "Like a swing with a consistent, two-part creak.",
+          "category": "Tufted Titmouse",
+          "activation": -0.990718,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a high-pitched, rhythmic squeak from a bicycle pedal.",
+          "category": "Tufted Titmouse",
+          "activation": -1.065354,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a metallic zipper being pulled closed in three distinct jerks.",
           "category": "Eastern Towhee",
-          "activation": -1.163497,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like a squeaky dog toy being pressed several times in quick succession.",
-          "category": "Black-capped Chickadee",
-          "activation": -1.18993,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
-        },
-        {
-          "concept": "Like flicking a stretched rubber band twice, then letting it buzz against the table.",
-          "category": "Eastern Towhee",
-          "activation": -1.261358,
+          "activation": -1.160238,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
@@ -1274,7 +1248,39 @@
         {
           "concept": "Like a tiny, rhythmic drumroll played on a high-pitched snare.",
           "category": "Black-capped Chickadee",
-          "activation": -1.292978,
+          "activation": -1.18156,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a small, metallic bell ringing twice and then vibrating.",
+          "category": "Eastern Towhee",
+          "activation": -1.225412,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a squeaky dog toy being pressed several times in quick succession.",
+          "category": "Black-capped Chickadee",
+          "activation": -1.228961,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like a metronome ticking with a distinct high and low tone.",
+          "category": "Tufted Titmouse",
+          "activation": -1.257445,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
+        },
+        {
+          "concept": "Like flicking a stretched rubber band twice, then letting it buzz against the table.",
+          "category": "Eastern Towhee",
+          "activation": -1.352068,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
@@ -1282,15 +1288,15 @@
         {
           "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
           "category": "Black-capped Chickadee",
-          "activation": -1.382993,
-          "head_weight": -0.044782,
-          "contribution": 0.061933,
-          "used_by_head": true
+          "activation": -1.360822,
+          "head_weight": 0.0,
+          "contribution": -0.0,
+          "used_by_head": false
         },
         {
-          "concept": "Like a small ratchet wrench clicking rapidly.",
-          "category": "Black-capped Chickadee",
-          "activation": -1.460033,
+          "concept": "Like water trickling into a deep, resonant hollow log.",
+          "category": "Wood Thrush",
+          "activation": -1.456537,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
@@ -1298,17 +1304,25 @@
         {
           "concept": "Like a rusty swing set creaking back and forth quickly.",
           "category": "Eastern Towhee",
-          "activation": -1.527361,
+          "activation": -1.624892,
           "head_weight": 0.0,
           "contribution": -0.0,
           "used_by_head": false
         },
         {
+          "concept": "Like a small ratchet wrench clicking rapidly.",
+          "category": "Black-capped Chickadee",
+          "activation": -1.652611,
+          "head_weight": -0.244887,
+          "contribution": 0.404702,
+          "used_by_head": true
+        },
+        {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "activation": -1.994008,
-          "head_weight": -0.474626,
-          "contribution": 0.946408,
+          "activation": -2.142056,
+          "head_weight": -0.748629,
+          "contribution": 1.603605,
           "used_by_head": true
         }
       ]
@@ -1319,32 +1333,46 @@
       "beats_weight": 0.5,
       "concepts": [
         {
-          "concept": "Like an enthusiastic, two-note chant increasing in urgency.",
-          "category": "Ovenbird",
-          "clap_z": 2.097085,
-          "beats_z": 3.227362,
-          "fused": 2.662223
-        },
-        {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "clap_z": -1.717524,
-          "beats_z": -1.639654,
-          "fused": -1.678589
+          "clap_z": -1.845194,
+          "beats_z": -1.728152,
+          "fused": -1.786673
         },
         {
-          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
+          "concept": "Like a fast-paced, ascending trill from a small wooden flute.",
+          "category": "Ovenbird",
+          "clap_z": 1.951698,
+          "beats_z": 2.54883,
+          "fused": 2.250264
+        },
+        {
+          "concept": "Like a small ratchet wrench clicking rapidly.",
           "category": "Black-capped Chickadee",
-          "clap_z": -0.469589,
-          "beats_z": -1.568597,
-          "fused": -1.019093
+          "clap_z": -2.309681,
+          "beats_z": -2.037274,
+          "fused": -2.173477
         },
         {
-          "concept": "Like a person enthusiastically ordering a cup of tea.",
+          "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
+          "category": "Ovenbird",
+          "clap_z": 1.790078,
+          "beats_z": 1.42491,
+          "fused": 1.607494
+        },
+        {
+          "concept": "Like a child's toy whistle blown twice shortly, then held for a trill.",
           "category": "Eastern Towhee",
-          "clap_z": 0.662469,
-          "beats_z": -0.938609,
-          "fused": -0.13807
+          "clap_z": -0.030892,
+          "beats_z": -1.328617,
+          "fused": -0.679754
+        },
+        {
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
+          "category": "Wood Thrush",
+          "clap_z": 1.414985,
+          "beats_z": -1.708133,
+          "fused": -0.146574
         }
       ]
     },
@@ -1355,44 +1383,64 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "Like an enthusiastic, two-note chant increasing in urgency.",
-          "category": "Ovenbird",
-          "activation": 2.140971,
-          "clap_attribution": 0.843313,
-          "beats_attribution": 1.297658,
-          "clap_share": 0.393893,
-          "clap_contribution": 0.62237,
-          "beats_contribution": 0.957679
-        },
-        {
           "concept": "Like a silver coin spinning and settling on a glass table.",
           "category": "Wood Thrush",
-          "activation": -1.994008,
-          "clap_attribution": -1.021676,
-          "beats_attribution": -0.972332,
-          "clap_share": 0.512373,
-          "clap_contribution": 0.484914,
-          "beats_contribution": 0.461494
+          "activation": -2.142056,
+          "clap_attribution": -1.106974,
+          "beats_attribution": -1.035082,
+          "clap_share": 0.516781,
+          "clap_contribution": 0.828713,
+          "beats_contribution": 0.774892
         },
         {
-          "concept": "Like a fast-paced Morse code message tapped out on a telegraph.",
+          "concept": "Like a fast-paced, ascending trill from a small wooden flute.",
+          "category": "Ovenbird",
+          "activation": 1.285263,
+          "clap_attribution": 0.556745,
+          "beats_attribution": 0.728518,
+          "clap_share": 0.433176,
+          "clap_contribution": 0.608327,
+          "beats_contribution": 0.796014
+        },
+        {
+          "concept": "Like a small ratchet wrench clicking rapidly.",
           "category": "Black-capped Chickadee",
-          "activation": -1.382993,
-          "clap_attribution": -0.320434,
-          "beats_attribution": -1.062559,
-          "clap_share": 0.231696,
-          "clap_contribution": 0.01435,
-          "beats_contribution": 0.047584
+          "activation": -1.652611,
+          "clap_attribution": -0.878271,
+          "beats_attribution": -0.77434,
+          "clap_share": 0.531444,
+          "clap_contribution": 0.215077,
+          "beats_contribution": 0.189626
         },
         {
-          "concept": "Like a person enthusiastically ordering a cup of tea.",
+          "concept": "Like a repetitive, rhythmic chant echoing in an empty hallway.",
+          "category": "Ovenbird",
+          "activation": 1.076758,
+          "clap_attribution": 0.600188,
+          "beats_attribution": 0.47657,
+          "clap_share": 0.557403,
+          "clap_contribution": 0.069685,
+          "beats_contribution": 0.055332
+        },
+        {
+          "concept": "Like a child's toy whistle blown twice shortly, then held for a trill.",
           "category": "Eastern Towhee",
-          "activation": -0.06273,
-          "clap_attribution": 0.06273,
-          "beats_attribution": -0.125461,
+          "activation": -0.688969,
+          "clap_attribution": -0.014587,
+          "beats_attribution": -0.674382,
+          "clap_share": 0.021172,
+          "clap_contribution": 0.001304,
+          "beats_contribution": 0.060284
+        },
+        {
+          "concept": "Like a skilled flutist playing a delicate, echoing arpeggio.",
+          "category": "Wood Thrush",
+          "activation": 0.026777,
+          "clap_attribution": -0.026777,
+          "beats_attribution": 0.053554,
           "clap_share": -1.0,
-          "clap_contribution": -0.034985,
-          "beats_contribution": 0.069971
+          "clap_contribution": 0.011247,
+          "beats_contribution": -0.022494
         }
       ]
     },
@@ -1405,39 +1453,53 @@
       "faithful": 1.0,
       "concepts": [
         {
-          "concept": "chik_CHIK_trrrreeee_gemini_tts",
-          "category": "Eastern Towhee",
-          "activation": -1.174484,
-          "head_weight": -1.482524,
-          "contribution": 1.741201
-        },
-        {
           "concept": "chweek_chweek_TWEEEEE_gemini_tts",
           "category": "Eastern Towhee",
           "activation": -1.362242,
-          "head_weight": -1.265389,
-          "contribution": 1.723765
+          "head_weight": -1.220421,
+          "contribution": 1.662509
         },
         {
           "concept": "chik_ik_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
           "activation": -0.790234,
-          "head_weight": -1.882114,
-          "contribution": 1.48731
+          "head_weight": -1.239332,
+          "contribution": 0.979362
+        },
+        {
+          "concept": "chik_CHIK_trrrreeee_gemini_tts",
+          "category": "Eastern Towhee",
+          "activation": -1.174484,
+          "head_weight": -0.79677,
+          "contribution": 0.935793
+        },
+        {
+          "concept": "tee_CHER_tee_CHER_TEE_CHER_gemini_tts",
+          "category": "Ovenbird",
+          "activation": 1.808542,
+          "head_weight": 0.307452,
+          "contribution": 0.556041
         },
         {
           "concept": "tchi_TCHI_TCHII_gemini_tts",
           "category": "Ovenbird",
           "activation": 0.268847,
-          "head_weight": 1.60107,
-          "contribution": 0.430443
+          "head_weight": 1.296786,
+          "contribution": 0.348637
         },
         {
           "concept": "chk_chk_dee_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
           "activation": -0.198064,
-          "head_weight": 1.304751,
-          "contribution": -0.258425
+          "head_weight": 0.720741,
+          "contribution": -0.142753
+        },
+        {
+          "concept": "twee_twee_twee_twee_gemini_tts",
+          "category": "Tufted Titmouse",
+          "activation": -0.172944,
+          "head_weight": -0.421263,
+          "contribution": 0.072855
         }
       ]
     },
@@ -1454,9 +1516,9 @@
           "concept": "tee_CHER_tee_CHER_TEE_CHER_gemini_tts",
           "category": "Ovenbird",
           "activation": 1.808542,
-          "head_weight": 0.0,
-          "contribution": 0.0,
-          "used_by_head": false
+          "head_weight": 0.307452,
+          "contribution": 0.556041,
+          "used_by_head": true
         },
         {
           "concept": "TEE_chur_TEE_chur_TEE_CHUR_gemini_tts",
@@ -1534,8 +1596,8 @@
           "concept": "tchi_TCHI_TCHII_gemini_tts",
           "category": "Ovenbird",
           "activation": 0.268847,
-          "head_weight": 1.60107,
-          "contribution": 0.430443,
+          "head_weight": 1.296786,
+          "contribution": 0.348637,
           "used_by_head": true
         },
         {
@@ -1590,16 +1652,16 @@
           "concept": "twee_twee_twee_twee_gemini_tts",
           "category": "Tufted Titmouse",
           "activation": -0.172944,
-          "head_weight": 0.0,
-          "contribution": -0.0,
-          "used_by_head": false
+          "head_weight": -0.421263,
+          "contribution": 0.072855,
+          "used_by_head": true
         },
         {
           "concept": "chk_chk_dee_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
           "activation": -0.198064,
-          "head_weight": 1.304751,
-          "contribution": -0.258425,
+          "head_weight": 0.720741,
+          "contribution": -0.142753,
           "used_by_head": true
         },
         {
@@ -1646,8 +1708,8 @@
           "concept": "chik_ik_dee_dee_dee_gemini_tts",
           "category": "Black-capped Chickadee",
           "activation": -0.790234,
-          "head_weight": -1.882114,
-          "contribution": 1.48731,
+          "head_weight": -1.239332,
+          "contribution": 0.979362,
           "used_by_head": true
         },
         {
@@ -1678,16 +1740,16 @@
           "concept": "chik_CHIK_trrrreeee_gemini_tts",
           "category": "Eastern Towhee",
           "activation": -1.174484,
-          "head_weight": -1.482524,
-          "contribution": 1.741201,
+          "head_weight": -0.79677,
+          "contribution": 0.935793,
           "used_by_head": true
         },
         {
           "concept": "chweek_chweek_TWEEEEE_gemini_tts",
           "category": "Eastern Towhee",
           "activation": -1.362242,
-          "head_weight": -1.265389,
-          "contribution": 1.723765,
+          "head_weight": -1.220421,
+          "contribution": 1.662509,
           "used_by_head": true
         }
       ]
@@ -1697,13 +1759,6 @@
       "clap_weight": 0.5,
       "beats_weight": 0.5,
       "concepts": [
-        {
-          "concept": "chik_CHIK_trrrreeee_gemini_tts",
-          "category": "Eastern Towhee",
-          "clap_z": -1.962529,
-          "beats_z": -0.538145,
-          "fused": -1.250337
-        },
         {
           "concept": "chweek_chweek_TWEEEEE_gemini_tts",
           "category": "Eastern Towhee",
@@ -1719,6 +1774,20 @@
           "fused": -0.612294
         },
         {
+          "concept": "chik_CHIK_trrrreeee_gemini_tts",
+          "category": "Eastern Towhee",
+          "clap_z": -1.962529,
+          "beats_z": -0.538145,
+          "fused": -1.250337
+        },
+        {
+          "concept": "tee_CHER_tee_CHER_TEE_CHER_gemini_tts",
+          "category": "Ovenbird",
+          "clap_z": 1.776269,
+          "beats_z": 2.780712,
+          "fused": 2.27849
+        },
+        {
           "concept": "tchi_TCHI_TCHII_gemini_tts",
           "category": "Ovenbird",
           "clap_z": -0.800585,
@@ -1731,6 +1800,13 @@
           "clap_z": -0.634166,
           "beats_z": -0.194099,
           "fused": -0.414133
+        },
+        {
+          "concept": "twee_twee_twee_twee_gemini_tts",
+          "category": "Tufted Titmouse",
+          "clap_z": -1.603837,
+          "beats_z": 0.999532,
+          "fused": -0.302153
         }
       ]
     },
@@ -1741,24 +1817,14 @@
       "decomposition": "approx_activation_split",
       "concepts": [
         {
-          "concept": "chik_CHIK_trrrreeee_gemini_tts",
-          "category": "Eastern Towhee",
-          "activation": -1.174484,
-          "clap_attribution": -0.921312,
-          "beats_attribution": -0.253172,
-          "clap_share": 0.78444,
-          "clap_contribution": 1.365867,
-          "beats_contribution": 0.375334
-        },
-        {
           "concept": "chweek_chweek_TWEEEEE_gemini_tts",
           "category": "Eastern Towhee",
           "activation": -1.362242,
           "clap_attribution": -1.34495,
           "beats_attribution": -0.017292,
           "clap_share": 0.987307,
-          "clap_contribution": 1.701885,
-          "beats_contribution": 0.021881
+          "clap_contribution": 1.641405,
+          "beats_contribution": 0.021104
         },
         {
           "concept": "chik_ik_dee_dee_dee_gemini_tts",
@@ -1767,8 +1833,28 @@
           "clap_attribution": -1.052727,
           "beats_attribution": 0.262494,
           "clap_share": 1.332172,
-          "clap_contribution": 1.981352,
-          "beats_contribution": -0.494044
+          "clap_contribution": 1.304678,
+          "beats_contribution": -0.325317
+        },
+        {
+          "concept": "chik_CHIK_trrrreeee_gemini_tts",
+          "category": "Eastern Towhee",
+          "activation": -1.174484,
+          "clap_attribution": -0.921312,
+          "beats_attribution": -0.253172,
+          "clap_share": 0.78444,
+          "clap_contribution": 0.734074,
+          "beats_contribution": 0.20172
+        },
+        {
+          "concept": "tee_CHER_tee_CHER_TEE_CHER_gemini_tts",
+          "category": "Ovenbird",
+          "activation": 1.808542,
+          "clap_attribution": 0.704876,
+          "beats_attribution": 1.103666,
+          "clap_share": 0.389748,
+          "clap_contribution": 0.216716,
+          "beats_contribution": 0.339324
         },
         {
           "concept": "tchi_TCHI_TCHII_gemini_tts",
@@ -1777,8 +1863,8 @@
           "clap_attribution": -0.174163,
           "beats_attribution": 0.44301,
           "clap_share": -0.647814,
-          "clap_contribution": -0.278847,
-          "beats_contribution": 0.70929
+          "clap_contribution": -0.225852,
+          "beats_contribution": 0.574489
         },
         {
           "concept": "chk_chk_dee_dee_dee_dee_gemini_tts",
@@ -1787,8 +1873,18 @@
           "clap_attribution": -0.151777,
           "beats_attribution": -0.046287,
           "clap_share": 0.766302,
-          "clap_contribution": -0.198031,
-          "beats_contribution": -0.060393
+          "clap_contribution": -0.109392,
+          "beats_contribution": -0.033361
+        },
+        {
+          "concept": "twee_twee_twee_twee_gemini_tts",
+          "category": "Tufted Titmouse",
+          "activation": -0.172944,
+          "clap_attribution": -0.345889,
+          "beats_attribution": 0.172944,
+          "clap_share": 2.0,
+          "clap_contribution": 0.14571,
+          "beats_contribution": -0.072855
         }
       ]
     },
