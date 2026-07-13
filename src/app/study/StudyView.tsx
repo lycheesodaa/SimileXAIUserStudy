@@ -2,19 +2,23 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { STUDY_DOMAINS } from './domainRegistry';
-import { DATA_V1_TRAIN_ROOT, loadCoreSamples } from './dataV1';
+import { DATA_V1_TRAIN_ROOT, loadCoreSamples, loadSplitSamples } from './dataV1';
 import { createStudyLogger } from './logger';
 import { useStudyInstrumentation } from './useStudyInstrumentation';
 
 // Study-mode entry point, embedded in Qualtrics as an iframe:
 //   test:     /#/study/v1/:domain/test/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
-//   train:    /#/study/v1/:domain/train?pid=<participant>&xai=<condition>
+//   train:    /#/study/v1/:domain/train/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
+//   guide:    /#/study/v1/:domain/guide?pid=<participant>&xai=<condition>
 //   tutorial: /#/study/v1/:domain/tutorial/:sampleId??pid=<participant>&xai=<condition>
 // (unversioned /#/study/... redirects here; /#/v1/... is the navbar'd dev twin)
-// tutorial mode renders the condition's explanation UI from a real sample
-// (defaulting to the first core sample) as a static guided tour; train mode
-// shows the practice descriptions plus, when public/data_v1_train/<domain>
-// exists, an explanation UI for each sample in that practice subset.
+// test and train both render one sample's explanation; they differ only in
+// which curated split supplies the default sample when the URL omits one
+// (testing.csv vs training.csv, both at the data_v1 root). tutorial mode
+// renders the condition's explanation UI from a real sample (defaulting to
+// the first testing split sample) as a static guided tour; guide mode shows
+// the practice descriptions plus, when public/data_v1_train/<domain> exists,
+// an explanation UI for each sample in that practice subset.
 // The URL carries no class labels; Qualtrics Loop & Merge decides which
 // sample (and in what order) each participant sees. The xai param selects the
 // condition (similes, onomatopoeia, similes_dualview_approx,
@@ -22,16 +26,18 @@ import { useStudyInstrumentation } from './useStudyInstrumentation';
 // similes_dualview_actv, onomatopoeia_dualview_actv, rexnet, examples,
 // noxai); an unrecognized
 // value renders the neutral fallback and logs lookup_error rather than
-// silently showing the wrong condition. Train mode shows the condition's
+// silently showing the wrong condition. Guide mode shows the condition's
 // training/practice descriptions without any sample or navbar.
 //
 // Samples are fetched from public/data_v1 at runtime (variant getSample is
 // async), so the view holds a small load state machine; instrumentation only
 // starts once the sample is ready, so exactly one session_start fires.
-type LoadState =
-  | { status: 'loading' }
-  | { status: 'ready'; sample?: unknown }
-  | { status: 'missing' };
+type LoadState = {
+  // The route (domain/mode/sample/xai) this state was produced for.
+  key: string;
+  status: 'loading' | 'ready' | 'missing';
+  sample?: unknown;
+};
 
 export function StudyView() {
   const rawParams = useParams<{ domain: string; mode?: string; sampleId?: string }>();
@@ -44,59 +50,74 @@ export function StudyView() {
   const pid = (searchParams.get('pid') || 'unknown').trim();
   const pos = searchParams.get('pos');
 
+  const isGuide = mode === 'guide';
   const isTrain = mode === 'train';
   const isTutorial = mode === 'tutorial';
   const domainCfg = STUDY_DOMAINS[domain];
   const xaiType = (searchParams.get('xai') || domainCfg?.defaultXai || 'similes').trim();
   const xaiCfg = domainCfg?.xaiVariants[xaiType];
 
-  const [resolvedSampleId, setResolvedSampleId] = useState<string | undefined>(rawSampleId);
+  // A loaded sample is only valid for the route it was fetched for; a stale
+  // one must render as loading, never be handed to a different condition's
+  // render() (shape mismatch = crash = blank iframe).
+  const viewKey = `${domain}|${mode}|${rawSampleId ?? ''}|${xaiType}`;
+
+  const [resolved, setResolved] = useState<{ key: string; sampleId?: string }>({
+    key: viewKey,
+    sampleId: rawSampleId,
+  });
   useEffect(() => {
-    if (rawSampleId) {
-      setResolvedSampleId(rawSampleId);
+    if (rawSampleId || isGuide || !domain) {
+      setResolved({ key: viewKey, sampleId: rawSampleId });
       return;
     }
-    if (!isTrain && domain) {
-      loadCoreSamples(domain).then((list) => {
-        if (list?.[0]) {
-          setResolvedSampleId(list[0].sample_id);
+    // No sample in the URL: default to the first sample of the mode's split
+    // (training.csv for train, testing.csv for test/tutorial), falling back
+    // to the full core list if the split file is missing.
+    let cancelled = false;
+    setResolved({ key: viewKey, sampleId: undefined });
+    loadSplitSamples(domain, isTrain ? 'train' : 'test')
+      .then((list) => list ?? loadCoreSamples(domain))
+      .then((list) => {
+        if (!cancelled && list?.[0]) {
+          setResolved({ key: viewKey, sampleId: list[0].sample_id });
         }
       });
-    }
-  }, [rawSampleId, isTrain, domain]);
+    return () => {
+      cancelled = true;
+    };
+  }, [rawSampleId, isGuide, isTrain, domain, viewKey]);
 
-  const [load, setLoad] = useState<LoadState>({ status: 'loading' });
+  const resolvedSampleId = resolved.key === viewKey ? resolved.sampleId : undefined;
+
+  const [load, setLoad] = useState<LoadState>({ key: viewKey, status: 'loading' });
   useEffect(() => {
-    if (isTrain) {
-      setLoad({ status: 'ready' });
+    if (isGuide) {
+      setLoad({ key: viewKey, status: 'ready' });
       return;
     }
     if (!xaiCfg || !resolvedSampleId) {
-      if (!xaiCfg) {
-        setLoad({ status: 'missing' });
-      } else {
-        setLoad({ status: 'loading' });
-      }
+      setLoad({ key: viewKey, status: !xaiCfg ? 'missing' : 'loading' });
       return;
     }
     let cancelled = false;
-    setLoad({ status: 'loading' });
+    setLoad({ key: viewKey, status: 'loading' });
     xaiCfg.getSample(resolvedSampleId).then((sample) => {
       if (cancelled) return;
-      setLoad(sample ? { status: 'ready', sample } : { status: 'missing' });
+      setLoad(sample ? { key: viewKey, status: 'ready', sample } : { key: viewKey, status: 'missing' });
     });
     return () => {
       cancelled = true;
     };
-  }, [xaiCfg, resolvedSampleId, isTrain]);
+  }, [xaiCfg, resolvedSampleId, isGuide, viewKey]);
 
-  // Optional practice subset for train mode: every sample found in the
+  // Optional practice subset for guide mode: every sample found in the
   // data_v1_train bundle, mapped through the active condition. Missing bundle
-  // (404) resolves undefined and leaves the list empty — train renders as
+  // (404) resolves undefined and leaves the list empty — guide renders as
   // descriptions-only, exactly as before the subset existed.
   const [trainViews, setTrainViews] = useState<unknown[]>([]);
   useEffect(() => {
-    if (!isTrain || !xaiCfg) return;
+    if (!isGuide || !xaiCfg) return;
     let cancelled = false;
     setTrainViews([]);
     loadCoreSamples(domain, DATA_V1_TRAIN_ROOT).then(async (list) => {
@@ -109,11 +130,13 @@ export function StudyView() {
     return () => {
       cancelled = true;
     };
-  }, [isTrain, xaiCfg, domain]);
+  }, [isGuide, xaiCfg, domain]);
 
+  // Stale load states (fetched for a previous route) render as loading.
+  const loadStatus = load.key === viewKey ? load.status : 'loading';
   const lookupFailed =
-    !xaiCfg || load.status === 'missing' || (isTutorial && !xaiCfg.renderTutorial);
-  const sample = load.status === 'ready' ? load.sample : undefined;
+    !xaiCfg || loadStatus === 'missing' || (isTutorial && !xaiCfg.renderTutorial);
+  const sample = loadStatus === 'ready' && load.key === viewKey ? load.sample : undefined;
 
   const logger = useMemo(
     () =>
@@ -121,19 +144,19 @@ export function StudyView() {
         pid,
         domain: domain || 'unknown',
         mode: mode || 'unknown',
-        sampleId: resolvedSampleId || (isTrain ? 'none' : 'unknown'),
+        sampleId: resolvedSampleId || (isGuide ? 'none' : 'unknown'),
         xaiType,
       }),
     // one logger per mounted study page (domain/mode/sample change = new session)
-    [pid, domain, mode, resolvedSampleId, isTrain, xaiType]
+    [pid, domain, mode, resolvedSampleId, isGuide, xaiType]
   );
 
-  // Instrumentation runs for both modes; skipped entirely on failed lookups
+  // Instrumentation runs for all modes; skipped entirely on failed lookups
   // and while the sample is still loading (no premature session_start).
   useStudyInstrumentation(
     logger,
     sample,
-    lookupFailed || load.status !== 'ready' ? undefined : xaiCfg,
+    lookupFailed || loadStatus !== 'ready' ? undefined : xaiCfg,
     pos
   );
 
@@ -154,7 +177,7 @@ export function StudyView() {
     );
   }
 
-  if (load.status === 'loading') {
+  if (loadStatus === 'loading') {
     return (
       <div
         className="flex flex-col items-center justify-center min-h-[400px] gap-3 text-gray-500"
@@ -166,7 +189,7 @@ export function StudyView() {
     );
   }
 
-  if (isTrain) {
+  if (isGuide) {
     return (
       <>
         {xaiCfg.renderTrain()}

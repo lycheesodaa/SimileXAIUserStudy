@@ -77,7 +77,8 @@ export function CuesExplanationV1({
   const visibleCues = selected?.cues.filter(
     (cue) =>
       !cue.cue.toLowerCase().includes('trill rate') &&
-      !cue.cue.toLowerCase().includes('gap ratio')
+      !cue.cue.toLowerCase().includes('gap ratio') &&
+      !cue.cue.toLowerCase().includes('event density')
   ) ?? [];
   const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
 
@@ -235,17 +236,17 @@ export const LUNG_CUE_ROWS: CueReferenceRow[] = [
     ranking: 'Normal < Stridor < Crackle ~ Wheeze ~ Rhonchi',
   },
   {
-    cue: 'Crackle Spikiness (popping)',
+    cue: 'Spikiness (popping)',
     metric: 'crest_factor',
     description: 'How impulsive/spiky the peaks are vs the background breath.',
     ranking: 'Stridor ~ Rhonchi ~ Wheeze < Crackle ~ Normal',
   },
-  {
-    cue: 'Crackle / Event Density',
-    metric: 'event_rate',
-    description: 'Number of discrete sound events per second.',
-    ranking: 'Wheeze ~ Crackle ~ Normal ~ Rhonchi ~ Stridor',
-  },
+  // {
+  //   cue: 'Crackle / Event Density',
+  //   metric: 'event_rate',
+  //   description: 'Number of discrete sound events per second.',
+  //   ranking: 'Wheeze ~ Crackle ~ Normal ~ Rhonchi ~ Stridor',
+  // },
 ];
 
 export const BIRD_CUE_ROWS: CueReferenceRow[] = [

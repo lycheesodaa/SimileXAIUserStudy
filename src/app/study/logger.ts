@@ -5,8 +5,8 @@
 export interface StudyLoggerContext {
   pid: string;
   domain: string;
-  mode: string; // "train" | "test"
-  sampleId: string; // "none" in train mode
+  mode: string; // "guide" | "train" | "test" | "tutorial"
+  sampleId: string; // "none" in guide mode
   xaiType: string;
 }
 

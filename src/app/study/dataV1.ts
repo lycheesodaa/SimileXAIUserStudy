@@ -209,6 +209,23 @@ function fetchJson<T>(url: string): Promise<T | undefined> {
   return pending as Promise<T | undefined>;
 }
 
+const textCache = new Map<string, Promise<string | undefined>>();
+
+function fetchText(url: string): Promise<string | undefined> {
+  let pending = textCache.get(url);
+  if (!pending) {
+    pending = fetch(url)
+      .then((res) => (res.ok ? res.text() : undefined))
+      .catch(() => undefined)
+      .then((value) => {
+        if (value === undefined) textCache.delete(url);
+        return value;
+      });
+    textCache.set(url, pending);
+  }
+  return pending;
+}
+
 export function loadSample(
   domain: string,
   sampleId: string,
@@ -231,6 +248,49 @@ export function loadCoreSamples(
   root: DataRoot = DATA_V1_ROOT
 ): Promise<CoreSampleInfo[] | undefined> {
   return fetchJson<CoreSampleInfo[]>(dataV1Url(`${domain}/core_samples.json`, root));
+}
+
+// ─── Study splits (training.csv / testing.csv) ───────────────────────────────
+// The bundle root carries two curated sample lists that restrict which core
+// samples each browsing mode exposes: training.csv (train mode) and
+// testing.csv (test + tutorial modes). Both files span all domains and only
+// need domain + sample_id columns (positions 0/1, or found by header when a
+// `sample_id` header row is present); true labels come from the domain's
+// core_samples.json, keeping the committed CSVs free of any study metadata.
+// All referenced samples live in the main data_v1 bundle.
+
+export type StudySplit = 'train' | 'test';
+
+export async function loadSplitSamples(
+  domain: string,
+  split: StudySplit
+): Promise<CoreSampleInfo[] | undefined> {
+  const [text, core] = await Promise.all([
+    fetchText(dataV1Url(split === 'train' ? 'training.csv' : 'testing.csv')),
+    loadCoreSamples(domain),
+  ]);
+  if (text === undefined) return undefined;
+  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+  if (lines.length === 0) return undefined;
+
+  // Header-aware column mapping; headerless files use positional columns.
+  const header = lines[0].split(',').map((c) => c.trim().toLowerCase());
+  const hasHeader = header.includes('sample_id');
+  const col = hasHeader
+    ? { domain: header.indexOf('domain'), id: header.indexOf('sample_id') }
+    : { domain: 0, id: 1 };
+
+  const labelById = new Map((core ?? []).map((s) => [s.sample_id, s.true_label]));
+  const samples: CoreSampleInfo[] = [];
+  for (const line of hasHeader ? lines.slice(1) : lines) {
+    const cells = line.split(',');
+    // The domain filter also drops non-data lines (e.g. training.csv's note row).
+    if (cells[col.domain]?.trim() !== domain) continue;
+    const sampleId = cells[col.id]?.trim();
+    if (!sampleId) continue;
+    samples.push({ sample_id: sampleId, true_label: labelById.get(sampleId) ?? '' });
+  }
+  return samples.length > 0 ? samples : undefined;
 }
 
 export async function loadConcepts(
