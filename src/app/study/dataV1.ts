@@ -180,9 +180,23 @@ export const prettifyOnomatopoeia = (concept: string): string =>
 // with the same per-domain layout (samples/ + core_samples.json) holding the
 // small practice subset shown in train mode; it may simply not exist yet, in
 // which case its loaders resolve undefined and train mode shows no samples.
+// DATA_V2_ROOT / DATA_V3_ROOT are regenerated bundles with the identical layout
+// and model keys as data_v1 (only schema_version + content differ); they carry
+// no training.csv/testing.csv, so split loaders fall back to core_samples.
 export const DATA_V1_ROOT = 'data_v1';
 export const DATA_V1_TRAIN_ROOT = 'data_v1_train';
-export type DataRoot = typeof DATA_V1_ROOT | typeof DATA_V1_TRAIN_ROOT;
+export const DATA_V2_ROOT = 'data_v2';
+export const DATA_V3_ROOT = 'data_v3';
+export type DataRoot =
+  | typeof DATA_V1_ROOT
+  | typeof DATA_V1_TRAIN_ROOT
+  | typeof DATA_V2_ROOT
+  | typeof DATA_V3_ROOT;
+
+// The URL version segment (/v1, /v2, /v3 and /study/v1…) selects which bundle a
+// browser/study page reads from. v1 is the default/live bundle.
+export const dataRootForVersion = (version: string): DataRoot =>
+  version === 'v2' ? DATA_V2_ROOT : version === 'v3' ? DATA_V3_ROOT : DATA_V1_ROOT;
 
 const dataV1Url = (path: string, root: DataRoot = DATA_V1_ROOT): string =>
   `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${root}/${path}`;
@@ -263,11 +277,12 @@ export type StudySplit = 'train' | 'test';
 
 export async function loadSplitSamples(
   domain: string,
-  split: StudySplit
+  split: StudySplit,
+  root: DataRoot = DATA_V1_ROOT
 ): Promise<CoreSampleInfo[] | undefined> {
   const [text, core] = await Promise.all([
-    fetchText(dataV1Url(split === 'train' ? 'training.csv' : 'testing.csv')),
-    loadCoreSamples(domain),
+    fetchText(dataV1Url(split === 'train' ? 'training.csv' : 'testing.csv', root)),
+    loadCoreSamples(domain, root),
   ]);
   if (text === undefined) return undefined;
   const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
@@ -295,9 +310,10 @@ export async function loadSplitSamples(
 
 export async function loadConcepts(
   domain: string,
-  set: ConceptSet
+  set: ConceptSet,
+  root: DataRoot = DATA_V1_ROOT
 ): Promise<Map<string, ConceptEntry> | undefined> {
-  const entries = await fetchJson<ConceptEntry[]>(dataV1Url(`${domain}/concepts/${set}.json`));
+  const entries = await fetchJson<ConceptEntry[]>(dataV1Url(`${domain}/concepts/${set}.json`, root));
   if (!entries) return undefined;
   return new Map(entries.map((e) => [e.concept, e]));
 }

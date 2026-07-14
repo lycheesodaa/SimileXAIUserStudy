@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { STUDY_DOMAINS } from './domainRegistry';
-import { DATA_V1_TRAIN_ROOT, loadCoreSamples, loadSplitSamples } from './dataV1';
+import { DATA_V1_ROOT, DATA_V1_TRAIN_ROOT, DataRoot, loadCoreSamples, loadSplitSamples } from './dataV1';
 import { createStudyLogger } from './logger';
 import { useStudyInstrumentation } from './useStudyInstrumentation';
 
@@ -39,7 +39,9 @@ type LoadState = {
   sample?: unknown;
 };
 
-export function StudyView() {
+// `root` selects the bundle read for this study version (/study/v1 → data_v1,
+// /study/v2 → data_v2, …). Defaults to the live v1 bundle.
+export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   const rawParams = useParams<{ domain: string; mode?: string; sampleId?: string }>();
   const [searchParams] = useSearchParams();
 
@@ -76,8 +78,8 @@ export function StudyView() {
     // to the full core list if the split file is missing.
     let cancelled = false;
     setResolved({ key: viewKey, sampleId: undefined });
-    loadSplitSamples(domain, isTrain ? 'train' : 'test')
-      .then((list) => list ?? loadCoreSamples(domain))
+    loadSplitSamples(domain, isTrain ? 'train' : 'test', root)
+      .then((list) => list ?? loadCoreSamples(domain, root))
       .then((list) => {
         if (!cancelled && list?.[0]) {
           setResolved({ key: viewKey, sampleId: list[0].sample_id });
@@ -86,7 +88,7 @@ export function StudyView() {
     return () => {
       cancelled = true;
     };
-  }, [rawSampleId, isGuide, isTrain, domain, viewKey]);
+  }, [rawSampleId, isGuide, isTrain, domain, viewKey, root]);
 
   const resolvedSampleId = resolved.key === viewKey ? resolved.sampleId : undefined;
 
@@ -102,14 +104,14 @@ export function StudyView() {
     }
     let cancelled = false;
     setLoad({ key: viewKey, status: 'loading' });
-    xaiCfg.getSample(resolvedSampleId).then((sample) => {
+    xaiCfg.getSample(resolvedSampleId, root).then((sample) => {
       if (cancelled) return;
       setLoad(sample ? { key: viewKey, status: 'ready', sample } : { key: viewKey, status: 'missing' });
     });
     return () => {
       cancelled = true;
     };
-  }, [xaiCfg, resolvedSampleId, isGuide, viewKey]);
+  }, [xaiCfg, resolvedSampleId, isGuide, viewKey, root]);
 
   // Optional practice subset for guide mode: every sample found in the
   // data_v1_train bundle, mapped through the active condition. Missing bundle

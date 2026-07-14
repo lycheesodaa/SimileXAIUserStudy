@@ -12,6 +12,7 @@ import { NoXaiPractice } from '../components/noxai/NoXaiPractice';
 import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
 import {
   ConceptSet,
+  DATA_V2_ROOT,
   DataRoot,
   RexnetReport,
   V1ActivationsModel,
@@ -101,10 +102,17 @@ const fusedVariant = (
   getSample: async (sampleId, root) => {
     const [sample, conceptMap] = await Promise.all([
       loadSample(domain, sampleId, root),
-      loadConcepts(domain, set),
+      loadConcepts(domain, set, root),
     ]);
     const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
     if (!sample || !model?.concepts?.length) return undefined;
+
+    // The v2 bundle reframes a concept whose *head weight* is negative as a
+    // negation of the descriptor ("NOT like a whistle"). This is independent of
+    // the row's evidence sign: a negative-evidence row can have a positive head
+    // weight (no NOT), and a positive-evidence row a negative head weight (NOT).
+    const negate = (headWeight: number | undefined): boolean =>
+      root === DATA_V2_ROOT && (headWeight ?? 0) < 0;
 
     if (mode === 'actv' || mode === 'actv_dual') {
       // Activation-only card: the full concept list (not just the sparse
@@ -133,6 +141,7 @@ const fusedVariant = (
           confidence: c.activation / maxAbs,
           displayValue: c.activation,
           usedByHead: c.used_by_head,
+          negate: negate(c.head_weight),
           ...(a ? { clapValue: a.clap_attribution, beatsValue: a.beats_attribution } : {}),
           withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
         };
@@ -163,6 +172,7 @@ const fusedVariant = (
             displayValue: c.contribution,
             clapValue: a.clap_contribution,
             beatsValue: a.beats_contribution,
+            negate: negate(c.head_weight),
             withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
           },
         ];
@@ -197,6 +207,7 @@ const fusedVariant = (
             net: clap + beats,
             clapValue: clap,
             beatsValue: beats,
+            negate: negate(c.head_weight),
             withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
           },
         ];
@@ -218,6 +229,7 @@ const fusedVariant = (
       category: c.category ?? conceptMap?.get(c.concept)?.category,
       confidence: c.contribution / maxAbs,
       displayValue: c.contribution,
+      negate: negate(c.head_weight),
       withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
     }));
     return { sample, items, predictedLabel: model.predicted_label };

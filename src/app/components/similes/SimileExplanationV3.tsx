@@ -18,6 +18,9 @@ export interface SimileItem {
   /** Activation-only view: whether the classifier's sparse head actually uses
    *  this concept (non-zero head weight). Undefined outside that view. */
   usedByHead?: boolean;
+  /** Render the descriptor negated ("NOT like a whistle"). Set by the v2 bundle
+   *  for concepts whose head weight is negative, regardless of evidence sign. */
+  negate?: boolean;
   category?: string;
   withinClassAudioUrl?: string;
 }
@@ -208,7 +211,12 @@ export function SimileExplanationV3({
             )}
           </div>
           <div className="flex justify-end items-center gap-2 text-right">
-            <span>{s.text}</span>
+            <span>
+              {s.negate && (
+                <span className="font-semibold text-red-600 uppercase mr-1">not</span>
+              )}
+              {s.text}
+            </span>
             {s.withinClassAudioUrl && (
               <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
             )}

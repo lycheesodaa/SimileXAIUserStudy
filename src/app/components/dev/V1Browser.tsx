@@ -3,14 +3,24 @@ import { useLocation, useNavigate, useParams, useSearchParams } from 'react-rout
 import { STUDY_DOMAINS } from '../../study/domainRegistry';
 import {
   CoreSampleInfo,
+  DATA_V1_ROOT,
   DATA_V1_TRAIN_ROOT,
+  DATA_V2_ROOT,
+  DATA_V3_ROOT,
+  DataRoot,
   StudySplit,
   V1ModelVerdict,
+  dataRootForVersion,
   loadCoreSamples,
   loadSample,
   loadSplitSamples,
   modelKeyForXai,
 } from '../../study/dataV1';
+
+// The dev browser is mounted per version-prefixed route (/v1, /v2, /v3); the
+// prefix both selects the bundle root and prefixes every nav URL it builds.
+const versionForRoot = (root: DataRoot): string =>
+  root === DATA_V2_ROOT ? 'v2' : root === DATA_V3_ROOT ? 'v3' : 'v1';
 
 // Dev-only browser for the v1 study conditions, mounted at
 //   /#/v1/:domain/test/:sampleId?xai=<condition>       (testing.csv samples)
@@ -30,10 +40,14 @@ const splitForMode = (mode: string): StudySplit | null => {
 
 // Split list, falling back to the full core list if the CSV is missing/empty
 // so the browser stays usable on incomplete bundles.
-const loadSamplesForMode = async (domain: string, mode: string): Promise<CoreSampleInfo[]> => {
+const loadSamplesForMode = async (
+  domain: string,
+  mode: string,
+  root: DataRoot = DATA_V1_ROOT
+): Promise<CoreSampleInfo[]> => {
   const split = splitForMode(mode);
   if (!split) return [];
-  const list = (await loadSplitSamples(domain, split)) ?? (await loadCoreSamples(domain));
+  const list = (await loadSplitSamples(domain, split, root)) ?? (await loadCoreSamples(domain, root));
   return list ?? [];
 };
 
@@ -52,14 +66,16 @@ const labelStyle: React.CSSProperties = { fontSize: '13px', color: '#0369a1' };
 function useV1Route() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  // /v1/:domain/:mode/:sampleId
+  // /<version>/:domain/:mode/:sampleId  (version = v1 | v2 | v3)
   const parts = location.pathname.split('/');
+  const version = parts[1] || 'v1';
   const domain = parts[2] || 'lung';
   const mode = parts[3] || 'test';
   const sampleId = parts[4] ? decodeURIComponent(parts[4]) : undefined;
   const domainCfg = STUDY_DOMAINS[domain];
   const xai = searchParams.get('xai') || domainCfg?.defaultXai || 'similes';
-  return { domain, mode, sampleId, xai, domainCfg };
+  const root = dataRootForVersion(version);
+  return { version, domain, mode, sampleId, xai, domainCfg, root };
 }
 
 export function V1Navigator({ versionOptions, onVersionChange }: {
@@ -67,19 +83,19 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   onVersionChange: (version: string) => void;
 }) {
   const navigate = useNavigate();
-  const { domain, mode, sampleId, xai, domainCfg } = useV1Route();
+  const { version, domain, mode, sampleId, xai, domainCfg, root } = useV1Route();
 
   const [samples, setSamples] = useState<CoreSampleInfo[]>([]);
   useEffect(() => {
     let cancelled = false;
     setSamples([]);
-    loadSamplesForMode(domain, mode).then((list) => {
+    loadSamplesForMode(domain, mode, root).then((list) => {
       if (!cancelled) setSamples(list);
     });
     return () => {
       cancelled = true;
     };
-  }, [domain, mode]);
+  }, [domain, mode, root]);
 
   // The selected condition's model verdict (predicted label / correct /
   // faithful), read from the sample JSON. Cached by loadSample, so this shares
@@ -91,7 +107,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
     if (mode === 'guide' || !sampleId) return;
     const key = modelKeyForXai(domain, xai);
     if (!key) return; // noxai: no model verdict to show
-    loadSample(domain, sampleId).then((s) => {
+    loadSample(domain, sampleId, root).then((s) => {
       if (cancelled || !s) return;
       const m = s.models[key] as
         | { predicted_label?: string; correct?: boolean; faithful?: number }
@@ -102,10 +118,10 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
     return () => {
       cancelled = true;
     };
-  }, [domain, sampleId, xai, mode]);
+  }, [domain, sampleId, xai, mode, root]);
 
   const goTo = (d: string, m: string, id: string | undefined, x: string) => {
-    const path = m === 'guide' ? `/v1/${d}/guide` : `/v1/${d}/${m}${id ? `/${encodeURIComponent(id)}` : ''}`;
+    const path = m === 'guide' ? `/${version}/${d}/guide` : `/${version}/${d}/${m}${id ? `/${encodeURIComponent(id)}` : ''}`;
     navigate(`${path}?xai=${encodeURIComponent(x)}`);
   };
 
@@ -127,7 +143,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
 
         <label style={labelStyle}>
           Version&nbsp;
-          <select value="v1" onChange={(e) => onVersionChange(e.target.value)} style={selectStyle}>
+          <select value={version} onChange={(e) => onVersionChange(e.target.value)} style={selectStyle}>
             {versionOptions.map((v) => (
               <option key={v} value={v}>{v}</option>
             ))}
@@ -235,8 +251,9 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   );
 }
 
-export function V1DevView() {
+export function V1DevView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   const navigate = useNavigate();
+  const version = versionForRoot(root);
   const { domain, mode, sampleId } = useParams<{ domain: string; mode: string; sampleId?: string }>();
   const [searchParams] = useSearchParams();
   const domainCfg = domain ? STUDY_DOMAINS[domain] : undefined;
@@ -250,18 +267,18 @@ export function V1DevView() {
   // would hand the previous condition's view — a different shape — to the new
   // condition's render() and crash before any effect could recover (the blank
   // page + never-populated sample id in the URL).
-  const viewKey = `${domain}|${mode}|${sampleId ?? ''}|${xai}`;
+  const viewKey = `${version}|${domain}|${mode}|${sampleId ?? ''}|${xai}`;
 
   // /v1/<domain>/test|train|tutorial without a sample id: jump to the first
   // sample of the mode's split, keeping the mode.
   useEffect(() => {
     if (isGuide || sampleId || !domainCfg) return;
-    loadSamplesForMode(domain!, mode ?? 'test').then((list) => {
+    loadSamplesForMode(domain!, mode ?? 'test', root).then((list) => {
       if (list[0]) {
-        navigate(`/v1/${domain}/${mode ?? 'test'}/${encodeURIComponent(list[0].sample_id)}?xai=${encodeURIComponent(xai)}`, { replace: true });
+        navigate(`/${version}/${domain}/${mode ?? 'test'}/${encodeURIComponent(list[0].sample_id)}?xai=${encodeURIComponent(xai)}`, { replace: true });
       }
     });
-  }, [isGuide, sampleId, domain, domainCfg, mode, xai, navigate]);
+  }, [isGuide, sampleId, domain, domainCfg, mode, xai, navigate, root, version]);
 
   const [load, setLoad] = useState<{ key: string; status: 'loading' | 'ready' | 'missing'; view?: unknown }>({
     key: viewKey,
@@ -279,13 +296,13 @@ export function V1DevView() {
     }
     let cancelled = false;
     setLoad({ key: viewKey, status: 'loading' });
-    xaiCfg.getSample(sampleId).then((view) => {
+    xaiCfg.getSample(sampleId, root).then((view) => {
       if (!cancelled) setLoad(view ? { key: viewKey, status: 'ready', view } : { key: viewKey, status: 'missing' });
     });
     return () => {
       cancelled = true;
     };
-  }, [xaiCfg, sampleId, isGuide, viewKey]);
+  }, [xaiCfg, sampleId, isGuide, viewKey, root]);
 
   // Optional practice subset from public/data_v1_train (mirrors StudyView):
   // absent bundle = empty list = descriptions-only guide mode.
@@ -315,7 +332,7 @@ export function V1DevView() {
       <div className="flex items-center justify-center min-h-[300px] text-gray-500 text-center p-8">
         {!xaiCfg
           ? `Unknown domain/condition: ${domain}/${xai}`
-          : `Sample not found in data_v1/${domain}: ${sampleId ?? '(none)'}`}
+          : `Sample not found in ${root}/${domain}: ${sampleId ?? '(none)'}`}
       </div>
     );
   }
