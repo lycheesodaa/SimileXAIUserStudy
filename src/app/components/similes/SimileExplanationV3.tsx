@@ -89,8 +89,10 @@ export function SimileExplanationV3({
   const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
 
   // Raw evidence values this close to 0 are effectively no evidence; drop them
-  // rather than render a sliver bar with a "0.00" label.
-  const MIN_EVIDENCE = 0.001;
+  // rather than render a sliver bar with a "0.00" label. The activation view is
+  // meant to show the full concept list (including non-firing ones), so it opts
+  // out of this floor.
+  const MIN_EVIDENCE = activationView ? 0 : 0.001;
 
   // Filter and sort similes for the tornado plot
   const filteredSimiles = similes
@@ -197,23 +199,29 @@ export function SimileExplanationV3({
       <div key={s.id} className={`grid ${rowGridClass} gap-4 items-center mb-2`} data-tutorial="evidence-row">
         <div className="flex justify-between items-center gap-2 text-sm text-gray-700 leading-tight">
           <div
-            className="flex items-center flex-shrink-0"
+            className="flex items-center gap-1 flex-shrink-0"
             data-tutorial={categoryClass ? 'category-badge' : undefined}
           >
-            {categoryClass && (
-              <ClassBadge className={categoryClass} useAbbrev size="xs" />
+            <div className="w-11 flex justify-start">
+              {categoryClass && (
+                <ClassBadge className={categoryClass} useAbbrev size="xs" />
+              )}
+            </div>
+            {activationView && (
+              <div className="w-10 flex justify-start">
+                {s.usedByHead && (
+                  <span
+                    className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700 bg-cyan-50 border border-cyan-200 rounded px-1 flex-shrink-0"
+                    title="The classifier uses this concept in its decision"
+                    data-tutorial="used-badge"
+                  >
+                    used
+                  </span>
+                )}
+              </div>
             )}
           </div>
           <div className="flex justify-end items-center gap-2 text-right">
-            {s.usedByHead && (
-              <span
-                className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700 bg-cyan-50 border border-cyan-200 rounded px-1 flex-shrink-0"
-                title="The classifier uses this concept in its decision"
-                data-tutorial="used-badge"
-              >
-                used
-              </span>
-            )}
             <span>{s.text}</span>
             {s.withinClassAudioUrl && (
               <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
