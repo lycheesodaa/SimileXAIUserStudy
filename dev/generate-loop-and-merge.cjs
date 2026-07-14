@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // Regenerates the Qualtrics Loop & Merge tables from the v1 study bundle.
 //
-// One TSV per domain x condition x split: dev/loop-and-merge-<domain>-<xai>.tsv
-// (testing.csv) and dev/loop-and-merge-train-<domain>-<xai>.tsv (training.csv),
+// One TSV per split x domain x condition:
+//   dev/loop-and-merge/test/<domain>/<xai>.tsv   (testing.csv)
+//   dev/loop-and-merge/train/<domain>/<xai>.tsv  (training.csv)
 // with rows "sampleId<TAB>domain<TAB>xai<TAB>aiPrediction<TAB>trueLabel"
 // (Field 1-5). aiPrediction/trueLabel are for experimenter analysis only —
 // never surface them in the Qualtrics-facing iframe URL. Paste a file's
@@ -22,6 +23,7 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const DATA_V1 = path.join(ROOT, 'public', 'data_v1');
+const OUT_ROOT = path.join(__dirname, 'loop-and-merge');
 const XAI_CONDITIONS = [
   'similes',
   'onomatopoeia',
@@ -71,10 +73,9 @@ function parseSplitCsv(csvPath) {
   return idsByDomain;
 }
 
-// Generates the per-domain x per-condition TSVs for one split.
-// filePrefix distinguishes the outputs ('' for testing.csv, 'train-' for
-// training.csv).
-function generateForSplit(splitIdsByDomain, filePrefix) {
+// Generates the per-domain x per-condition TSVs for one split, under
+// dev/loop-and-merge/<splitDir>/<domain>/<xai>.tsv.
+function generateForSplit(splitIdsByDomain, splitDir) {
   for (const domain of manifest.domains) {
     const ids = splitIdsByDomain.get(domain);
     if (!ids || ids.length === 0) continue;
@@ -96,19 +97,22 @@ function generateForSplit(splitIdsByDomain, filePrefix) {
       predictionsById.set(id, byModelKey);
     }
 
+    const outDir = path.join(OUT_ROOT, splitDir, domain);
+    fs.mkdirSync(outDir, { recursive: true });
+
     for (const xai of XAI_CONDITIONS) {
       const modelKey = modelKeyForXai(domain, xai);
-      const outPath = path.join(__dirname, `loop-and-merge-${filePrefix}${domain}-${xai}.tsv`);
+      const outPath = path.join(outDir, `${xai}.tsv`);
       const rows = ids.map((id) => {
         const aiPrediction = modelKey ? (predictionsById.get(id)[modelKey] ?? '') : '';
         const trueLabel = trueLabelById.get(id) ?? '';
         return `${id}\t${domain}\t${xai}\t${aiPrediction}\t${trueLabel}`;
       });
       fs.writeFileSync(outPath, rows.join('\n') + '\n');
-      console.log(`${path.basename(outPath)}: ${ids.length} rows`);
+      console.log(`${path.relative(__dirname, outPath)}: ${ids.length} rows`);
     }
   }
 }
 
-generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), '');
-generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train-');
+generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
+generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
