@@ -146,9 +146,14 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
         <label style={labelStyle}>
           XAI Type&nbsp;
           <select value={xai} onChange={(e) => goTo(domain, mode, sampleId, e.target.value)} style={selectStyle}>
-            {Object.keys(domainCfg?.xaiVariants ?? {}).map((x) => (
-              <option key={x} value={x}>{x}</option>
-            ))}
+            {Object.keys(domainCfg?.xaiVariants ?? {})
+              // Dualview conditions are hidden from the navbar dropdown; the
+              // variants still exist in the registry so study routes / direct
+              // ?xai= URLs continue to resolve.
+              .filter((x) => !x.includes('dualview'))
+              .map((x) => (
+                <option key={x} value={x}>{x}</option>
+              ))}
           </select>
         </label>
 

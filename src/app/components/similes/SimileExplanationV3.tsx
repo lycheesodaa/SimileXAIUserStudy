@@ -102,12 +102,6 @@ export function SimileExplanationV3({
   const isDualView = filteredSimiles.some(
     (s) => s.clapValue !== undefined && s.beatsValue !== undefined
   );
-  // Raw evidence values below this magnitude get a bar too short to hold the
-  // label, so the label sits outside the bar (grey) instead of inside (white).
-  // Adaptive: bars under 1/5 of the largest raw value in the plot are the
-  // ones too short to fit the label.
-  const maxRawMagnitude = Math.max(...filteredSimiles.map(magnitude), 0);
-  const OUTSIDE_LABEL_BELOW = maxRawMagnitude / 5;
   // Onomatopoeia tokens are much shorter than simile sentences; a narrower
   // plot and label column avoid a large empty gutter on the left.
   const plotWidthClass = isOnomatopoeia ? 'max-w-4xl' : 'max-w-4xl';
@@ -133,10 +127,6 @@ export function SimileExplanationV3({
     const barWidth = `${Math.abs(s.confidence) * 100}%`;
     const rawValue = s.displayValue ?? s.confidence;
     const barLabel = rawValue.toFixed(2);
-    // Only raw-valued bars opt into the outside label; legacy
-    // normalized-only usages keep the label inside the bar.
-    const labelOutside =
-      s.displayValue !== undefined && Math.abs(s.displayValue) < OUTSIDE_LABEL_BELOW;
 
     const generic = isPositive ? 'bg-blue-400' : 'bg-red-400';
     const darker = isPositive ? 'bg-blue-600' : 'bg-red-600';
@@ -178,17 +168,13 @@ export function SimileExplanationV3({
         {orderedSegments.map((seg, i) => (
           <div key={i} className={`h-full ${seg.cls}`} style={{ width: `${seg.frac * 100}%` }} />
         ))}
-        {!labelOutside && (
-          <span
-            className={`text-xs text-white absolute top-1/2 -translate-y-1/2 ${isPositive ? 'left-1' : 'right-1'}`}
-          >
-            {barLabel}
-          </span>
-        )}
       </div>
     );
-    const outsideLabel = labelOutside && (
-      <span className={`text-xs text-gray-500 ${isPositive ? 'ml-1' : 'mr-1'}`}>
+    // The value always sits in the half opposite the coloured bar, flush
+    // against the center line: left of center (flush right) for positive
+    // bars, right of center (flush left) for negative bars.
+    const valueLabel = (
+      <span className={`text-xs text-gray-600 ${isPositive ? 'mr-1' : 'ml-1'}`}>
         {barLabel}
       </span>
     );
@@ -232,24 +218,14 @@ export function SimileExplanationV3({
           {/* Center line */}
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-400 z-10" />
 
-          {/* Negative half */}
+          {/* Negative half: red bar, or the positive value flush to center */}
           <div className="w-1/2 h-full flex justify-end items-center pr-px">
-            {!isPositive && (
-              <>
-                {outsideLabel}
-                {bar}
-              </>
-            )}
+            {isPositive ? valueLabel : bar}
           </div>
 
-          {/* Positive half */}
+          {/* Positive half: blue bar, or the negative value flush to center */}
           <div className="w-1/2 h-full flex justify-start items-center pl-px">
-            {isPositive && (
-              <>
-                {bar}
-                {outsideLabel}
-              </>
-            )}
+            {isPositive ? bar : valueLabel}
           </div>
         </div>
       </div>
