@@ -95,7 +95,7 @@ export function SimileExplanationV3({
   // rather than render a sliver bar with a "0.00" label. The activation view is
   // meant to show the full concept list (including non-firing ones), so it opts
   // out of this floor.
-  const MIN_EVIDENCE = activationView ? 0 : 0.001;
+  const MIN_EVIDENCE = activationView ? 0 : 0.01;
 
   // Filter and sort similes for the tornado plot
   const filteredSimiles = similes
