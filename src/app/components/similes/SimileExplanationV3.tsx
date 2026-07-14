@@ -365,7 +365,7 @@ export function SimileExplanationV3({
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {cheatsheet ?? <SimilePractice isOnomatopoeia={isOnomatopoeia} />}
+              {cheatsheet ?? <SimilePractice isOnomatopoeia={isOnomatopoeia} inDrawer />}
             </div>
           </div>
         </div>
