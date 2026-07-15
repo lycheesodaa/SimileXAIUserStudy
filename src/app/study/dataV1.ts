@@ -180,23 +180,32 @@ export const prettifyOnomatopoeia = (concept: string): string =>
 // with the same per-domain layout (samples/ + core_samples.json) holding the
 // small practice subset shown in train mode; it may simply not exist yet, in
 // which case its loaders resolve undefined and train mode shows no samples.
-// DATA_V2_ROOT / DATA_V3_ROOT are regenerated bundles with the identical layout
-// and model keys as data_v1 (only schema_version + content differ); they carry
-// no training.csv/testing.csv, so split loaders fall back to core_samples.
+// DATA_V2_ROOT / DATA_V3_ROOT / DATA_V4_ROOT / DATA_V5_ROOT are regenerated
+// bundles with the identical layout and model keys as data_v1 (only
+// schema_version + content differ); they carry no training.csv/testing.csv,
+// so split loaders fall back to core_samples.
 export const DATA_V1_ROOT = 'data_v1';
 export const DATA_V1_TRAIN_ROOT = 'data_v1_train';
 export const DATA_V2_ROOT = 'data_v2';
 export const DATA_V3_ROOT = 'data_v3';
+export const DATA_V4_ROOT = 'data_v4';
+export const DATA_V5_ROOT = 'data_v5';
 export type DataRoot =
   | typeof DATA_V1_ROOT
   | typeof DATA_V1_TRAIN_ROOT
   | typeof DATA_V2_ROOT
-  | typeof DATA_V3_ROOT;
+  | typeof DATA_V3_ROOT
+  | typeof DATA_V4_ROOT
+  | typeof DATA_V5_ROOT;
 
-// The URL version segment (/v1, /v2, /v3 and /study/v1…) selects which bundle a
-// browser/study page reads from. v1 is the default/live bundle.
+// The URL version segment (/v1, /v2, /v3, /v4, /v5 and /study/v1…) selects
+// which bundle a browser/study page reads from. v1 is the default/live bundle.
 export const dataRootForVersion = (version: string): DataRoot =>
-  version === 'v2' ? DATA_V2_ROOT : version === 'v3' ? DATA_V3_ROOT : DATA_V1_ROOT;
+  version === 'v2' ? DATA_V2_ROOT
+  : version === 'v3' ? DATA_V3_ROOT
+  : version === 'v4' ? DATA_V4_ROOT
+  : version === 'v5' ? DATA_V5_ROOT
+  : DATA_V1_ROOT;
 
 const dataV1Url = (path: string, root: DataRoot = DATA_V1_ROOT): string =>
   `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${root}/${path}`;

@@ -13,6 +13,7 @@ import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
 import {
   ConceptSet,
   DATA_V2_ROOT,
+  DATA_V4_ROOT,
   DataRoot,
   RexnetReport,
   V1ActivationsModel,
@@ -107,12 +108,12 @@ const fusedVariant = (
     const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
     if (!sample || !model?.concepts?.length) return undefined;
 
-    // The v2 bundle reframes a concept whose *head weight* is negative as a
+    // The v2/v4 bundles reframe a concept whose *head weight* is negative as a
     // negation of the descriptor ("NOT like a whistle"). This is independent of
     // the row's evidence sign: a negative-evidence row can have a positive head
     // weight (no NOT), and a positive-evidence row a negative head weight (NOT).
     const negate = (headWeight: number | undefined): boolean =>
-      root === DATA_V2_ROOT && (headWeight ?? 0) < 0;
+      (root === DATA_V2_ROOT || root === DATA_V4_ROOT) && (headWeight ?? 0) < 0;
 
     if (mode === 'actv' || mode === 'actv_dual') {
       // Activation-only card: the full concept list (not just the sparse

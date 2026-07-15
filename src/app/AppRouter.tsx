@@ -10,7 +10,7 @@ import { LUNG_SOUND_DATA, PATHOLOGY_LABELS } from './data_v2';
 import { LUNG_SOUND_DATA_V3 } from './data_v3';
 import { SimileExplanationV3 } from './components/similes/SimileExplanationV3';
 import { StudyView } from './study/StudyView';
-import { DATA_V2_ROOT, DATA_V3_ROOT } from './study/dataV1';
+import { DATA_V2_ROOT, DATA_V3_ROOT, DATA_V4_ROOT, DATA_V5_ROOT } from './study/dataV1';
 import { V1Navigator, V1DevView } from './components/dev/V1Browser';
 
 export const SettingsContext = createContext<{
@@ -27,17 +27,22 @@ export const SettingsContext = createContext<{
 // v1   = public/data_v1 modular bundle (the live study conditions, navbar)
 // v2   = public/data_v2 modular bundle (same layout as v1, regenerated)
 // v3   = public/data_v3 modular bundle (same layout as v1, regenerated)
+// v4   = public/data_v4 modular bundle (same layout as v1, regenerated)
+// v5   = public/data_v5 modular bundle (same layout as v1, regenerated)
 // (Note: the v0.x "data_v2/v3" TS files are unrelated to the public/data_v2/3
-// bundles despite the name — v1/v2/v3 all share the modular V1DevView browser.)
-// Participant-facing study URLs are versioned separately under /study/v{1,2,3}/…
+// bundles despite the name — v1/v2/v3/v4/v5 all share the modular V1DevView
+// browser.)
+// Participant-facing study URLs are versioned separately under /study/v{1..5}/…
 
-const VERSIONS = ['v0.1', 'v0.2', 'v1', 'v2', 'v3'];
+const VERSIONS = ['v0.1', 'v0.2', 'v1', 'v2', 'v3', 'v4', 'v5'];
 const VERSION_HOME: Record<string, string> = {
   'v0.1': '/v0.1/similes/practice',
   'v0.2': '/v0.2/similes_v3/practice',
   v1: '/v1/lung/test',
   v2: '/v2/lung/test',
   v3: '/v3/lung/test',
+  v4: '/v4/lung/test',
+  v5: '/v5/lung/test',
 };
 const XAI_TYPES_BY_VERSION: Record<string, { value: string; label: string }[]> = {
   'v0.1': [
@@ -356,9 +361,10 @@ function DevNavigator() {
   const location = useLocation();
   const navigate = useNavigate();
   if (location.pathname.startsWith('/study')) return null;
-  // The modular bundle browser (v1/v2/v3) all share the V1 navbar; it reads the
-  // version from the URL prefix. Guard against /v0.x which starts with '/v'.
-  if (/^\/v[123](\/|$)/.test(location.pathname)) {
+  // The modular bundle browser (v1/v2/v3/v4/v5) all share the V1 navbar; it
+  // reads the version from the URL prefix. Guard against /v0.x which starts
+  // with '/v'.
+  if (/^\/v[12345](\/|$)/.test(location.pathname)) {
     return (
       <V1Navigator
         versionOptions={VERSIONS}
@@ -539,17 +545,27 @@ export function AppRouter() {
             <Route path="/study/v3" element={<Navigate to="/study/v3/lung/test" replace />} />
             <Route path="/study/v3/:domain/:mode?/:sampleId?" element={<StudyView root={DATA_V3_ROOT} />} />
             <Route path="/study/v3/*" element={<StudyFallback />} />
+            <Route path="/study/v4" element={<Navigate to="/study/v4/lung/test" replace />} />
+            <Route path="/study/v4/:domain/:mode?/:sampleId?" element={<StudyView root={DATA_V4_ROOT} />} />
+            <Route path="/study/v4/*" element={<StudyFallback />} />
+            <Route path="/study/v5" element={<Navigate to="/study/v5/lung/test" replace />} />
+            <Route path="/study/v5/:domain/:mode?/:sampleId?" element={<StudyView root={DATA_V5_ROOT} />} />
+            <Route path="/study/v5/*" element={<StudyFallback />} />
 
             <Route path="/study/*" element={<StudyVersionRedirect />} />
 
-            {/* v1/v2/v3 — modular dev browser over public/data_v{1,2,3} (same
-                content as /study/v{1,2,3}, plus navbar, no study logging) */}
+            {/* v1/v2/v3/v4/v5 — modular dev browser over public/data_v{1..5}
+                (same content as /study/v{1..5}, plus navbar, no study logging) */}
             <Route path="/v1" element={<Navigate to="/v1/lung/test" replace />} />
             <Route path="/v1/:domain/:mode?/:sampleId?" element={<V1DevView />} />
             <Route path="/v2" element={<Navigate to="/v2/lung/test" replace />} />
             <Route path="/v2/:domain/:mode?/:sampleId?" element={<V1DevView root={DATA_V2_ROOT} />} />
             <Route path="/v3" element={<Navigate to="/v3/lung/test" replace />} />
             <Route path="/v3/:domain/:mode?/:sampleId?" element={<V1DevView root={DATA_V3_ROOT} />} />
+            <Route path="/v4" element={<Navigate to="/v4/lung/test" replace />} />
+            <Route path="/v4/:domain/:mode?/:sampleId?" element={<V1DevView root={DATA_V4_ROOT} />} />
+            <Route path="/v5" element={<Navigate to="/v5/lung/test" replace />} />
+            <Route path="/v5/:domain/:mode?/:sampleId?" element={<V1DevView root={DATA_V5_ROOT} />} />
 
             {/* v0.1 — data_v2 bundle */}
             <Route path="/v0.1/similes/practice" element={<SimilePractice />} />

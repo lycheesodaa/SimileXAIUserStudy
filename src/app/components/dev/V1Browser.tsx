@@ -7,6 +7,8 @@ import {
   DATA_V1_TRAIN_ROOT,
   DATA_V2_ROOT,
   DATA_V3_ROOT,
+  DATA_V4_ROOT,
+  DATA_V5_ROOT,
   DataRoot,
   StudySplit,
   V1ModelVerdict,
@@ -17,10 +19,15 @@ import {
   modelKeyForXai,
 } from '../../study/dataV1';
 
-// The dev browser is mounted per version-prefixed route (/v1, /v2, /v3); the
-// prefix both selects the bundle root and prefixes every nav URL it builds.
+// The dev browser is mounted per version-prefixed route (/v1, /v2, /v3, /v4,
+// /v5); the prefix both selects the bundle root and prefixes every nav URL it
+// builds.
 const versionForRoot = (root: DataRoot): string =>
-  root === DATA_V2_ROOT ? 'v2' : root === DATA_V3_ROOT ? 'v3' : 'v1';
+  root === DATA_V2_ROOT ? 'v2'
+  : root === DATA_V3_ROOT ? 'v3'
+  : root === DATA_V4_ROOT ? 'v4'
+  : root === DATA_V5_ROOT ? 'v5'
+  : 'v1';
 
 // Dev-only browser for the v1 study conditions, mounted at
 //   /#/v1/:domain/test/:sampleId?xai=<condition>       (testing.csv samples)
@@ -66,7 +73,7 @@ const labelStyle: React.CSSProperties = { fontSize: '13px', color: '#0369a1' };
 function useV1Route() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  // /<version>/:domain/:mode/:sampleId  (version = v1 | v2 | v3)
+  // /<version>/:domain/:mode/:sampleId  (version = v1 | v2 | v3 | v4 | v5)
   const parts = location.pathname.split('/');
   const version = parts[1] || 'v1';
   const domain = parts[2] || 'lung';
