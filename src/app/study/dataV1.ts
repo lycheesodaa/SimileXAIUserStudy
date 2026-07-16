@@ -182,8 +182,9 @@ export const prettifyOnomatopoeia = (concept: string): string =>
 // which case its loaders resolve undefined and train mode shows no samples.
 // DATA_V2_ROOT / DATA_V3_ROOT / DATA_V4_ROOT / DATA_V5_ROOT are regenerated
 // bundles with the identical layout and model keys as data_v1 (only
-// schema_version + content differ); they carry no training.csv/testing.csv,
-// so split loaders fall back to core_samples.
+// schema_version + content differ). v2/v3 carry no training.csv/testing.csv,
+// so split loaders fall back to core_samples for those; v4/v5 do carry their
+// own training.csv/testing.csv, which loadSplitSamples reads from that root.
 export const DATA_V1_ROOT = 'data_v1';
 export const DATA_V1_TRAIN_ROOT = 'data_v1_train';
 export const DATA_V2_ROOT = 'data_v2';
