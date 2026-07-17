@@ -8,17 +8,21 @@ import { useStudyInstrumentation } from './useStudyInstrumentation';
 
 // Study-mode entry point, embedded in Qualtrics as an iframe:
 //   test:     /#/study/v1/:domain/test/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
-//   train:    /#/study/v1/:domain/train/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
+//   post:     /#/study/v1/:domain/post/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
 //   guide:    /#/study/v1/:domain/guide?pid=<participant>&xai=<condition>
 //   tutorial: /#/study/v1/:domain/tutorial/:sampleId??pid=<participant>&xai=<condition>
 // (unversioned /#/study/... redirects here; /#/v1/... is the navbar'd dev twin)
-// test and train both render one sample's explanation; they differ only in
+// test and post both render one sample's explanation; they differ only in
 // which curated split supplies the default sample when the URL omits one
-// (testing.csv vs training.csv, both at the data_v1 root). tutorial mode
+// (testing.csv vs post-test.csv, both at the bundle root). tutorial mode
 // renders the condition's explanation UI from a real sample (defaulting to
 // the first testing split sample) as a static guided tour; guide mode shows
-// the practice descriptions plus, when public/data_v1_train/<domain> exists,
-// an explanation UI for each sample in that practice subset.
+// the practice descriptions — including the per-class training.csv recordings
+// (the former train mode, subsumed into guide) — plus, when
+// public/data_v1_train/<domain> exists, an explanation UI for each sample in
+// that practice subset.
+// (train mode — one training.csv sample's explanation per page — is retired;
+// its samples now surface on the guide page instead.)
 // The URL carries no class labels; Qualtrics Loop & Merge decides which
 // sample (and in what order) each participant sees. The xai param selects the
 // condition (similes, onomatopoeia, similes_dualview_approx,
@@ -53,7 +57,9 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   const pos = searchParams.get('pos');
 
   const isGuide = mode === 'guide';
-  const isTrain = mode === 'train';
+  // train mode retired — its samples are shown on the guide page instead.
+  // const isTrain = mode === 'train';
+  const isPost = mode === 'post';
   const isTutorial = mode === 'tutorial';
   const domainCfg = STUDY_DOMAINS[domain];
   const xaiType = (searchParams.get('xai') || domainCfg?.defaultXai || 'similes').trim();
@@ -74,11 +80,11 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
       return;
     }
     // No sample in the URL: default to the first sample of the mode's split
-    // (training.csv for train, testing.csv for test/tutorial), falling back
+    // (post-test.csv for post, testing.csv for test/tutorial), falling back
     // to the full core list if the split file is missing.
     let cancelled = false;
     setResolved({ key: viewKey, sampleId: undefined });
-    loadSplitSamples(domain, isTrain ? 'train' : 'test', root)
+    loadSplitSamples(domain, isPost ? 'post' : 'test', root)
       .then((list) => list ?? loadCoreSamples(domain, root))
       .then((list) => {
         if (!cancelled && list?.[0]) {
@@ -88,7 +94,7 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
     return () => {
       cancelled = true;
     };
-  }, [rawSampleId, isGuide, isTrain, domain, viewKey, root]);
+  }, [rawSampleId, isGuide, isPost, domain, viewKey, root]);
 
   const resolvedSampleId = resolved.key === viewKey ? resolved.sampleId : undefined;
 

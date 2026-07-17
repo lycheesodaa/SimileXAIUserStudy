@@ -291,16 +291,23 @@ export function loadCoreSamples(
   return fetchJson<CoreSampleInfo[]>(dataV1Url(`${domain}/core_samples.json`, root));
 }
 
-// ─── Study splits (training.csv / testing.csv) ───────────────────────────────
-// The bundle root carries two curated sample lists that restrict which core
-// samples each browsing mode exposes: training.csv (train mode) and
-// testing.csv (test + tutorial modes). Both files span all domains and only
-// need domain + sample_id columns (positions 0/1, or found by header when a
-// `sample_id` header row is present); true labels come from the domain's
-// core_samples.json, keeping the committed CSVs free of any study metadata.
-// All referenced samples live in the main data_v1 bundle.
+// ─── Study splits (training.csv / testing.csv / post-test.csv) ───────────────
+// The bundle root carries curated sample lists that restrict which core
+// samples each browsing mode exposes: training.csv (one sample per class,
+// shown in guide mode), testing.csv (test + tutorial modes) and post-test.csv
+// (post mode). All files span all domains and only need domain + sample_id
+// columns (positions 0/1, or found by header when a `sample_id` header row is
+// present); true labels come from the domain's core_samples.json, keeping the
+// committed CSVs free of any study metadata.
+// All referenced samples live in the main bundle.
 
-export type StudySplit = 'train' | 'test';
+export type StudySplit = 'train' | 'test' | 'post';
+
+const SPLIT_FILES: Record<StudySplit, string> = {
+  train: 'training.csv',
+  test: 'testing.csv',
+  post: 'post-test.csv',
+};
 
 export async function loadSplitSamples(
   domain: string,
@@ -308,7 +315,7 @@ export async function loadSplitSamples(
   root: DataRoot = DATA_V1_ROOT
 ): Promise<CoreSampleInfo[] | undefined> {
   const [text, core] = await Promise.all([
-    fetchText(dataV1Url(split === 'train' ? 'training.csv' : 'testing.csv', root)),
+    fetchText(dataV1Url(SPLIT_FILES[split], root)),
     loadCoreSamples(domain, root),
   ]);
   if (text === undefined) return undefined;
@@ -334,6 +341,56 @@ export async function loadSplitSamples(
   }
   return samples.length > 0 ? samples : undefined;
 }
+
+// ─── Class description notes (guide mode) ────────────────────────────────────
+// Bundles may ship per-domain markdown notes at the bundle root ("Similes for
+// Lung Sounds.md", "Bracketed Onomatopoeia for Bird Sounds.md", …). Each class
+// is a "### N. Class Name (code)" heading followed by a one-line blockquote
+// description (then the concept bullets, which the guide does not surface).
+// Missing file resolves undefined — guide pages fall back to class names only.
+
+export interface ClassNote {
+  /** Heading title with the numbering stripped, e.g. "Crackles (Rales)". */
+  className: string;
+  description: string;
+}
+
+const classNotesFile = (domain: string, set: ConceptSet): string => {
+  const domainWord = domain.charAt(0).toUpperCase() + domain.slice(1);
+  const prefix = set === 'onomatopoeia' ? 'Bracketed Onomatopoeia' : 'Similes';
+  return `${prefix} for ${domainWord} Sounds.md`;
+};
+
+export async function loadClassNotes(
+  domain: string,
+  set: ConceptSet,
+  root: DataRoot = DATA_V1_ROOT
+): Promise<ClassNote[] | undefined> {
+  const text = await fetchText(dataV1Url(encodeURIComponent(classNotesFile(domain, set)), root));
+  if (text === undefined) return undefined;
+  const notes: ClassNote[] = [];
+  // Sections alternate: [preamble, title1, body1, title2, body2, …]
+  const sections = text.split(/^###\s*\d+\.\s*(.+)$/m);
+  for (let i = 1; i < sections.length; i += 2) {
+    const className = sections[i].trim();
+    const description = (sections[i + 1] ?? '')
+      .split(/\r?\n/)
+      .filter((l) => l.trim().startsWith('>'))
+      .map((l) => l.replace(/^\s*>\s*/, '').replace(/^_|_$/g, '').trim())
+      .join(' ')
+      .trim();
+    notes.push({ className, description });
+  }
+  return notes.length > 0 ? notes : undefined;
+}
+
+/** Match a bundle true_label ("Crackle") to its notes heading ("Crackles
+ *  (Rales)") — the label is always a prefix of the heading. */
+export const classNoteForLabel = (
+  notes: ClassNote[] | undefined,
+  label: string
+): ClassNote | undefined =>
+  notes?.find((n) => n.className.toLowerCase().startsWith(label.toLowerCase()));
 
 export async function loadConcepts(
   domain: string,

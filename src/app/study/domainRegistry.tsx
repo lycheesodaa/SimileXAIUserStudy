@@ -10,6 +10,7 @@ import { CuesTutorial } from '../components/tutorial/CuesTutorial';
 import { NoXaiExplanation } from '../components/noxai/NoXaiExplanation';
 import { NoXaiPractice } from '../components/noxai/NoXaiPractice';
 import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
+import { ClassGuide } from '../components/guide/ClassGuide';
 import {
   ConceptSet,
   DATA_V1_ROOT,
@@ -266,8 +267,11 @@ const fusedVariant = (
       cheatsheet={<ConceptCheatsheet domain={domain} set={set} root={view.conceptsRoot} />}
     />
   ),
+  // Guide page: the concept cheatsheet, with each class heading carrying its
+  // training.csv example recording and markdown-notes description
+  // (withClassGuide — never set on the in-study cheatsheet drawer).
   renderTrain: (root) => (
-    <ConceptCheatsheet domain={domain} set={set} root={conceptsRootFor(root)} />
+    <ConceptCheatsheet domain={domain} set={set} root={conceptsRootFor(root)} withClassGuide />
   ),
   renderTutorial: (view) => (
     <SimileTutorial
@@ -311,7 +315,9 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       domain={domain}
     />
   ),
-  renderTrain: () => <CuesPractice domain={domain} />,
+  // Guide page: CuesPractice's own class list carries the per-class example
+  // recordings (no descriptions for this condition).
+  renderTrain: (root) => <CuesPractice domain={domain} root={root} />,
   renderTutorial: (view) => (
     <CuesTutorial
       audioUrl={view.sample.audio}
@@ -360,7 +366,14 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
       originalAudioUrl={view.sample.audio}
     />
   ),
-  renderTrain: () => <ExamplesTutorial />,
+  // Guide page: no class descriptions here — class names + example recordings
+  // only, after the example-based intro text.
+  renderTrain: (root) => (
+    <>
+      {/* <ExamplesTutorial /> */}
+      <ClassGuide domain={domain} root={root} />
+    </>
+  ),
   renderTutorial: (view) => (
     <ExamplesTutorial examples={view.examples} originalAudioUrl={view.sample.audio} />
   ),
@@ -374,7 +387,14 @@ const noXaiVariant = (domain: string): StudyXaiVariant<V1Sample> => ({
   audioIdForSrc: (sample, src) =>
     audioIdOrFallback(src, (s) => (s === sample.audio ? 'original' : undefined)),
   render: (sample) => <NoXaiExplanation originalAudioUrl={sample.audio} />,
-  renderTrain: () => <NoXaiPractice />,
+  // Guide page: class names + example recordings so the control condition can
+  // still familiarize with the categories (no explanations involved).
+  renderTrain: (root) => (
+    <>
+      {/* <NoXaiPractice /> */}
+      <ClassGuide domain={domain} root={root} />
+    </>
+  ),
 });
 
 // ─── Registry ─────────────────────────────────────────────────────────────────

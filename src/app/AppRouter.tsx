@@ -530,10 +530,12 @@ export function AppRouter() {
 
             {/* Study mode (Qualtrics-embedded; no class labels in URL, no navbar),
                 one block per BUNDLE_VERSIONS entry (same conditions, other data).
-                guide = practice descriptions (+ optional data_v1_train samples),
-                train = one sample's explanation (training.csv split),
+                guide = practice descriptions + per-class training.csv
+                        recordings (+ optional data_v1_train samples),
                 test = one sample's explanation (testing.csv split),
-                tutorial = static guided tour of the explanation UI */}
+                post = one sample's explanation (post-test.csv split),
+                tutorial = static guided tour of the explanation UI
+                (train mode retired — subsumed into guide) */}
             {BUNDLE_VERSIONS.map(({ version, root }) => [
               <Route
                 key={`study-${version}-home`}

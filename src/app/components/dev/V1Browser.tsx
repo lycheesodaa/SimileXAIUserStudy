@@ -23,9 +23,11 @@ import {
 
 // Dev-only browser for the v1 study conditions, mounted at
 //   /#/v1/:domain/test/:sampleId?xai=<condition>       (testing.csv samples)
-//   /#/v1/:domain/train/:sampleId?xai=<condition>      (training.csv samples)
-//   /#/v1/:domain/guide?xai=<condition>                (practice descriptions)
+//   /#/v1/:domain/post/:sampleId?xai=<condition>       (post-test.csv samples)
+//   /#/v1/:domain/guide?xai=<condition>                (practice descriptions
+//                                                       + per-class recordings)
 //   /#/v1/:domain/tutorial/:sampleId?xai=<condition>   (guided UI tour)
+// (train mode is retired — training.csv samples surface on the guide page.)
 // It renders exactly what participants see via /#/study/v1/... but adds the
 // navigation bar (true labels included — this is for audio quality checks)
 // and creates NO study logger, so browsing never spams the /log endpoint.
@@ -34,7 +36,9 @@ import {
 // the condition's practice descriptions instead).
 const splitForMode = (mode: string): StudySplit | null => {
   if (mode === 'guide') return null;
-  return mode === 'train' ? 'train' : 'test';
+  // train mode retired (subsumed into guide):
+  // if (mode === 'train') return 'train';
+  return mode === 'post' ? 'post' : 'test';
 };
 
 // Split list, falling back to the full core list if the CSV is missing/empty
@@ -213,7 +217,10 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
             {FULL_NAV && (
               <>
                 <option value="guide">guide</option>
-                <option value="train">train</option>
+                {/* train mode retired — training samples now live on the
+                    guide page: */}
+                {/* <option value="train">train</option> */}
+                <option value="post">post</option>
               </>
             )}
             <option value="test">test</option>

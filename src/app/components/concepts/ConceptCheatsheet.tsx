@@ -1,22 +1,28 @@
 import { useEffect, useState } from 'react';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
+import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
 import { ConceptEntry, ConceptSet, DataRoot, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
 
 // Training/practice content generated from the bundle's shared concept lookup
 // (<root>/<domain>/concepts/<set>.json): the concepts grouped by category,
-// each with its generated audio. Used both as the train-mode page and as the
+// each with its generated audio. Used both as the guide-mode page and as the
 // cheatsheet drawer inside the simile/onomatopoeia explanations. `root`
 // selects the bundle whose concept vocabulary is shown (default data_v1), so
 // versioned bundles with reworked similes surface their own lists.
+// `withClassGuide` (guide page only — never the in-study drawer) puts each
+// class's training.csv example recording next to its heading and its brief
+// description (from the bundle's markdown notes) underneath.
 interface ConceptCheatsheetProps {
   domain: string;
   set: ConceptSet;
   root?: DataRoot;
+  withClassGuide?: boolean;
 }
 
-export function ConceptCheatsheet({ domain, set, root }: ConceptCheatsheetProps) {
+export function ConceptCheatsheet({ domain, set, root, withClassGuide }: ConceptCheatsheetProps) {
   const isOnomatopoeia = set === 'onomatopoeia';
   const [concepts, setConcepts] = useState<ConceptEntry[] | undefined | 'error'>(undefined);
+  const classSections = useClassSections(withClassGuide ? domain : '', root, set);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,13 +72,22 @@ export function ConceptCheatsheet({ domain, set, root }: ConceptCheatsheetProps)
         </p>
 
         <div className="space-y-8 mt-6">
-          {[...byCategory.entries()].map(([category, entries], idx) => (
+          {[...byCategory.entries()].map(([category, entries], idx) => {
+            // Concept categories carry the exact class labels, so the guide's
+            // per-class sections (training.csv recording + markdown
+            // description) attach directly to each heading.
+            const classSection = classSections?.find((s) => s.label === category);
+            return (
             <section key={category}>
-              <div className="flex items-center gap-4 border-b pb-2 mb-3">
+              <div className="flex items-center gap-2 border-b pb-2 mb-3">
                 <h3 className="text-xl font-semibold text-cyan-800">
                   {idx + 1}. {category}
                 </h3>
+                {classSection && <ClassClipButtons section={classSection} />}
               </div>
+              {classSection?.note?.description && (
+                <p className="italic text-gray-600 mb-3">{classSection.note.description}</p>
+              )}
               <ul className="space-y-1 text-gray-700">
                 {entries.map((entry) => (
                   <li key={entry.concept} className="flex items-center gap-1">
@@ -85,7 +100,8 @@ export function ConceptCheatsheet({ domain, set, root }: ConceptCheatsheetProps)
                 ))}
               </ul>
             </section>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

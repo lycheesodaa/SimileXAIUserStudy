@@ -1,4 +1,6 @@
 import { ReferenceTableV1 } from './CuesExplanationV1';
+import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
+import { DataRoot } from '../../study/dataV1';
 
 const LUNG_CLASSES = ['Crackle', 'Normal', 'Wheeze', 'Rhonchi', 'Stridor'];
 const BIRD_CLASSES = [
@@ -11,11 +13,16 @@ const BIRD_CLASSES = [
 
 interface CuesPracticeProps {
   domain?: string;
+  /** Bundle whose training.csv supplies the per-class example recordings;
+   *  bundles without one render the class list without play buttons. */
+  root?: DataRoot;
 }
 
-export function CuesPractice({ domain }: CuesPracticeProps) {
+export function CuesPractice({ domain, root }: CuesPracticeProps) {
   const isBird = domain === 'bird';
   const classes = isBird ? BIRD_CLASSES : LUNG_CLASSES;
+  const sections = useClassSections(isBird ? 'bird' : 'lung', root);
+  const sectionFor = (c: string) => sections?.find((s) => s.label === c);
 
   return (
     <div className="flex flex-col gap-6 my-6 mx-3">
@@ -26,15 +33,23 @@ export function CuesPractice({ domain }: CuesPracticeProps) {
             identify different {isBird ? 'bird sound' : 'lung sound'} categories. Familiarizing
             yourself with these attributes will improve your recognition skills.
           </p>
-
           <div>
             <p className="mb-4">
-              There are <strong>{classes.length}</strong> different {isBird ? 'bird sound' : 'lung sound'} categories that we are interested in:
+              There are <strong>{classes.length}</strong> different {isBird ? 'bird sound' : 'lung sound'} categories that we are interested in
+              {sections?.length ? '. Press the play button next to a category to hear an example recording' : ''}:
             </p>
             <ol className="list-decimal ml-10 space-y-1 mb-4">
-              {classes.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
+              {classes.map((c) => {
+                const section = sectionFor(c);
+                return (
+                  <li key={c}>
+                    <span className="inline-flex items-center gap-2 align-middle">
+                      {c}
+                      {section && <ClassClipButtons section={section} />}
+                    </span>
+                  </li>
+                );
+              })}
             </ol>
           </div>
 
