@@ -50,6 +50,15 @@ const loadSamplesForMode = async (
   return list ?? [];
 };
 
+// Full navbar vs. the restricted one shown on the deployed build.
+//   full (npm run dev):   version + domain pickers, every non-dualview
+//                         condition, all four modes, sample navigation.
+//   restricted (build):   XAI Type + Mode (test/tutorial) only.
+// `vite build` — what the Pages deploy runs — sets DEV false, so the split
+// needs no configuration. Set VITE_FULL_NAV=true to force the full navbar into
+// a production build (e.g. to check `npm run preview` locally).
+export const FULL_NAV = import.meta.env.DEV || import.meta.env.VITE_FULL_NAV === 'true';
+
 const selectStyle: React.CSSProperties = {
   fontSize: '13px',
   padding: '3px 6px',
@@ -84,10 +93,13 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   const navigate = useNavigate();
   const { version, domain, mode, sampleId, xai, domainCfg, root } = useV1Route();
 
+  // Both lists below feed the sample-navigation row only, so the restricted
+  // navbar skips fetching them.
   const [samples, setSamples] = useState<CoreSampleInfo[]>([]);
   useEffect(() => {
     let cancelled = false;
     setSamples([]);
+    if (!FULL_NAV) return;
     loadSamplesForMode(domain, mode, root).then((list) => {
       if (!cancelled) setSamples(list);
     });
@@ -103,7 +115,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   useEffect(() => {
     let cancelled = false;
     setVerdict(null);
-    if (mode === 'guide' || !sampleId) return;
+    if (!FULL_NAV || mode === 'guide' || !sampleId) return;
     const key = modelKeyForXai(domain, xai);
     if (!key) return; // noxai: no model verdict to show
     loadSample(domain, sampleId, root).then((s) => {
@@ -140,32 +152,37 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '13px', color: '#0369a1', fontWeight: 700 }}>XAI User Study</span>
 
-        <label style={labelStyle}>
-          Version&nbsp;
-          <select value={version} onChange={(e) => onVersionChange(e.target.value)} style={selectStyle}>
-            {versionOptions.map((v) => (
-              <option key={v} value={v}>{v}</option>
-            ))}
-          </select>
-        </label>
+        {FULL_NAV && (
+          <>
+            <label style={labelStyle}>
+              Version&nbsp;
+              <select value={version} onChange={(e) => onVersionChange(e.target.value)} style={selectStyle}>
+                {versionOptions.map((v) => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </label>
 
-        <label style={labelStyle}>
-          Domain&nbsp;
-          <select value={domain} onChange={(e) => goTo(e.target.value, mode, undefined, xai)} style={selectStyle}>
-            {Object.keys(STUDY_DOMAINS).map((d) => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
-        </label>
+            <label style={labelStyle}>
+              Domain&nbsp;
+              <select value={domain} onChange={(e) => goTo(e.target.value, mode, undefined, xai)} style={selectStyle}>
+                {Object.keys(STUDY_DOMAINS).map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </label>
+          </>
+        )}
 
         <label style={labelStyle}>
           XAI Type&nbsp;
           <select value={xai} onChange={(e) => goTo(domain, mode, sampleId, e.target.value)} style={selectStyle}>
             {Object.keys(domainCfg?.xaiVariants ?? {})
-              // Dualview conditions are hidden from the navbar dropdown; the
-              // variants still exist in the registry so study routes / direct
-              // ?xai= URLs continue to resolve.
-              .filter((x) => !x.includes('dualview'))
+              // Dualview conditions are always hidden from the dropdown, and
+              // the activation views (_actv) additionally only in the full
+              // navbar. Either way the variants still exist in the registry, so
+              // study routes / direct ?xai= URLs continue to resolve.
+              .filter((x) => !x.includes('dualview') && (FULL_NAV || !x.endsWith('_actv')))
               .map((x) => (
                 <option key={x} value={x}>{x}</option>
               ))}
@@ -175,15 +192,19 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
         <label style={labelStyle}>
           Mode&nbsp;
           <select value={mode} onChange={(e) => goToMode(e.target.value)} style={selectStyle}>
-            <option value="guide">guide</option>
-            <option value="train">train</option>
+            {FULL_NAV && (
+              <>
+                <option value="guide">guide</option>
+                <option value="train">train</option>
+              </>
+            )}
             <option value="test">test</option>
             <option value="tutorial">tutorial</option>
           </select>
         </label>
       </div>
 
-      {mode !== 'guide' && (
+      {FULL_NAV && mode !== 'guide' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', paddingTop: '8px', marginTop: '8px', borderTop: '1px dashed #bae6fd' }}>
           <span style={{ fontSize: '13px', color: '#0369a1', fontWeight: 600 }}>
             Navigate sample{index >= 0 ? ` (${index + 1}/${samples.length})` : ''}:
