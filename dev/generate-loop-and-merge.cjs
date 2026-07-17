@@ -1,36 +1,43 @@
 #!/usr/bin/env node
-// Regenerates the Qualtrics Loop & Merge tables from the v1 study bundle.
+// Regenerates the Qualtrics Loop & Merge tables from a versioned study bundle.
 //
 // One TSV per split x domain x condition:
-//   dev/loop-and-merge/test/<domain>/<xai>.tsv   (testing.csv)
-//   dev/loop-and-merge/train/<domain>/<xai>.tsv  (training.csv)
+//   dev/loop-and-merge/<version>/test/<domain>/<xai>.tsv   (testing.csv)
+//   dev/loop-and-merge/<version>/train/<domain>/<xai>.tsv  (training.csv)
 // with rows "sampleId<TAB>domain<TAB>xai<TAB>aiPrediction<TAB>trueLabel"
 // (Field 1-5). aiPrediction/trueLabel are for experimenter analysis only —
 // never surface them in the Qualtrics-facing iframe URL. Paste a file's
 // contents into Block options -> Loop & Merge (static list) and pair it with
 // the iframe snippet:
-//   .../#/study/v1/${lm://Field/2}/test/${lm://Field/1}?pid=${e://Field/PROLIFIC_PID}&xai=${lm://Field/3}
+//   .../#/study/<version>/${lm://Field/2}/test/${lm://Field/1}?pid=${e://Field/PROLIFIC_PID}&xai=${lm://Field/3}
 // (swap /test/ for /train/ for the training.csv-derived files).
 //
 // Mirrors loadSplitSamples in src/app/study/dataV1.ts: training.csv and
-// testing.csv at the data_v1 root each list domain,sample_id rows that
+// testing.csv at the bundle root each list domain,sample_id rows that
 // restrict which core samples belong to that split; only those ids are
 // emitted here.
 //
-// Usage: node dev/generate-loop-and-merge.cjs
+// XAI_CONDITIONS mirrors the xaiVariants keys in makeV1Domain
+// (src/app/study/domainRegistry.tsx) — keep the two in sync when a variant is
+// added, renamed or retired there.
+//
+// Usage: node dev/generate-loop-and-merge.cjs [version]   (default: v1)
 const fs = require('fs');
 const path = require('path');
 
+const VERSION = process.argv[2] || 'v1';
 const ROOT = path.join(__dirname, '..');
-const DATA_V1 = path.join(ROOT, 'public', 'data_v1');
-const OUT_ROOT = path.join(__dirname, 'loop-and-merge');
+const DATA_V1 = path.join(ROOT, 'public', `data_${VERSION}`);
+const OUT_ROOT = path.join(__dirname, 'loop-and-merge', VERSION);
 const XAI_CONDITIONS = [
   'similes',
-  'onomatopoeia',
-  'similes_dualview',
-  'onomatopoeia_dualview',
+  'similes_actv',
   'similes_dualview_approx',
+  'similes_dualview_actv',
+  'onomatopoeia',
+  'onomatopoeia_actv',
   'onomatopoeia_dualview_approx',
+  'onomatopoeia_dualview_actv',
   'rexnet',
   'examples',
   'noxai',

@@ -194,7 +194,7 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   if (isGuide) {
     return (
       <>
-        {xaiCfg.renderTrain()}
+        {xaiCfg.renderTrain(root)}
         {trainViews.map((v, i) => (
           <div key={i} className="mt-8 pt-4 border-t border-gray-200">
             {xaiCfg.render(v, { isStudy: true })}

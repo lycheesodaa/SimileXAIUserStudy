@@ -176,37 +176,54 @@ export interface V1ModelVerdict {
 export const prettifyOnomatopoeia = (concept: string): string =>
   concept.replace(/_gemini_tts$/, '').replace(/_/g, ' ');
 
-// Bundle roots under public/. DATA_V1_TRAIN_ROOT is an optional sibling bundle
-// with the same per-domain layout (samples/ + core_samples.json) holding the
-// small practice subset shown in train mode; it may simply not exist yet, in
-// which case its loaders resolve undefined and train mode shows no samples.
-// DATA_V2_ROOT / DATA_V3_ROOT / DATA_V4_ROOT / DATA_V5_ROOT are regenerated
-// bundles with the identical layout and model keys as data_v1 (only
-// schema_version + content differ). v2/v3 carry no training.csv/testing.csv,
-// so split loaders fall back to core_samples for those; v4/v5 do carry their
-// own training.csv/testing.csv, which loadSplitSamples reads from that root.
+// Bundle registry — the single source of truth for the versioned bundles
+// under public/. Each entry maps a URL version segment (/v2, /study/v2, …) to
+// its bundle root plus any per-version rendering flags. All bundles share the
+// v1 modular layout and model keys (samples/ + concepts/ + core_samples.json;
+// only schema_version + content differ); bundles without their own
+// training.csv/testing.csv fall back to core_samples in the split loaders.
+// Adding a new bundle = dropping public/data_vN in place and adding one row
+// here — routes, the dev navbar and root/version lookups all derive from it.
+export const BUNDLE_VERSIONS = [
+  { version: 'v1', root: 'data_v1' },
+  // v2/v4 reframe a negative *head weight* as a negation of the descriptor
+  // ("NOT like a whistle"); the other bundles have nonnegative head weights.
+  { version: 'v2', root: 'data_v2', negativeWeightsAsNot: true },
+  { version: 'v3', root: 'data_v3' },
+  { version: 'v4', root: 'data_v4', negativeWeightsAsNot: true },
+  { version: 'v5', root: 'data_v5' },
+  { version: 'v6', root: 'data_v6' },
+] as const satisfies readonly {
+  version: string;
+  root: string;
+  negativeWeightsAsNot?: boolean;
+}[];
+
+// DATA_V1_TRAIN_ROOT is an optional sibling bundle with the same per-domain
+// layout (samples/ + core_samples.json) holding the small practice subset
+// shown in guide mode; it may simply not exist yet, in which case its loaders
+// resolve undefined and guide mode shows descriptions only. It has no URL
+// version of its own, so it lives outside the registry.
 export const DATA_V1_ROOT = 'data_v1';
 export const DATA_V1_TRAIN_ROOT = 'data_v1_train';
-export const DATA_V2_ROOT = 'data_v2';
-export const DATA_V3_ROOT = 'data_v3';
-export const DATA_V4_ROOT = 'data_v4';
-export const DATA_V5_ROOT = 'data_v5';
 export type DataRoot =
-  | typeof DATA_V1_ROOT
-  | typeof DATA_V1_TRAIN_ROOT
-  | typeof DATA_V2_ROOT
-  | typeof DATA_V3_ROOT
-  | typeof DATA_V4_ROOT
-  | typeof DATA_V5_ROOT;
+  | (typeof BUNDLE_VERSIONS)[number]['root']
+  | typeof DATA_V1_TRAIN_ROOT;
 
-// The URL version segment (/v1, /v2, /v3, /v4, /v5 and /study/v1…) selects
-// which bundle a browser/study page reads from. v1 is the default/live bundle.
+// The URL version segment (/v1, /v2, … and /study/v1…) selects which bundle a
+// browser/study page reads from. v1 is the default/live bundle.
 export const dataRootForVersion = (version: string): DataRoot =>
-  version === 'v2' ? DATA_V2_ROOT
-  : version === 'v3' ? DATA_V3_ROOT
-  : version === 'v4' ? DATA_V4_ROOT
-  : version === 'v5' ? DATA_V5_ROOT
-  : DATA_V1_ROOT;
+  BUNDLE_VERSIONS.find((b) => b.version === version)?.root ?? DATA_V1_ROOT;
+
+export const versionForRoot = (root: DataRoot): string =>
+  BUNDLE_VERSIONS.find((b) => b.root === root)?.version ?? 'v1';
+
+// Whether the bundle encodes negative head weights as descriptor negations
+// ("NOT like a whistle"). The train subset follows the live v1 bundle (false).
+export const negativeWeightsAsNot = (root: DataRoot): boolean =>
+  BUNDLE_VERSIONS.some(
+    (b) => b.root === root && 'negativeWeightsAsNot' in b && b.negativeWeightsAsNot === true
+  );
 
 const dataV1Url = (path: string, root: DataRoot = DATA_V1_ROOT): string =>
   `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${root}/${path}`;

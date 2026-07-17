@@ -1,29 +1,33 @@
 import { useEffect, useState } from 'react';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
-import { ConceptEntry, ConceptSet, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
+import { ConceptEntry, ConceptSet, DataRoot, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
 
-// Training/practice content generated from data_v1's shared concept lookup
-// (data_v1/<domain>/concepts/<set>.json): the concepts grouped by category,
+// Training/practice content generated from the bundle's shared concept lookup
+// (<root>/<domain>/concepts/<set>.json): the concepts grouped by category,
 // each with its generated audio. Used both as the train-mode page and as the
-// cheatsheet drawer inside the simile/onomatopoeia explanations.
+// cheatsheet drawer inside the simile/onomatopoeia explanations. `root`
+// selects the bundle whose concept vocabulary is shown (default data_v1), so
+// versioned bundles with reworked similes surface their own lists.
 interface ConceptCheatsheetProps {
   domain: string;
   set: ConceptSet;
+  root?: DataRoot;
 }
 
-export function ConceptCheatsheet({ domain, set }: ConceptCheatsheetProps) {
+export function ConceptCheatsheet({ domain, set, root }: ConceptCheatsheetProps) {
   const isOnomatopoeia = set === 'onomatopoeia';
   const [concepts, setConcepts] = useState<ConceptEntry[] | undefined | 'error'>(undefined);
 
   useEffect(() => {
     let cancelled = false;
-    loadConcepts(domain, set).then((map) => {
+    setConcepts(undefined);
+    loadConcepts(domain, set, root).then((map) => {
       if (!cancelled) setConcepts(map ? [...map.values()] : 'error');
     });
     return () => {
       cancelled = true;
     };
-  }, [domain, set]);
+  }, [domain, set, root]);
 
   if (concepts === undefined) {
     return <div className="my-6 mx-3 text-gray-400 italic">Loading…</div>;

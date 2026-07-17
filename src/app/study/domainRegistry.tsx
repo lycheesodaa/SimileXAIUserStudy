@@ -12,9 +12,10 @@ import { NoXaiPractice } from '../components/noxai/NoXaiPractice';
 import { ConceptCheatsheet } from '../components/concepts/ConceptCheatsheet';
 import {
   ConceptSet,
-  DATA_V2_ROOT,
-  DATA_V4_ROOT,
+  DATA_V1_ROOT,
+  DATA_V1_TRAIN_ROOT,
   DataRoot,
+  negativeWeightsAsNot,
   RexnetReport,
   V1ActivationsModel,
   V1AttrBreakdownModel,
@@ -50,8 +51,10 @@ export interface StudyXaiVariant<S = unknown> {
   /** Resolve which audio a media event belongs to, from the element's src. */
   audioIdForSrc(sample: S, src: string): string;
   render(sample: S, ctx?: { isStudy?: boolean }): ReactNode;
-  /** Training/practice descriptions shown before the test items (no sample). */
-  renderTrain(): ReactNode;
+  /** Training/practice descriptions shown before the test items (no sample).
+   *  `root` selects which bundle's concept lists back the content (default
+   *  data_v1); variants without bundle-driven content ignore it. */
+  renderTrain(root?: DataRoot): ReactNode;
   /** Guided tour of the explanation UI (tutorial mode), rendered from a real
    *  sample but static/non-interactable. Absent = no tutorial (e.g. noxai). */
   renderTutorial?(sample: S): ReactNode;
@@ -89,7 +92,16 @@ interface FusedView {
   sample: V1Sample;
   items: SimileItem[];
   predictedLabel: string;
+  /** Bundle whose concept lists back this view's cheatsheet (train subset
+   *  maps to the live v1 bundle, which it mirrors and has no concepts/ of
+   *  its own). */
+  conceptsRoot: DataRoot;
 }
+
+// The practice subset has no concepts/ dir; its cheatsheets read the live v1
+// bundle it mirrors, exactly as they did before roots were threaded through.
+const conceptsRootFor = (root: DataRoot | undefined): DataRoot =>
+  !root || root === DATA_V1_TRAIN_ROOT ? DATA_V1_ROOT : root;
 
 const fusedVariant = (
   domain: string,
@@ -101,19 +113,21 @@ const fusedVariant = (
   mode?: 'beta' | 'attr' | 'actv' | 'actv_dual'
 ): StudyXaiVariant<FusedView> => ({
   getSample: async (sampleId, root) => {
+    const conceptsRoot = conceptsRootFor(root);
     const [sample, conceptMap] = await Promise.all([
       loadSample(domain, sampleId, root),
-      loadConcepts(domain, set, root),
+      loadConcepts(domain, set, conceptsRoot),
     ]);
     const model = sample?.models[fusedModelKey(domain, set)] as V1FusedModel | undefined;
     if (!sample || !model?.concepts?.length) return undefined;
 
-    // The v2/v4 bundles reframe a concept whose *head weight* is negative as a
-    // negation of the descriptor ("NOT like a whistle"). This is independent of
-    // the row's evidence sign: a negative-evidence row can have a positive head
-    // weight (no NOT), and a positive-evidence row a negative head weight (NOT).
+    // Registry-flagged bundles (v2/v4) reframe a concept whose *head weight* is
+    // negative as a negation of the descriptor ("NOT like a whistle"). This is
+    // independent of the row's evidence sign: a negative-evidence row can have
+    // a positive head weight (no NOT), and a positive-evidence row a negative
+    // head weight (NOT).
     const negate = (headWeight: number | undefined): boolean =>
-      (root === DATA_V2_ROOT || root === DATA_V4_ROOT) && (headWeight ?? 0) < 0;
+      negativeWeightsAsNot(root ?? DATA_V1_ROOT) && (headWeight ?? 0) < 0;
 
     if (mode === 'actv' || mode === 'actv_dual') {
       // Activation-only card: the full concept list (not just the sparse
@@ -147,7 +161,7 @@ const fusedVariant = (
           withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
         };
       });
-      return { sample, items, predictedLabel: actv.predicted_label };
+      return { sample, items, predictedLabel: actv.predicted_label, conceptsRoot };
     }
 
     if (mode === 'attr') {
@@ -179,7 +193,7 @@ const fusedVariant = (
         ];
       });
       if (!items.length) return undefined;
-      return { sample, items, predictedLabel: model.predicted_label };
+      return { sample, items, predictedLabel: model.predicted_label, conceptsRoot };
     }
 
     if (mode === 'beta') {
@@ -218,7 +232,7 @@ const fusedVariant = (
       const items: SimileItem[] = dualItems
         .sort((a, b) => Math.abs(b.net) - Math.abs(a.net))
         .map(({ net, ...rest }) => ({ ...rest, confidence: net / maxAbs, displayValue: net }));
-      return { sample, items, predictedLabel: model.predicted_label };
+      return { sample, items, predictedLabel: model.predicted_label, conceptsRoot };
     }
 
     // Bar width is normalized to the sample's max |contribution|; the raw
@@ -233,7 +247,7 @@ const fusedVariant = (
       negate: negate(c.head_weight),
       withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
     }));
-    return { sample, items, predictedLabel: model.predicted_label };
+    return { sample, items, predictedLabel: model.predicted_label, conceptsRoot };
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => {
@@ -249,10 +263,12 @@ const fusedVariant = (
       isOnomatopoeia={set === 'onomatopoeia'}
       threshold={0}
       activationView={mode === 'actv' || mode === 'actv_dual'}
-      cheatsheet={<ConceptCheatsheet domain={domain} set={set} />}
+      cheatsheet={<ConceptCheatsheet domain={domain} set={set} root={view.conceptsRoot} />}
     />
   ),
-  renderTrain: () => <ConceptCheatsheet domain={domain} set={set} />,
+  renderTrain: (root) => (
+    <ConceptCheatsheet domain={domain} set={set} root={conceptsRootFor(root)} />
+  ),
   renderTutorial: (view) => (
     <SimileTutorial
       audioName={view.sample.sample_id}
@@ -295,7 +311,7 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       domain={domain}
     />
   ),
-  renderTrain: () => <CuesPractice />,
+  renderTrain: () => <CuesPractice domain={domain} />,
   renderTutorial: (view) => (
     <CuesTutorial
       audioUrl={view.sample.audio}

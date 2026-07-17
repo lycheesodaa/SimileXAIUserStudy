@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Regenerates the per-class concept Loop & Merge tables from the v1 study
-// bundle's concept files (data_v1/<domain>/concepts/<set>.json).
+// Regenerates the per-class concept Loop & Merge tables from a versioned
+// study bundle's concept files (data_<version>/<domain>/concepts/<set>.json).
 //
-// One TSV per domain x concept set: dev/loop-and-merge-concepts-<domain>-<set>.tsv
+// One TSV per domain x concept set:
+//   dev/loop-and-merge-concepts-<version>-<domain>-<set>.tsv
 // with one row per class:
 //   Field 1      class name
 //   Field 2      exemplar recording URL for the class (see EXEMPLAR_SAMPLES)
@@ -13,11 +14,12 @@
 // Class order and within-class concept order follow the JSON file, which is
 // also the order ConceptCheatsheet shows participants.
 //
-// Usage: node dev/generate-concept-loop-and-merge.cjs
+// Usage: node dev/generate-concept-loop-and-merge.cjs [version]   (default: v1)
 const fs = require('fs');
 const path = require('path');
 
-const DATA_V1 = path.join(__dirname, '..', 'public', 'data_v1');
+const VERSION = process.argv[2] || 'v1';
+const DATA_V1 = path.join(__dirname, '..', 'public', `data_${VERSION}`);
 const CONCEPT_SETS = ['similes', 'onomatopoeia'];
 
 const prettifyOnomatopoeia = (concept) =>
@@ -83,7 +85,7 @@ for (const domain of manifest.domains) {
       return [category, exemplarAudioUrl(domain, category), ...texts, ...audio].join('\t');
     });
 
-    const outPath = path.join(__dirname, `loop-and-merge-concepts-${domain}-${set}.tsv`);
+    const outPath = path.join(__dirname, `loop-and-merge-concepts-${VERSION}-${domain}-${set}.tsv`);
     fs.writeFileSync(outPath, rows.join('\n') + '\n');
     console.log(`${path.basename(outPath)}: ${rows.length} rows`);
   }
