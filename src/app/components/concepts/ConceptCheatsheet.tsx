@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
 import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
 import { ConceptEntry, ConceptSet, DataRoot, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
+import { Play } from 'lucide-react';
 
 // Training/practice content generated from the bundle's shared concept lookup
 // (<root>/<domain>/concepts/<set>.json): the concepts grouped by category,
@@ -50,7 +51,7 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
   }
 
   const noun = isOnomatopoeia ? 'onomatopoeia' : 'simile';
-  const nounPlural = isOnomatopoeia ? 'onomatopoeias' : 'similes';
+  const nounPlural = isOnomatopoeia ? 'onomatopoeia' : 'similes';
 
   return (
     <div className="my-6 mx-3">
@@ -59,10 +60,16 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
           In this section, you can review how different sound categories may be mapped to{' '}
           {isOnomatopoeia ? 'onomatopoeic sounds (words that imitate the sound)' : 'everyday sounds'}.
         </p>
+
         <p>
           These are known as {nounPlural}. {nounPlural[0].toUpperCase() + nounPlural.slice(1)} can
           provide intuitive ways to recognize and communicate sounds. Press the play button next to
           a {noun} to hear it.
+        </p>
+        <p>
+          There are <strong>{byCategory.size}</strong> different {domain == 'bird' ? 'bird sound' : 'lung sound'} categories that we are interested in.
+          Press the play button next to a category to hear an example recording.
+          {/* <Play className='inline-flex text-blue-500 mx-1 mt-[-5px]' size={18} fill="currentColor" /> */}
         </p>
         <p>
           <i>
@@ -70,6 +77,7 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
             seconds to internalize the associations to improve efficiency of recognition.
           </i>
         </p>
+
 
         <div className="space-y-8 mt-6">
           {[...byCategory.entries()].map(([category, entries], idx) => {
