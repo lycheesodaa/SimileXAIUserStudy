@@ -59,6 +59,16 @@ const loadSamplesForMode = async (
 // a production build (e.g. to check `npm run preview` locally).
 export const FULL_NAV = import.meta.env.DEV || import.meta.env.VITE_FULL_NAV === 'true';
 
+// Which conditions the XAI Type dropdown offers. Dualview is always hidden;
+// the activation views (_actv) and the noxai control are hidden in the
+// restricted navbar only. Being off the dropdown hides nothing from the
+// registry, so study routes and direct ?xai= URLs still resolve to them.
+const xaiVisible = (x: string): boolean => {
+  if (x.includes('dualview')) return false;
+  if (!FULL_NAV && (x === 'noxai' || x.endsWith('_actv'))) return false;
+  return true;
+};
+
 const selectStyle: React.CSSProperties = {
   fontSize: '13px',
   padding: '3px 6px',
@@ -147,8 +157,20 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
   const prev = index > 0 ? samples[index - 1] : null;
   const next = index >= 0 && index < samples.length - 1 ? samples[index + 1] : null;
 
+  // The navbar sits above the tutorial overlay's dim (z-60), which is fixed to
+  // the whole viewport and would otherwise grey out chrome that stays fully
+  // clickable — the tour dims the explanation, not the navigation around it.
+  // Still below the tour's tooltip card (z-70).
   return (
-    <div style={{ background: '#f0f9ff', borderBottom: '1px solid #bae6fd', padding: '8px 12px' }}>
+    <div
+      style={{
+        background: '#f0f9ff',
+        borderBottom: '1px solid #bae6fd',
+        padding: '8px 12px',
+        position: 'relative',
+        zIndex: 65,
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
         <span style={{ fontSize: '13px', color: '#0369a1', fontWeight: 700 }}>XAI User Study</span>
 
@@ -178,11 +200,7 @@ export function V1Navigator({ versionOptions, onVersionChange }: {
           XAI Type&nbsp;
           <select value={xai} onChange={(e) => goTo(domain, mode, sampleId, e.target.value)} style={selectStyle}>
             {Object.keys(domainCfg?.xaiVariants ?? {})
-              // Dualview conditions are always hidden from the dropdown, and
-              // the activation views (_actv) additionally only in the full
-              // navbar. Either way the variants still exist in the registry, so
-              // study routes / direct ?xai= URLs continue to resolve.
-              .filter((x) => !x.includes('dualview') && (FULL_NAV || !x.endsWith('_actv')))
+              .filter(xaiVisible)
               .map((x) => (
                 <option key={x} value={x}>{x}</option>
               ))}

@@ -88,8 +88,12 @@ function buildSteps(isOnomatopoeia: boolean): TutorialStep[] {
       title: `Hear the ${noun}`,
       body: (
         <>
-          Press this play button to hear what the {noun} itself sounds like — useful when you
-          want to compare it against the recording.
+          Press this play button to hear a generated sample of the {noun} — useful when you
+          don't know what a {noun} sounds like. <br /><br />
+          <i>
+            Note that these generated samples may not be entirely representative of the given text.
+            You can choose to rely on your subjective experience of the text instead.
+          </i>
         </>
       ),
     },

@@ -2,6 +2,7 @@ import { ReactNode, useState, useRef } from 'react';
 import { Play, Pause, HelpCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { SimilePractice } from './SimilePractice';
 import { ClassBadge, resolveConceptCategory } from '../ClassBadge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 export interface SimileItem {
   id: string;
@@ -41,6 +42,22 @@ interface SimileExplanationV3Props {
   cheatsheet?: ReactNode;
 }
 
+// Only one generated sample plays at a time: starting one pauses whichever was
+// playing. Module-level rather than context so it spans every player on the
+// page — the tornado rows and the cheatsheet drawer — without threading state
+// through the components between them. Driven off the 'play' event, so it holds
+// no matter what started playback.
+let currentlyPlaying: HTMLAudioElement | null = null;
+
+const pauseOthers = (el: HTMLAudioElement) => {
+  if (currentlyPlaying && currentlyPlaying !== el) currentlyPlaying.pause();
+  currentlyPlaying = el;
+};
+
+export const GENERATED_SAMPLE_NOTE =
+  'Note that these generated samples may not be entirely representative of the given text. ' +
+  'You can choose to rely on your subjective experience of the text instead.';
+
 export function SimileAudioPlayer({ url, logId }: { url: string; logId?: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -58,22 +75,34 @@ export function SimileAudioPlayer({ url, logId }: { url: string; logId?: string 
 
   return (
     <div className="flex items-center flex-shrink-0">
-      <button
-        onClick={togglePlay}
-        className="p-1.5 rounded-full text-blue-600 hover:bg-blue-50 transition-colors"
-        title={isPlaying ? "Pause" : "Play"}
-        data-log-id={logId}
-        data-tutorial="concept-play"
-      >
-        {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
-      </button>
-      <audio 
-        ref={audioRef} 
-        src={url} 
-        onEnded={() => setIsPlaying(false)} 
-        onPause={() => setIsPlaying(false)} 
-        onPlay={() => setIsPlaying(true)} 
-        className="hidden" 
+      {/* The shared tooltip's provider defaults to no delay; half a second
+          keeps the note from flashing up while the pointer crosses the row. */}
+      <Tooltip delayDuration={500}>
+        <TooltipTrigger asChild>
+          <button
+            onClick={togglePlay}
+            className="p-1.5 rounded-full text-blue-600 hover:bg-blue-50 transition-colors"
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+            data-log-id={logId}
+            data-tutorial="concept-play"
+          >
+            {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" sideOffset={6} className="max-w-xs leading-relaxed">
+          {GENERATED_SAMPLE_NOTE}
+        </TooltipContent>
+      </Tooltip>
+      <audio
+        ref={audioRef}
+        src={url}
+        onEnded={() => setIsPlaying(false)}
+        onPause={() => setIsPlaying(false)}
+        onPlay={(e) => {
+          pauseOthers(e.currentTarget);
+          setIsPlaying(true);
+        }}
+        className="hidden"
       />
     </div>
   );
