@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { STUDY_DOMAINS } from '../../study/domainRegistry';
+import { AudioLoadingIndicator } from '../guide/AudioLoadingIndicator';
 import {
   CoreSampleInfo,
   DATA_V1_ROOT,
@@ -387,6 +388,7 @@ export function V1DevView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   if (isGuide) {
     return (
       <>
+        <AudioLoadingIndicator />
         {xaiCfg.renderTrain(root)}
         {trainViews.map((v, i) => (
           <div key={i} className="mt-8 pt-4 border-t border-gray-200">

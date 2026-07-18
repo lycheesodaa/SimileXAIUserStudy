@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { STUDY_DOMAINS } from './domainRegistry';
 import { DATA_V1_ROOT, DATA_V1_TRAIN_ROOT, DataRoot, loadCoreSamples, loadSplitSamples } from './dataV1';
 import { createStudyLogger } from './logger';
+import { AudioLoadingIndicator } from '../components/guide/AudioLoadingIndicator';
 import { useStudyInstrumentation } from './useStudyInstrumentation';
 
 // Study-mode entry point, embedded in Qualtrics as an iframe:
@@ -200,6 +201,7 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   if (isGuide) {
     return (
       <>
+        <AudioLoadingIndicator />
         {xaiCfg.renderTrain(root)}
         {trainViews.map((v, i) => (
           <div key={i} className="mt-8 pt-4 border-t border-gray-200">
