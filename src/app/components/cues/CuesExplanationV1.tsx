@@ -61,16 +61,16 @@ export function CuesExplanationV1({
     deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
   );
 
+  // Re-derive the initial selection only when the sample/report changes;
+  // selectedClass is deliberately excluded so user picks aren't reverted.
   useEffect(() => {
-    if (randomFoil) {
-      const foil = sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
-      if (foil && foil.contrastClass !== selectedClass) {
-        setSelectedClass(foil.contrastClass);
-      }
-    } else if (contrasts.length > 0 && !contrasts.some((c) => c.contrastClass === selectedClass)) {
-      setSelectedClass(contrasts[0].contrastClass);
+    const initial =
+      randomFoil && sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
+    if (initial) {
+      setSelectedClass(initial.contrastClass);
     }
-  }, [contrasts, randomFoil, sampleId, selectedClass]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contrasts, randomFoil, sampleId]);
 
   const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
 
