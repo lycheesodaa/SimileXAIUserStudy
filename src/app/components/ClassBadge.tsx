@@ -64,7 +64,7 @@ export const CLASS_METADATA: Record<string, ClassMetadata> = {
   'Tufted Titmouse': {
     className: 'Tufted Titmouse',
     domain: 'bird',
-    abbrev: 'TFTM',
+    abbrev: 'TUTI',
     badgeStyle: 'bg-blue-100 text-blue-800 border-blue-300',
     colorHex: '#2563eb',
   },
