@@ -1,6 +1,5 @@
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
-import { ExampleExplanation } from '../examples/ExampleExplanation';
-import { ExampleItem } from '../examples/ExampleList';
+import { ExampleExplanation, ExampleItem } from '../examples/ExampleExplanation';
 
 // Renamed from ExamplesPractice: the intro text now doubles as the header of a
 // guided tour of the example-based explanation UI. Without a sample (the
@@ -48,8 +47,8 @@ const STEPS: TutorialStep[] = [
     title: 'A similar training example',
     body: (
       <>
-        Each card is one real training recording the system found similar to the recording
-        above. Cards are ordered from most to least similar.
+        Each row is one real training recording the system found similar to the recording
+        above. Rows are ordered from most to least similar.
       </>
     ),
   },
@@ -70,11 +69,12 @@ const STEPS: TutorialStep[] = [
   },
   {
     target: '[data-tutorial="example-weight"]',
-    title: 'Similarity weight',
+    title: 'Contribution',
     body: (
       <>
-        How similar the system judged this example to be to the recording — higher numbers mean
-        this example weighed more heavily in the classification.
+        How much this example contributed to the classification — its similarity to the
+        recording multiplied by its learned weight. Longer bars mean this example weighed
+        more heavily in the classification.
       </>
     ),
   },
@@ -83,7 +83,7 @@ const STEPS: TutorialStep[] = [
     title: 'Listen and compare',
     body: (
       <>
-        Each example comes with its own audio player, so during the study you can listen and
+        Each example comes with its own play button, so during the study you can listen and
         judge the similarity for yourself.
       </>
     ),

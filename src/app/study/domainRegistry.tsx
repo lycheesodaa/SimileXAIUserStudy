@@ -2,8 +2,7 @@ import { ReactNode } from 'react';
 import { SimileExplanationV3, SimileItem } from '../components/similes/SimileExplanationV3';
 import { CuesExplanationV1 } from '../components/cues/CuesExplanationV1';
 import { CuesPractice } from '../components/cues/CuesPractice';
-import { ExampleExplanation } from '../components/examples/ExampleExplanation';
-import { ExampleItem } from '../components/examples/ExampleList';
+import { ExampleExplanation, ExampleItem } from '../components/examples/ExampleExplanation';
 import { ExamplesTutorial } from '../components/tutorial/ExamplesTutorial';
 import { SimileTutorial } from '../components/tutorial/SimileTutorial';
 import { CuesTutorial } from '../components/tutorial/CuesTutorial';
@@ -348,6 +347,7 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
       className: p.proto_class,
       weight: p.weight,
       similarity: p.similarity,
+      contribution: p.contribution,
       audioUrl: p.audio,
     }));
     return { sample, examples, predictedLabel: model.predicted_label, confidence: model.confidence };
