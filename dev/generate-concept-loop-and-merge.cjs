@@ -25,28 +25,55 @@ const CONCEPT_SETS = ['similes', 'onomatopoeia'];
 const prettifyOnomatopoeia = (concept) =>
   concept.replace(/_gemini_tts$/, '').replace(/_/g, ' ');
 
-// Hand-picked exemplar recording per class; the row's Field 2 is the sample's
-// hosted audio URL, read from its data_v1 sample JSON.
-const EXEMPLAR_SAMPLES = {
-  lung: {
-    Crackle: 'hflung_trunc_2019-07-17-11-06-06-L2_9_15',
-    Normal: 'icbhi_116_1b2_Pl_sc_Meditron_3',
-    Rhonchi: 'hflung_trunc_2019-07-16-11-46-52-L5_11_18',
-    Stridor: 'hflung_trunc_2019-05-28-14-44-45-L5_5_12',
-    Wheeze: 'fraiwan_140',
-  },
-  bird: {
-    'Black-capped Chickadee': 'bird_Recording_4_Recording_4_Segment_22_263',
-    'Eastern Towhee': 'bird_Recording_4_Recording_4_Segment_09_140',
-    Ovenbird: 'bird_Recording_1_Recording_1_Segment_24_4',
-    'Tufted Titmouse': 'bird_Recording_1_Recording_1_Segment_23_10',
-    'Wood Thrush': 'bird_Recording_2_Recording_2_Segment_04_25',
-  },
-};
+// Exemplar recording per class, pulled from the data version's training.csv;
+// the row's Field 2 is the sample's hosted audio URL, read from its sample JSON.
+function loadExemplarsFromTrainingCsv() {
+  const csvPath = path.join(DATA_V1, 'training.csv');
+  if (!fs.existsSync(csvPath)) {
+    throw new Error(`training.csv not found for version ${VERSION} at ${csvPath}`);
+  }
+  const text = fs.readFileSync(csvPath, 'utf8');
+  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+  if (lines.length === 0) return {};
+
+  const header = lines[0].split(',').map((c) => c.trim().toLowerCase());
+  const hasHeader = header.includes('sample_id');
+  const col = hasHeader
+    ? { domain: header.indexOf('domain'), id: header.indexOf('sample_id') }
+    : { domain: 0, id: 1 };
+
+  const exemplars = {};
+  for (const line of hasHeader ? lines.slice(1) : lines) {
+    const cells = line.split(',');
+    const domain = cells[col.domain]?.trim();
+    const sampleId = cells[col.id]?.trim();
+    if (!domain || !sampleId) continue;
+
+    const samplePath = path.join(DATA_V1, domain, 'samples', `${sampleId}.json`);
+    if (!fs.existsSync(samplePath)) {
+      throw new Error(`${domain}/${sampleId}: listed in training.csv but sample JSON not found at ${samplePath}`);
+    }
+    const sample = JSON.parse(fs.readFileSync(samplePath, 'utf8'));
+    if (!sample.true_label) {
+      throw new Error(`${domain}/${sampleId}: sample JSON has no true_label`);
+    }
+    const category = sample.true_label;
+    if (!exemplars[domain]) exemplars[domain] = {};
+    if (exemplars[domain][category]) {
+      throw new Error(
+        `${domain}: training.csv has multiple samples configured for category "${category}" (${exemplars[domain][category]} and ${sampleId})`
+      );
+    }
+    exemplars[domain][category] = sampleId;
+  }
+  return exemplars;
+}
+
+const EXEMPLAR_SAMPLES = loadExemplarsFromTrainingCsv();
 
 function exemplarAudioUrl(domain, category) {
   const id = EXEMPLAR_SAMPLES[domain]?.[category];
-  if (!id) throw new Error(`${domain}: no exemplar sample configured for ${category}`);
+  if (!id) throw new Error(`${domain}: no exemplar sample configured in training.csv for ${category}`);
   const sample = JSON.parse(
     fs.readFileSync(path.join(DATA_V1, domain, 'samples', `${id}.json`), 'utf8')
   );

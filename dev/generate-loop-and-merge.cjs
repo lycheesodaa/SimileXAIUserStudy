@@ -121,5 +121,13 @@ function generateForSplit(splitIdsByDomain, splitDir) {
   }
 }
 
-generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
-generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
+if (VERSION != 'v6') {
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
+} else {
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing-formative.csv')), 'test-formative');
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training-formative.csv')), 'train-formative');
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
+  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'post-test.csv')), 'post-test');
+}
