@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
 import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
 import { ConceptEntry, ConceptSet, DataRoot, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
+import { ClassBadge } from '../ClassBadge';
 import { Play } from 'lucide-react';
 
 // Training/practice content generated from the bundle's shared concept lookup
@@ -66,17 +67,21 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
           provide intuitive ways to recognize and communicate sounds. Press the play button next to
           a {noun} to hear it.
         </p>
-        <p>
-          There are <strong>{byCategory.size}</strong> different {domain == 'bird' ? 'bird sound' : 'lung sound'} categories that we are interested in.
-          Press the play button next to a category to hear an example recording.
-          {/* <Play className='inline-flex text-blue-500 mx-1 mt-[-5px]' size={18} fill="currentColor" /> */}
-        </p>
-        <p>
-          <i>
-            Some {nounPlural} may be more intuitive than others, and it may be helpful to take a few
-            seconds to internalize the associations to improve efficiency of recognition.
-          </i>
-        </p>
+        {withClassGuide && (
+          <div className="space-y-4 text-gray-700">
+            <p>
+              There are <strong>{byCategory.size}</strong> different {domain == 'bird' ? 'bird sound' : 'lung sound'} categories that we are interested in.
+              Press the play button next to a category to hear an example recording.
+              {/* <Play className='inline-flex text-blue-500 mx-1 mt-[-5px]' size={18} fill="currentColor" /> */}
+            </p>
+            <p>
+              <i>
+                Some {nounPlural} may be more intuitive than others, and it may be helpful to take a few
+                seconds to internalize the associations to improve efficiency of recognition.
+              </i>
+            </p>
+          </div>
+        )}
 
 
         <div className="space-y-8 mt-6">
@@ -91,6 +96,7 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
                 <h3 className="text-xl font-semibold text-cyan-800">
                   {idx + 1}. {category}
                 </h3>
+                <ClassBadge className={category} useAbbrev size="xs" />
                 {classSection && <ClassClipButtons section={classSection} />}
               </div>
               {classSection?.note?.description && (
