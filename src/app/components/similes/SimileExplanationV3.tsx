@@ -144,7 +144,7 @@ export function SimileExplanationV3({
 
   // Only the top MAX_MAJOR_COUNT bars are visible by default; everything else
   // gets tucked into the collapsible "weaker evidence" section.
-  const MAX_MAJOR_COUNT = 5;
+  const MAX_MAJOR_COUNT = 3;
   const majorSimiles = filteredSimiles.slice(0, MAX_MAJOR_COUNT);
   const minorSimiles = filteredSimiles.slice(MAX_MAJOR_COUNT);
 
@@ -246,9 +246,9 @@ export function SimileExplanationV3({
               )}
               {s.text}
             </span>
-            {s.withinClassAudioUrl && (
+            {/* {s.withinClassAudioUrl && (
               <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
-            )}
+            )} */}
           </div>
         </div>
         <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm" data-tutorial="evidence-bar">
