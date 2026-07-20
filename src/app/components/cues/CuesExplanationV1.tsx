@@ -38,9 +38,10 @@ export function CuesExplanationV1({
   report,
   sampleId,
   randomFoil = false,
-  hideDropdown = false,
+  hideDropdown: hideDropdownProp,
   domain,
 }: CuesExplanationV1Props) {
+  const hideDropdown = import.meta.env.PROD ? (hideDropdownProp ?? true) : false;
   const contrasts = report.contrasts;
   const deterministicFoil =
     randomFoil && sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
@@ -75,10 +76,8 @@ export function CuesExplanationV1({
   const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
 
   const visibleCues = selected?.cues.filter(
-    (cue) =>
-      !cue.cue.toLowerCase().includes('trill rate') &&
-      !cue.cue.toLowerCase().includes('gap ratio') &&
-      !cue.cue.toLowerCase().includes('event density')
+    (cue) => !cue.cue.toLowerCase().includes('event density') &&
+    !cue.cue.toLowerCase().includes('pitch sweep')
   ) ?? [];
   const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
 
@@ -251,29 +250,11 @@ export const LUNG_CUE_ROWS: CueReferenceRow[] = [
 
 export const BIRD_CUE_ROWS: CueReferenceRow[] = [
   {
-    cue: 'Average Song Pitch',
-    metric: 'average_pitch',
-    description: 'Mean fundamental frequency (F0) of the song.',
-    ranking: 'Ovenbird ~ Black-capped Chickadee ~ Tufted Titmouse ~ Wood Thrush ~ Eastern Towhee',
+    cue: 'Song Pitch (high vs low)',
+    metric: 'peak_frequency',
+    description: 'Dominant (peak) frequency of the song, tracked over the 0.6–12 kHz band.',
+    ranking: 'Tufted Titmouse < Black-capped Chickadee ~ Wood Thrush ~ Eastern Towhee < Ovenbird',
   },
-  {
-    cue: 'High-Pitch Shrillness',
-    metric: 'hf_content',
-    description: 'Fraction of energy in the high band.',
-    ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Eastern Towhee ~ Wood Thrush ≪ Ovenbird',
-  },
-  // {
-  //   cue: 'Trill Rate / Note Tempo',
-  //   metric: 'event_rate',
-  //   description: 'Notes/syllables per second.',
-  //   ranking: 'Black-capped Chickadee ~ Ovenbird ~ Wood Thrush ~ Eastern Towhee ~ Tufted Titmouse',
-  // },
-  // {
-  //   cue: 'Gap Ratio / Pause Duration',
-  //   metric: 'silence_ratio',
-  //   description: 'Fraction of the clip that is silence between notes.',
-  //   ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Ovenbird ~ Eastern Towhee ~ Wood Thrush',
-  // },
   {
     cue: 'Note Frequency Span',
     metric: 'spectral_bandwidth',
@@ -281,10 +262,28 @@ export const BIRD_CUE_ROWS: CueReferenceRow[] = [
     ranking: 'Ovenbird ≪ Black-capped Chickadee < Wood Thrush ~ Tufted Titmouse ~ Eastern Towhee',
   },
   {
-    cue: 'Vocal Inflection Speed',
-    metric: 'pitch_modulation_velocity',
-    description: 'How fast pitch changes frame-to-frame (warble speed).',
-    ranking: 'Black-capped Chickadee ~ Wood Thrush ~ Eastern Towhee ~ Tufted Titmouse ~ Ovenbird',
+    cue: 'High-Pitch Shrillness',
+    metric: 'hf_content',
+    description: 'Fraction of energy in the high band.',
+    ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Eastern Towhee ~ Wood Thrush ≪ Ovenbird',
+  },
+  {
+    cue: 'Trill / Note Tempo',
+    metric: 'syllable_rate',
+    description: 'Onset-detected notes/syllables per second (trill rate).',
+    ranking: 'Wood Thrush ~ Eastern Towhee ~ Black-capped Chickadee < Tufted Titmouse ≪ Ovenbird',
+  },
+  // {
+  //   cue: 'Pitch Sweep (frequency glide)',
+  //   metric: 'fm_extent',
+  //   description: '10–90th-percentile sweep range of the dominant-frequency contour (how far pitch glides).',
+  //   ranking: 'Wood Thrush ~ Ovenbird ~ Tufted Titmouse ~ Eastern Towhee < Black-capped Chickadee',
+  // },
+  {
+    cue: 'Pure whistle vs buzzy/broadband',
+    metric: 'tonality',
+    description: 'Spectral flatness — low = pure tone/whistle, high = broadband/buzzy.',
+    ranking: 'Ovenbird < Wood Thrush ~ Tufted Titmouse ~ Black-capped Chickadee ~ Eastern Towhee',
   },
 ];
 

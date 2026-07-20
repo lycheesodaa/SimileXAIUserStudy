@@ -310,7 +310,7 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       report={view.report}
       sampleId={view.sample.sample_id}
       randomFoil={true}
-      hideDropdown={ctx?.isStudy === true}
+      hideDropdown={import.meta.env.PROD ? ctx?.isStudy === true : false}
       domain={domain}
     />
   ),
