@@ -304,13 +304,13 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => (s === view.sample.audio ? 'original' : undefined)),
-  render: (view, ctx) => (
+  render: (view) => (
     <CuesExplanationV1
       audioUrl={view.sample.audio}
       report={view.report}
       sampleId={view.sample.sample_id}
       randomFoil={true}
-      hideDropdown={import.meta.env.PROD ? ctx?.isStudy === true : false}
+      hideDropdown={import.meta.env.PROD}
       domain={domain}
     />
   ),
