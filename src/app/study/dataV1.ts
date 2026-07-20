@@ -193,6 +193,7 @@ export const BUNDLE_VERSIONS = [
   { version: 'v4', root: 'data_v4', negativeWeightsAsNot: true },
   { version: 'v5', root: 'data_v5' },
   { version: 'v6', root: 'data_v6' },
+  { version: 'v6.1', root: 'data_v6.1' },
 ] as const satisfies readonly {
   version: string;
   root: string;

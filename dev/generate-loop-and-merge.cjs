@@ -118,10 +118,44 @@ function generateForSplit(splitIdsByDomain, splitDir) {
       fs.writeFileSync(outPath, rows.join('\n') + '\n');
       console.log(`${path.relative(__dirname, outPath)}: ${ids.length} rows`);
     }
+
+    if (splitDir === 'test-formative') {
+      const templatePath = path.join(__dirname, 'loop-and-merge', 'v6', 'test-formative', domain, 'formative.tsv');
+      if (fs.existsSync(templatePath)) {
+        const templateLines = fs.readFileSync(templatePath, 'utf8').split(/\r?\n/).filter(Boolean);
+        const formativeRows = templateLines.map((line) => {
+          const [id, dom, xai] = line.split('\t');
+          let aiPrediction = '';
+          const modelKey = modelKeyForXai(dom, xai);
+          if (modelKey) {
+            let byModelKey = predictionsById.get(id);
+            if (!byModelKey) {
+              const samplePath = path.join(DATA_V1, dom, 'samples', `${id}.json`);
+              if (fs.existsSync(samplePath)) {
+                const sample = JSON.parse(fs.readFileSync(samplePath, 'utf8'));
+                byModelKey = {};
+                for (const [mk, model] of Object.entries(sample.models ?? {})) {
+                  if (model && typeof model === 'object' && 'predicted_label' in model) {
+                    byModelKey[mk] = model.predicted_label;
+                  }
+                }
+                predictionsById.set(id, byModelKey);
+              }
+            }
+            aiPrediction = byModelKey?.[modelKey] ?? '';
+          }
+          const trueLabel = trueLabelById.get(id) ?? '';
+          return `${id}\t${dom}\t${xai}\t${aiPrediction}\t${trueLabel}`;
+        });
+        const outPath = path.join(outDir, 'formative.tsv');
+        fs.writeFileSync(outPath, formativeRows.join('\n') + '\n');
+        console.log(`${path.relative(__dirname, outPath)}: ${formativeRows.length} rows`);
+      }
+    }
   }
 }
 
-if (VERSION != 'v6') {
+if (parseFloat(VERSION.replace(/^v/i, '')) < 6) {
   generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
   generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
 } else {
