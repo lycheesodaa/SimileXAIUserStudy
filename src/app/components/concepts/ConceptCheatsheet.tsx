@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
 import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
 import { ConceptEntry, ConceptSet, DataRoot, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
-import { ClassBadge } from '../ClassBadge';
+import { ClassBadge, CLASS_METADATA, getClassMetadata } from '../ClassBadge';
 import { Play } from 'lucide-react';
 
 // Training/practice content generated from the bundle's shared concept lookup
@@ -51,6 +51,20 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
     byCategory.set(c.category, list);
   }
 
+  // Present classes in the fixed canonical CLASS_METADATA order rather than the
+  // concept JSON's incidental order, so the tutorial page and the in-study
+  // drawer always render the same, stable sequence. Categories carry the exact
+  // class labels; resolve each through getClassMetadata to tolerate aliases.
+  // Unknown categories (index -1) sort to the end, keeping their JSON order.
+  const canonicalOrder = Object.keys(CLASS_METADATA);
+  const orderIndex = (category: string) => {
+    const idx = canonicalOrder.indexOf(getClassMetadata(category).className);
+    return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+  };
+  const orderedCategories = [...byCategory.entries()].sort(
+    ([a], [b]) => orderIndex(a) - orderIndex(b)
+  );
+
   const noun = isOnomatopoeia ? 'onomatopoeia' : 'simile';
   const nounPlural = isOnomatopoeia ? 'onomatopoeia' : 'similes';
 
@@ -85,7 +99,7 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
 
 
         <div className="space-y-8 mt-6">
-          {[...byCategory.entries()].map(([category, entries], idx) => {
+          {orderedCategories.map(([category, entries], idx) => {
             // Concept categories carry the exact class labels, so the guide's
             // per-class sections (training.csv recording + markdown
             // description) attach directly to each heading.
