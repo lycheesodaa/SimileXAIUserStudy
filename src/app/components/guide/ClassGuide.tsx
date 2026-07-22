@@ -115,10 +115,10 @@ export function ClassGuide({ domain, root = DATA_V1_ROOT, set }: ClassGuideProps
           {sections.map((section, idx) => (
             <section key={section.label}>
               <div className="flex items-center gap-2 border-b pb-2 mb-2">
+                <ClassBadge className={section.label} useAbbrev size="xs" />
                 <h3 className="text-xl font-semibold text-cyan-800">
                   {idx + 1}. {section.label}
                 </h3>
-                <ClassBadge className={section.label} useAbbrev size="xs" />
                 <ClassClipButtons section={section} />
               </div>
               {section.note?.description && (
@@ -133,8 +133,8 @@ export function ClassGuide({ domain, root = DATA_V1_ROOT, set }: ClassGuideProps
             return (
               <li key={section.label}>
                 <span className="inline-flex items-center gap-2 align-middle">
-                  {section.label}
                   <ClassBadge className={section.label} useAbbrev size="xs" />
+                  {section.label}
                   <ClassClipButtons section={section} />
                 </span>
               </li>

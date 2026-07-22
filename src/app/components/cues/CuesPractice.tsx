@@ -45,8 +45,8 @@ export function CuesPractice({ domain, root }: CuesPracticeProps) {
                 return (
                   <li key={c}>
                     <span className="inline-flex items-center gap-2 align-middle">
-                      {c}
                       <ClassBadge className={c} useAbbrev size="xs" />
+                      {c}
                       {section && <ClassClipButtons section={section} />}
                     </span>
                   </li>

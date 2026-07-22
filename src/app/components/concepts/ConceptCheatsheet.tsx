@@ -107,10 +107,9 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
             return (
             <section key={category}>
               <div className="flex items-center gap-2 border-b pb-2 mb-3">
-                <h3 className="text-xl font-semibold text-cyan-800">
-                  {idx + 1}. {category}
+                <h3 className="text-xl font-semibold text-cyan-800 flex items-center gap-2">
+                  {idx + 1}. <ClassBadge className={category} useAbbrev size="xs" /> {category}
                 </h3>
-                <ClassBadge className={category} useAbbrev size="xs" />
                 {classSection && <ClassClipButtons section={classSection} />}
               </div>
               {classSection?.note?.description && (
