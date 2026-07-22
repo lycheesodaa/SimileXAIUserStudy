@@ -1,6 +1,7 @@
 import { ReferenceTableV1 } from './CuesExplanationV1';
 import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
 import { DataRoot } from '../../study/dataV1';
+import { ClassBadge } from '../ClassBadge';
 
 const LUNG_CLASSES = ['Crackle', 'Normal', 'Wheeze', 'Rhonchi', 'Stridor'];
 const BIRD_CLASSES = [
@@ -45,6 +46,7 @@ export function CuesPractice({ domain, root }: CuesPracticeProps) {
                   <li key={c}>
                     <span className="inline-flex items-center gap-2 align-middle">
                       {c}
+                      <ClassBadge className={c} useAbbrev size="xs" />
                       {section && <ClassClipButtons section={section} />}
                     </span>
                   </li>

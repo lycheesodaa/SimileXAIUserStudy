@@ -182,26 +182,28 @@ export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
             </span>
           </div>
           <div className="text-sm text-gray-600 leading-relaxed">{step.body}</div>
-          <div className="flex items-center justify-between pt-1">
-            <button
-              onClick={goPrev}
-              disabled={isFirst}
-              className={`flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border transition-colors ${
-                isFirst
-                  ? 'text-gray-300 border-gray-200 cursor-not-allowed'
-                  : 'text-gray-600 border-gray-300 hover:bg-gray-50'
-              }`}
-              data-log-id="tutorial-back"
-            >
-              <ArrowLeft size={14} /> Back
-            </button>
+          <div className={`flex items-center pt-1 ${isLast ? 'justify-start' : 'justify-between'}`}>
+            {!isLast && (
+              <button
+                onClick={goPrev}
+                disabled={isFirst}
+                className={`flex items-center gap-1 text-sm px-3 py-1.5 rounded-md border transition-colors ${
+                  isFirst
+                    ? 'text-gray-300 border-gray-200 cursor-not-allowed'
+                    : 'text-gray-600 border-gray-300 hover:bg-gray-50'
+                }`}
+                data-log-id="tutorial-back"
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
+            )}
             {isLast ? (
               <button
                 onClick={() => setIndex(0)}
-                className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md bg-cyan-600 text-white hover:bg-cyan-700 transition-colors"
+                className="flex items-center gap-1 text-sm px-3 py-1.5 rounded-md bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
                 data-log-id="tutorial-restart"
               >
-                <RotateCcw size={14} /> Restart tour
+                <RotateCcw size={14} /> Restart Tour
               </button>
             ) : (
               <button

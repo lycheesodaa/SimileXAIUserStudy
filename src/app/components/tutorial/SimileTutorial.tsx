@@ -14,6 +14,8 @@ interface SimileTutorialProps {
   isOnomatopoeia?: boolean;
   /** Whether the underlying condition splits bars into branch segments. */
   dualview?: boolean;
+  /** Study domain ('lung' | 'bird'), forwarded to word the recording label. */
+  domain?: string;
 }
 
 function buildSteps(isOnomatopoeia: boolean): TutorialStep[] {
@@ -155,8 +157,8 @@ function buildSteps(isOnomatopoeia: boolean): TutorialStep[] {
       title: "That's it!",
       body: (
         <>
-          You have now seen every part of the explanation screen. Use <b>Back</b> to review any
-          step, or restart the tour from the beginning.
+          You have now seen every part of the explanation screen. Use <b>Restart Tour</b> to view the
+          tutorial again, or proceed with the task.
         </>
       ),
     },
@@ -169,6 +171,7 @@ export function SimileTutorial({
   similes,
   originalAudioUrl,
   isOnomatopoeia = false,
+  domain,
 }: SimileTutorialProps) {
   // Stable identity: a fresh steps array on every render would reset the tour.
   const steps = useMemo(() => buildSteps(isOnomatopoeia), [isOnomatopoeia]);
@@ -181,6 +184,7 @@ export function SimileTutorial({
         originalAudioUrl={originalAudioUrl}
         isOnomatopoeia={isOnomatopoeia}
         threshold={0}
+        domain={domain}
       />
     </TutorialOverlay>
   );

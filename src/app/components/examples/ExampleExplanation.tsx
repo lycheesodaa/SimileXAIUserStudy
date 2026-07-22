@@ -22,6 +22,9 @@ interface ExampleExplanationProps {
   confidence: number;
   examples: ExampleItem[];
   originalAudioUrl?: string;
+  /** Study domain ('lung' | 'bird'), used to word the recording label.
+   *  Defaults to lung wording when unset. */
+  domain?: string;
 }
 
 // Only one example plays at a time: starting one pauses whichever was playing.
@@ -79,7 +82,11 @@ export function ExampleExplanation({
   confidence,
   examples,
   originalAudioUrl,
+  domain,
 }: ExampleExplanationProps) {
+  // Word the recording prompt for the input domain; fall back to lung wording.
+  const domainNoun = domain === 'bird' ? 'bird sound' : 'lung sound';
+
   const getAudioUrl = (path: string) =>
     // v1 data uses absolute S3 URLs; legacy v2 paths are root-relative.
     path.startsWith('http') ? path : `${import.meta.env.BASE_URL.replace(/\/$/, '')}${path}`;
@@ -152,7 +159,7 @@ export function ExampleExplanation({
       <div>
         <div className="pt-4">
           <div className="flex flex-col gap-2" data-tutorial="original-audio">
-            <span className="text-gray-600">Play this lung sound recording:</span>
+            <span className="text-gray-600">Play this {domainNoun} recording:</span>
             {originalAudioUrl ? (
               <audio
                 controls

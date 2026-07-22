@@ -92,8 +92,8 @@ const STEPS: TutorialStep[] = [
     title: "That's it!",
     body: (
       <>
-        You have now seen every part of the explanation screen. Use <b>Back</b> to review any
-        step, or restart the tour from the beginning.
+        You have now seen every part of the explanation screen. Use <b>Restart Tour</b> to view the
+        tutorial again, or proceed with the task.
       </>
     ),
   },

@@ -8,6 +8,7 @@ import { ExampleExplanation, ExampleItem } from '../examples/ExampleExplanation'
 interface ExamplesTutorialProps {
   examples?: ExampleItem[];
   originalAudioUrl?: string;
+  domain?: string;
 }
 
 const STEPS: TutorialStep[] = [
@@ -62,7 +63,7 @@ const STEPS: TutorialStep[] = [
     title: 'True class',
     body: (
       <>
-        The AI-predicted class of this training example. Highly similar examples of a class are
+        The class associated with this training example. Highly similar examples of a class are
         evidence that the recording belongs to that class too.
       </>
     ),
@@ -92,8 +93,8 @@ const STEPS: TutorialStep[] = [
     title: "That's it!",
     body: (
       <>
-        You have now seen every part of the explanation screen. Use <b>Back</b> to review any
-        step, or restart the tour from the beginning.
+        You have now seen every part of the explanation screen. Use <b>Restart Tour</b> to view the
+        tutorial again, or proceed with the task.
       </>
     ),
   },
@@ -117,7 +118,7 @@ function Intro() {
   );
 }
 
-export function ExamplesTutorial({ examples, originalAudioUrl }: ExamplesTutorialProps) {
+export function ExamplesTutorial({ examples, originalAudioUrl, domain }: ExamplesTutorialProps) {
   if (!examples?.length) {
     return <Intro />;
   }
@@ -130,6 +131,7 @@ export function ExamplesTutorial({ examples, originalAudioUrl }: ExamplesTutoria
         confidence={0}
         examples={examples}
         originalAudioUrl={originalAudioUrl}
+        domain={domain}
       />
     </TutorialOverlay>
   );

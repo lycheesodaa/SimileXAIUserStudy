@@ -57,6 +57,7 @@ export function CuesExplanationV1({
     domain === 'bird' ||
     contrasts.some((c) => birdClasses.has(c.contrastClass));
   const effectiveDomain = isBird ? 'bird' : 'lung';
+  const domainNoun = isBird ? 'bird sound' : 'lung sound';
 
   const [selectedClass, setSelectedClass] = useState(
     deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
@@ -86,7 +87,7 @@ export function CuesExplanationV1({
       {/* Audio Player Section */}
       <div className="mb-6 pt-6">
         <div className="flex flex-col gap-2 max-w-md" data-tutorial="original-audio">
-          <span className="text-gray-600">Play this sound recording:</span>
+          <span className="text-gray-600">Play this {domainNoun} recording:</span>
           <audio controls className="w-full h-10" src={audioUrl} data-log-id="original-audio">
             Your browser does not support the audio element.
           </audio>
@@ -171,12 +172,12 @@ export function CuesExplanationV1({
                     ))}
                   </tbody>
                 </table>
-                {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
+                {/* {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
                   <p className="text-sm text-gray-500 mt-2" data-tutorial="cue-match-summary">
                     The system's predicted relations match the measured relations for{' '}
                     {visibleCuesCorrect} of {visibleCues.length} cues.
                   </p>
-                )}
+                )} */}
               </div>
             )}
           </>

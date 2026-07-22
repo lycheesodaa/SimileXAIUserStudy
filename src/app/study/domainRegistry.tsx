@@ -264,6 +264,7 @@ const fusedVariant = (
       threshold={0}
       activationView={mode === 'actv' || mode === 'actv_dual'}
       cheatsheet={<ConceptCheatsheet domain={domain} set={set} root={view.conceptsRoot} />}
+      domain={domain}
     />
   ),
   // Guide page: the concept cheatsheet, with each class heading carrying its
@@ -280,6 +281,7 @@ const fusedVariant = (
       originalAudioUrl={view.sample.audio}
       isOnomatopoeia={set === 'onomatopoeia'}
       dualview={mode === 'beta' || mode === 'attr' || mode === 'actv_dual'}
+      domain={domain}
     />
   ),
 });
@@ -364,6 +366,7 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
       confidence={Math.round(view.confidence * 100)}
       examples={view.examples}
       originalAudioUrl={view.sample.audio}
+      domain={domain}
     />
   ),
   // Guide page: no class descriptions here — class names + example recordings
@@ -375,7 +378,7 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
     </>
   ),
   renderTutorial: (view) => (
-    <ExamplesTutorial examples={view.examples} originalAudioUrl={view.sample.audio} />
+    <ExamplesTutorial examples={view.examples} originalAudioUrl={view.sample.audio} domain={domain} />
   ),
 });
 

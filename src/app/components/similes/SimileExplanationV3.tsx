@@ -40,6 +40,9 @@ interface SimileExplanationV3Props {
   activationView?: boolean;
   /** Drawer content; defaults to the legacy hardcoded SimilePractice. */
   cheatsheet?: ReactNode;
+  /** Study domain ('lung' | 'bird'), used to word the recording label.
+   *  Defaults to lung wording when unset. */
+  domain?: string;
 }
 
 // Only one generated sample plays at a time: starting one pauses whichever was
@@ -117,7 +120,10 @@ export function SimileExplanationV3({
   threshold = 0.25,
   activationView = false,
   cheatsheet,
+  domain,
 }: SimileExplanationV3Props) {
+  // Word the recording prompt for the input domain; fall back to lung wording.
+  const domainNoun = domain === 'bird' ? 'bird sound' : 'lung sound';
   const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
 
   // Raw evidence values this close to 0 are effectively no evidence; drop them
@@ -276,7 +282,7 @@ export function SimileExplanationV3({
       <div className="mb-6">
         <div className="pt-6">
           <div className="flex flex-col gap-2" data-tutorial="original-audio">
-            <span className="text-gray-600">Play this lung sound recording:</span>
+            <span className="text-gray-600">Play this {domainNoun} recording:</span>
             {originalAudioUrl ? (
               <audio
                 controls

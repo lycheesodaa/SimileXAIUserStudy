@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
+import { ClassBadge } from '../ClassBadge';
 import {
   ClassNote,
   ConceptSet,
@@ -117,6 +118,7 @@ export function ClassGuide({ domain, root = DATA_V1_ROOT, set }: ClassGuideProps
                 <h3 className="text-xl font-semibold text-cyan-800">
                   {idx + 1}. {section.label}
                 </h3>
+                <ClassBadge className={section.label} useAbbrev size="xs" />
                 <ClassClipButtons section={section} />
               </div>
               {section.note?.description && (
@@ -132,6 +134,7 @@ export function ClassGuide({ domain, root = DATA_V1_ROOT, set }: ClassGuideProps
               <li key={section.label}>
                 <span className="inline-flex items-center gap-2 align-middle">
                   {section.label}
+                  <ClassBadge className={section.label} useAbbrev size="xs" />
                   <ClassClipButtons section={section} />
                 </span>
               </li>
