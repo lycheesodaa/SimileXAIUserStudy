@@ -4,12 +4,19 @@ import { DataRoot } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
 
 const LUNG_CLASSES = ['Crackle', 'Normal', 'Wheeze', 'Rhonchi', 'Stridor'];
-const BIRD_CLASSES = [
+const BIRD_CLASSES_V1 = [
   'Eastern Towhee',
   'Wood Thrush',
   'Black-capped Chickadee',
   'Tufted Titmouse',
   'Ovenbird',
+];
+const BIRD_CLASSES_V7 = [
+  'Eastern Towhee',
+  'Wood Thrush',
+  'Black-capped Chickadee',
+  'Tufted Titmouse',
+  'Blue Jay',
 ];
 
 interface CuesPracticeProps {
@@ -21,7 +28,8 @@ interface CuesPracticeProps {
 
 export function CuesPractice({ domain, root }: CuesPracticeProps) {
   const isBird = domain === 'bird';
-  const classes = isBird ? BIRD_CLASSES : LUNG_CLASSES;
+  const isV7 = root === 'data_v7';
+  const classes = isBird ? (isV7 ? BIRD_CLASSES_V7 : BIRD_CLASSES_V1) : LUNG_CLASSES;
   const sections = useClassSections(isBird ? 'bird' : 'lung', root);
   const sectionFor = (c: string) => sections?.find((s) => s.label === c);
 
@@ -67,10 +75,11 @@ export function CuesPractice({ domain, root }: CuesPracticeProps) {
           </p>
 
           <div>
-            <ReferenceTableV1 domain={isBird ? 'bird' : 'lung'} />
+            <ReferenceTableV1 domain={isBird ? 'bird' : 'lung'} root={root} />
           </div>
         </div>
       </div>
     </div>
   );
 }
+

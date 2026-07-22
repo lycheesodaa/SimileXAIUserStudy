@@ -291,6 +291,7 @@ const fusedVariant = (
 interface RexnetView {
   sample: V1Sample;
   report: RexnetReport;
+  root?: DataRoot;
 }
 
 const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
@@ -300,9 +301,9 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
     if (!sample || !model?.explanation_md) return undefined;
     // Parsing (rather than rendering the report markdown raw) keeps the true
     // label and correctness verdicts embedded in it out of the DOM.
-    const report = parseRexnetReport(model.explanation_md);
+    const report = parseRexnetReport(model.explanation_md, model.class_exemplars);
     if (report.contrasts.length === 0) return undefined;
-    return { sample, report };
+    return { sample, report, root };
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => (s === view.sample.audio ? 'original' : undefined)),
@@ -314,6 +315,7 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       randomFoil={true}
       hideDropdown={import.meta.env.PROD}
       domain={domain}
+      root={view.root}
     />
   ),
   // Guide page: CuesPractice's own class list carries the per-class example
@@ -325,6 +327,7 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       report={view.report}
       sampleId={view.sample.sample_id}
       domain={domain}
+      root={view.root}
     />
   ),
 });

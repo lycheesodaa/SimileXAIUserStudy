@@ -1,6 +1,6 @@
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
 import { CuesExplanationV1 } from '../cues/CuesExplanationV1';
-import { RexnetReport } from '../../study/dataV1';
+import { DataRoot, RexnetReport } from '../../study/dataV1';
 
 // Guided tour of the acoustic-cue (RExNet) explanation UI, rendered from a
 // real sample in the same static configuration participants see in the study
@@ -10,6 +10,7 @@ interface CuesTutorialProps {
   report: RexnetReport;
   sampleId?: string;
   domain?: string;
+  root?: DataRoot;
 }
 
 const STEPS: TutorialStep[] = [
@@ -99,7 +100,7 @@ const STEPS: TutorialStep[] = [
   },
 ];
 
-export function CuesTutorial({ audioUrl, report, sampleId, domain }: CuesTutorialProps) {
+export function CuesTutorial({ audioUrl, report, sampleId, domain, root }: CuesTutorialProps) {
   return (
     <TutorialOverlay steps={STEPS}>
       <CuesExplanationV1
@@ -109,7 +110,9 @@ export function CuesTutorial({ audioUrl, report, sampleId, domain }: CuesTutoria
         randomFoil={true}
         hideDropdown={true}
         domain={domain}
+        root={root}
       />
     </TutorialOverlay>
   );
 }
+

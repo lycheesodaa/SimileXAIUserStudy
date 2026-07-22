@@ -108,12 +108,19 @@ export interface V1ProtoModel {
   prototypes: V1Prototype[];
 }
 
+export interface V1ClassExemplar {
+  class_index?: number;
+  label?: string;
+  audio?: string;
+}
+
 export interface V1RexnetModel {
   family: string;
   predicted_label: string;
   consensus_label: string;
   confidence: number;
   explanation_md: string;
+  class_exemplars?: V1ClassExemplar[];
 }
 
 export interface V1Sample {
@@ -194,6 +201,7 @@ export const BUNDLE_VERSIONS = [
   { version: 'v5', root: 'data_v5' },
   { version: 'v6', root: 'data_v6' },
   { version: 'v6.1', root: 'data_v6.1' },
+  { version: 'v7', root: 'data_v7' },
 ] as const satisfies readonly {
   version: string;
   root: string;
@@ -425,6 +433,7 @@ export interface RexnetContrast {
   cuesCorrect: number | null;
   cuesTotal: number | null;
   cues: RexnetCueRow[];
+  foilAudioUrl?: string;
 }
 
 export interface RexnetReport {
@@ -433,7 +442,10 @@ export interface RexnetReport {
 
 const stripMd = (s: string): string => s.replace(/[`*]/g, '').trim();
 
-export function parseRexnetReport(md: string): RexnetReport {
+export function parseRexnetReport(
+  md: string,
+  classExemplars?: Array<{ class_index?: number; label?: string; audio?: string }>
+): RexnetReport {
   const contrasts: RexnetContrast[] = [];
   // Split into per-contrast sections; the first chunk is the report preamble.
   const sections = md.split(/^### Target vs\. Contrast Concept: `([^`]+)`/m);
@@ -459,6 +471,25 @@ export function parseRexnetReport(md: string): RexnetReport {
       });
     }
 
+    let foilAudioUrl: string | undefined = undefined;
+    if (classExemplars && classExemplars.length > 0) {
+      const match = classExemplars.find(
+        (e) => e.label && e.label.trim().toLowerCase() === contrastClass.trim().toLowerCase()
+      );
+      if (match?.audio) {
+        foilAudioUrl = match.audio;
+      }
+    }
+
+    if (!foilAudioUrl) {
+      const sourceMatches = [...body.matchAll(/<source\s+src=["']([^"']+)["']/gi)];
+      if (sourceMatches.length >= 2) {
+        foilAudioUrl = sourceMatches[1][1];
+      } else if (sourceMatches.length === 1) {
+        foilAudioUrl = sourceMatches[0][1];
+      }
+    }
+
     contrasts.push({
       contrastClass,
       prediction: predictionMatch ? predictionMatch[1] : '',
@@ -466,6 +497,7 @@ export function parseRexnetReport(md: string): RexnetReport {
       cuesCorrect: accuracyMatch ? parseInt(accuracyMatch[1], 10) : null,
       cuesTotal: accuracyMatch ? parseInt(accuracyMatch[2], 10) : null,
       cues,
+      foilAudioUrl,
     });
   }
   return { contrasts };

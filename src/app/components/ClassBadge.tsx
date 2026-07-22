@@ -65,8 +65,8 @@ export const CLASS_METADATA: Record<string, ClassMetadata> = {
     className: 'Tufted Titmouse',
     domain: 'bird',
     abbrev: 'TUTI',
-    badgeStyle: 'bg-blue-100 text-blue-800 border-blue-300',
-    colorHex: '#2563eb',
+    badgeStyle: 'bg-indigo-100 text-indigo-950 border-indigo-300',
+    colorHex: '#1e1b4b',
   },
   'Eastern Towhee': {
     className: 'Eastern Towhee',
@@ -96,6 +96,13 @@ export const CLASS_METADATA: Record<string, ClassMetadata> = {
     badgeStyle: 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300',
     colorHex: '#c026d3',
   },
+  'Blue Jay': {
+    className: 'Blue Jay',
+    domain: 'bird',
+    abbrev: 'BLJA',
+    badgeStyle: 'bg-sky-100 text-sky-800 border-sky-300',
+    colorHex: '#38bdf8',
+  },
 };
 
 // Aliases for legacy or hyphenated class names
@@ -114,6 +121,9 @@ const CLASS_ALIASES: Record<string, string> = {
   'wood thrush': 'Wood Thrush',
   'black-capped chickadee': 'Black-capped Chickadee',
   ovenbird: 'Ovenbird',
+  'blue jay': 'Blue Jay',
+  'blue-jay': 'Blue Jay',
+  bluejay: 'Blue Jay',
 };
 
 const FALLBACK_METADATA: ClassMetadata = {
