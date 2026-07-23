@@ -43,6 +43,11 @@ const XAI_CONDITIONS = [
   'noxai',
 ];
 
+// The conditions the formative table samples from, in output/priority order.
+// Order matters: it drives the diagonal wrong-pick assignment below and the
+// row order of the emitted formative.tsv. Keep it a subset of XAI_CONDITIONS.
+const FORMATIVE_CONDITIONS = ['similes', 'onomatopoeia', 'examples', 'rexnet'];
+
 // Mirrors modelKeyForXai in src/app/study/dataV1.ts: maps a study xai
 // condition to the per-sample model key that backs its predicted_label.
 // noxai has no backing model (audio only).
@@ -78,6 +83,78 @@ function parseSplitCsv(csvPath) {
     idsByDomain.get(domain).push(sampleId);
   }
   return idsByDomain;
+}
+
+// Builds the formative.tsv rows for one domain from the formative id pool,
+// replacing the old hand-authored template. The pool (testing-formative.csv,
+// via `ids`) is one block of N_cond samples per class; within each block
+// exactly one sample is a wrong prediction and the rest are correct.
+//
+// Selection rule (reproduces the original hand-built formative.tsv exactly):
+//   * One sample per class is taken from each condition -> class-balanced, and
+//     every pool sample is used exactly once (a partition).
+//   * Wrong pick sits on a diagonal: condition c receives the WRONG sample for
+//     class c; with more classes than conditions the LAST condition absorbs the
+//     overflow classes (so it carries >1 wrong).
+//   * The block's correct samples go to the remaining conditions, in fixed
+//     condition order matched to ascending pool (source) order.
+//   * Emit iterates conditions, then classes (= ascending pool order).
+function buildFormativeRows(domain, ids, predictionsById, trueLabelById) {
+  const conditions = FORMATIVE_CONDITIONS;
+  const nCond = conditions.length;
+
+  const predFor = (id, xai) => {
+    const modelKey = modelKeyForXai(domain, xai);
+    return modelKey ? (predictionsById.get(id)?.[modelKey] ?? '') : '';
+  };
+
+  // Class order = order of first appearance of the true label across the pool.
+  const classOrder = [];
+  for (const id of ids) {
+    const t = trueLabelById.get(id) ?? '';
+    if (!classOrder.includes(t)) classOrder.push(t);
+  }
+
+  // Per-class blocks in pool order; wrongness read from the first condition
+  // (the curated pool shares the same wrong sample across conditions).
+  const baseXai = conditions[0];
+  const blocks = new Map();
+  for (const id of ids) {
+    const t = trueLabelById.get(id) ?? '';
+    if (!blocks.has(t)) blocks.set(t, []);
+    blocks.get(t).push({ id, wrong: predFor(id, baseXai) !== t });
+  }
+
+  // assignment: condition -> Map(class -> sampleId)
+  const assignment = new Map(conditions.map((c) => [c, new Map()]));
+  classOrder.forEach((cls, j) => {
+    const members = blocks.get(cls) ?? [];
+    const wrongIds = members.filter((m) => m.wrong).map((m) => m.id);
+    const correctIds = members.filter((m) => !m.wrong).map((m) => m.id);
+    const designated = conditions[Math.min(j, nCond - 1)];
+    if (wrongIds.length !== 1 || correctIds.length !== nCond - 1) {
+      console.warn(
+        `  ! ${domain}/${cls}: expected 1 wrong + ${nCond - 1} correct, got ` +
+          `${wrongIds.length} wrong / ${correctIds.length} correct`,
+      );
+    }
+    assignment.get(designated).set(cls, wrongIds[0]);
+    conditions
+      .filter((c) => c !== designated)
+      .forEach((c, k) => assignment.get(c).set(cls, correctIds[k]));
+  });
+
+  const rows = [];
+  for (const xai of conditions) {
+    for (const cls of classOrder) {
+      const id = assignment.get(xai).get(cls);
+      if (id === undefined) continue;
+      const aiPrediction = predFor(id, xai);
+      const trueLabel = trueLabelById.get(id) ?? '';
+      rows.push(`${id}\t${domain}\t${xai}\t${aiPrediction}\t${trueLabel}`);
+    }
+  }
+  return rows;
 }
 
 // Generates the per-domain x per-condition TSVs for one split, under
@@ -120,33 +197,8 @@ function generateForSplit(splitIdsByDomain, splitDir) {
     }
 
     if (splitDir === 'test-formative') {
-      const templatePath = path.join(__dirname, 'loop-and-merge', 'v6', 'test-formative', domain, 'formative.tsv');
-      if (fs.existsSync(templatePath)) {
-        const templateLines = fs.readFileSync(templatePath, 'utf8').split(/\r?\n/).filter(Boolean);
-        const formativeRows = templateLines.map((line) => {
-          const [id, dom, xai] = line.split('\t');
-          let aiPrediction = '';
-          const modelKey = modelKeyForXai(dom, xai);
-          if (modelKey) {
-            let byModelKey = predictionsById.get(id);
-            if (!byModelKey) {
-              const samplePath = path.join(DATA_V1, dom, 'samples', `${id}.json`);
-              if (fs.existsSync(samplePath)) {
-                const sample = JSON.parse(fs.readFileSync(samplePath, 'utf8'));
-                byModelKey = {};
-                for (const [mk, model] of Object.entries(sample.models ?? {})) {
-                  if (model && typeof model === 'object' && 'predicted_label' in model) {
-                    byModelKey[mk] = model.predicted_label;
-                  }
-                }
-                predictionsById.set(id, byModelKey);
-              }
-            }
-            aiPrediction = byModelKey?.[modelKey] ?? '';
-          }
-          const trueLabel = trueLabelById.get(id) ?? '';
-          return `${id}\t${dom}\t${xai}\t${aiPrediction}\t${trueLabel}`;
-        });
+      const formativeRows = buildFormativeRows(domain, ids, predictionsById, trueLabelById);
+      if (formativeRows.length > 0) {
         const outPath = path.join(outDir, 'formative.tsv');
         fs.writeFileSync(outPath, formativeRows.join('\n') + '\n');
         console.log(`${path.relative(__dirname, outPath)}: ${formativeRows.length} rows`);
