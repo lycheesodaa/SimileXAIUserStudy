@@ -1,5 +1,5 @@
-import { Fragment, useState, useRef } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { Fragment, ReactNode, useState, useRef } from 'react';
+import { Play, Pause, HelpCircle, X } from 'lucide-react';
 import { ClassBadge } from '../ClassBadge';
 
 export interface ExampleItem {
@@ -25,6 +25,9 @@ interface ExampleExplanationProps {
   /** Study domain ('lung' | 'bird'), used to word the recording label.
    *  Defaults to lung wording when unset. */
   domain?: string;
+  /** Cheatsheet drawer content (per-class example recordings). Omit to hide
+   *  the floating reference button entirely. */
+  cheatsheet?: ReactNode;
 }
 
 // Only one example plays at a time: starting one pauses whichever was playing.
@@ -83,9 +86,12 @@ export function ExampleExplanation({
   examples,
   originalAudioUrl,
   domain,
+  cheatsheet,
 }: ExampleExplanationProps) {
   // Word the recording prompt for the input domain; fall back to lung wording.
   const domainNoun = domain === 'bird' ? 'bird sound' : 'lung sound';
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const getAudioUrl = (path: string) =>
     // v1 data uses absolute S3 URLs; legacy v2 paths are root-relative.
@@ -154,6 +160,7 @@ export function ExampleExplanation({
   };
 
   return (
+    <>
     <div className="space-y-4 mx-3">
       {/* Audio Player Section */}
       <div>
@@ -201,5 +208,46 @@ export function ExampleExplanation({
         )}
       </div>
     </div>
+
+      {cheatsheet && (
+        <>
+          {/* Floating Button */}
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="fixed bottom-6 right-6 w-14 h-14 bg-cyan-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-cyan-700 transition-colors z-40"
+            title="Open Example Cheatsheet"
+            data-log-id="cheatsheet-open"
+            data-tutorial="cheatsheet-button"
+          >
+            <HelpCircle size={28} />
+          </button>
+
+          {/* Drawer Overlay */}
+          {isDrawerOpen && (
+            <div className="fixed inset-0 z-50 flex justify-end">
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/40 transition-opacity"
+                onClick={() => setIsDrawerOpen(false)}
+              />
+
+              {/* Drawer content */}
+              <div className="relative w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
+                <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+                  <h2 className="text-xl font-semibold text-cyan-800">Example Cheatsheet</h2>
+                  <button
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-500 hover:text-gray-800"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto">{cheatsheet}</div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 }

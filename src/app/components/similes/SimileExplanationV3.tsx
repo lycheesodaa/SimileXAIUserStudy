@@ -52,7 +52,10 @@ interface SimileExplanationV3Props {
 // no matter what started playback.
 let currentlyPlaying: HTMLAudioElement | null = null;
 
-const pauseOthers = (el: HTMLAudioElement) => {
+// Exported so the plain recording play button (RecordingPlayButton) shares this
+// single coordinator: within a drawer that mixes generated concept clips and
+// real class recordings, starting any one still pauses whatever was playing.
+export const pauseOthers = (el: HTMLAudioElement) => {
   if (currentlyPlaying && currentlyPlaying !== el) currentlyPlaying.pause();
   currentlyPlaying = el;
 };

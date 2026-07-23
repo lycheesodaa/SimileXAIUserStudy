@@ -3,6 +3,7 @@ import { SimileExplanationV3, SimileItem } from '../components/similes/SimileExp
 import { CuesExplanationV1 } from '../components/cues/CuesExplanationV1';
 import { CuesPractice } from '../components/cues/CuesPractice';
 import { ExampleExplanation, ExampleItem } from '../components/examples/ExampleExplanation';
+import { ExamplesCheatsheet } from '../components/examples/ExamplesCheatsheet';
 import { ExamplesTutorial } from '../components/tutorial/ExamplesTutorial';
 import { SimileTutorial } from '../components/tutorial/SimileTutorial';
 import { CuesTutorial } from '../components/tutorial/CuesTutorial';
@@ -339,6 +340,9 @@ interface ProtoView {
   examples: ExampleItem[];
   predictedLabel: string;
   confidence: number;
+  /** Bundle whose training split backs the cheatsheet drawer's per-class
+   *  example recordings (train subset maps to the live v1 bundle it mirrors). */
+  cheatsheetRoot: DataRoot;
 }
 
 const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
@@ -355,7 +359,13 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
       contribution: p.contribution,
       audioUrl: p.audio,
     }));
-    return { sample, examples, predictedLabel: model.predicted_label, confidence: model.confidence };
+    return {
+      sample,
+      examples,
+      predictedLabel: model.predicted_label,
+      confidence: model.confidence,
+      cheatsheetRoot: conceptsRootFor(root),
+    };
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => {
@@ -370,6 +380,7 @@ const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
       examples={view.examples}
       originalAudioUrl={view.sample.audio}
       domain={domain}
+      cheatsheet={<ExamplesCheatsheet domain={domain} root={view.cheatsheetRoot} />}
     />
   ),
   // Guide page: no class descriptions here — class names + example recordings

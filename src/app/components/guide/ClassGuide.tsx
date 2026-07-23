@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
+import { RecordingPlayButton } from '../RecordingPlayButton';
 import { ClassBadge } from '../ClassBadge';
 import {
   ClassNote,
@@ -79,10 +79,11 @@ export function ClassClipButtons({ section }: { section: ClassSection }) {
   return (
     <span className="flex items-center gap-1">
       {section.clips.map((clip, clipIdx) => (
-        <SimileAudioPlayer
+        <RecordingPlayButton
           key={clip.sampleId}
           url={clip.audio}
           logId={`classguide-${section.label.replace(/\W+/g, '-')}-${clipIdx + 1}`}
+          label={`${section.label} recording ${clipIdx + 1}`}
         />
       ))}
     </span>
