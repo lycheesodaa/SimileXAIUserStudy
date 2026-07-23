@@ -154,7 +154,7 @@ export function CuesExplanationV1({
       return false;
     }
 
-    if (isV7) {
+    if (isV7 && isBird) {
       if (
         raw.includes('shrillness') ||
         pretty.includes('shrillness') ||

@@ -56,8 +56,8 @@ export function ExamplesCheatsheet({ domain, root }: ExamplesCheatsheetProps) {
           {isBird ? 'bird sound' : 'lung sound'} category.
         </p>
         <p>
-          The system explains its classifications by pointing to similar training examples. Press a play
-          button below to hear one of the training examples for each category.
+          The system explains its classifications by pointing to similar examples observed during its training. 
+          Press a play button below to hear one of the training examples for each category.
         </p>
         <p>
           <i>
