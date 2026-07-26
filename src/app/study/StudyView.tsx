@@ -8,10 +8,12 @@ import { AudioLoadingIndicator } from '../components/guide/AudioLoadingIndicator
 import { useStudyInstrumentation } from './useStudyInstrumentation';
 
 // Study-mode entry point, embedded in Qualtrics as an iframe:
-//   test:     /#/study/v1/:domain/test/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
-//   post:     /#/study/v1/:domain/post/:sampleId?pid=<participant>&xai=<condition>&pos=<loop position>
-//   guide:    /#/study/v1/:domain/guide?pid=<participant>&xai=<condition>
-//   tutorial: /#/study/v1/:domain/tutorial/:sampleId??pid=<participant>&xai=<condition>
+//   test:     /#/study/v1/:domain/test/:sampleId?rid=<ResponseID>&xai=<condition>&pos=<loop position>
+//   post:     /#/study/v1/:domain/post/:sampleId?rid=<ResponseID>&xai=<condition>&pos=<loop position>
+//   guide:    /#/study/v1/:domain/guide?rid=<ResponseID>&xai=<condition>
+//   tutorial: /#/study/v1/:domain/tutorial/:sampleId?rid=<ResponseID>&xai=<condition>
+// plus optional &uid=<manual pilot id> and &ppid=<Prolific PID> on any of them
+// (rid also accepted as &pid= for links fielded before the rename).
 // (unversioned /#/study/... redirects here; /#/v1/... is the navbar'd dev twin)
 // test and post both render one sample's explanation; they differ only in
 // which curated split supplies the default sample when the URL omits one
@@ -54,7 +56,14 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   const mode = (rawParams.mode || 'test').trim();
   const rawSampleId = rawParams.sampleId?.trim();
 
-  const pid = (searchParams.get('pid') || 'unknown').trim();
+  // Participant ids, all supplied by Qualtrics as query params. `rid`
+  // (ResponseID) is the join key against the survey export and names the
+  // server-side log file; `pid` is the pre-existing spelling, kept so links
+  // already fielded in the survey keep resolving. `uid` (manual pilot label)
+  // and `ppid` (Prolific) are logged alongside but never keyed on.
+  const responseId = (searchParams.get('rid') || searchParams.get('pid') || 'unknown').trim();
+  const userId = searchParams.get('uid')?.trim() || undefined;
+  const prolificPid = searchParams.get('ppid')?.trim() || undefined;
   const pos = searchParams.get('pos');
 
   const isGuide = mode === 'guide';
@@ -150,14 +159,16 @@ export function StudyView({ root = DATA_V1_ROOT }: { root?: DataRoot }) {
   const logger = useMemo(
     () =>
       createStudyLogger({
-        pid,
+        responseId,
+        userId,
+        prolificPid,
         domain: domain || 'unknown',
         mode: mode || 'unknown',
         sampleId: resolvedSampleId || (isGuide ? 'none' : 'unknown'),
         xaiType,
       }),
     // one logger per mounted study page (domain/mode/sample change = new session)
-    [pid, domain, mode, resolvedSampleId, isGuide, xaiType]
+    [responseId, userId, prolificPid, domain, mode, resolvedSampleId, isGuide, xaiType]
   );
 
   // Instrumentation runs for all modes; skipped entirely on failed lookups

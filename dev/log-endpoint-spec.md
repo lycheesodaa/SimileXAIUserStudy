@@ -31,7 +31,8 @@ In both cases the body is the same JSON — so **parse the raw request body as J
 **Response:**
 - `204 No Content` on success (200 also fine)
 - `401` on bad/missing key
-- **Never reject on schema oddities** — missing fields, unknown event types, extra keys: log-and-accept. Losing study data is worse than storing dirty data. Wrap parsing in try/except; if the body isn't even valid JSON, store the raw text with an error marker and still return 204.
+- `413` if over the size caps (see "Hard caps")
+- **Never reject on schema oddities** — missing fields, unknown event types, extra keys: log-and-accept. Losing study data is worse than storing dirty data. Wrap parsing in try/except; if the body isn't even valid JSON, or if the ids fail the filename check, quarantine it (see "Quarantine") and still return `204`.
 
 ## Request body (one "batch")
 
@@ -40,7 +41,9 @@ Each POST is one batch: session metadata + an array of events.
 ```json
 {
   "sessionId": "3f9c2a1e-8d4b-4e2a-9c1f-...",
-  "pid": "5f8a9b3c2d1e",
+  "responseId": "R_1a2B3c4D5e6F7g8",
+  "userId": "pilot-07",
+  "prolificPid": "5f8a9b3c2d1e0a4b6c8d9e2f",
   "domain": "lung",
   "mode": "test",
   "sampleId": "icbhi_222_1b1_Pr_sc_Meditron_11",
@@ -68,8 +71,10 @@ Field semantics:
 
 | Field | Meaning |
 |---|---|
-| `sessionId` | Random UUID per iframe mount (= per Qualtrics question view). Unique per (participant × item view). |
-| `pid` | Participant id (Prolific PID / Qualtrics ResponseID), or `"unknown"`. Opaque string. |
+| `sessionId` | Random UUID per iframe mount (= per Qualtrics question view). Unique per (participant × item view). Names the log file together with `responseId`. |
+| `responseId` | Qualtrics `ResponseID` (`R_...`), or `"unknown"` if the survey didn't pass it. **The join key against the Qualtrics export**, and the only participant id guaranteed present in every deployment phase. Names the log file. Opaque string — do not parse. |
+| `userId` | Optional. Manually assigned pilot label. Absent once the study moves to Prolific. Logged, never keyed on. |
+| `prolificPid` | Optional. Prolific participant id — stable *across* studies, so it is the most identifying field in the payload; treat the log directory accordingly. Absent during the manual pilot. Logged, never keyed on. |
 | `domain` | Study domain, currently `"lung"` or `"bird"`. More domains later. |
 | `mode` | `"test"` or `"post"` — both are one sample's explanation, drawn from the main (`testing.csv`) and post-test (`post-test.csv`) splits respectively. **These two are the analysis-relevant modes.** Also possible but not analysed: `"guide"` (practice/overview page, `sampleId` = `"none"`) and `"tutorial"` (static guided tour over a real sample). The old `"train"` mode is retired — its samples now surface on the guide page. |
 | `sampleId` | Dataset sample id; `"none"` in guide mode. Opaque string — currently `icbhi_*` / `hflung_*` / `sprsound_*` / `fraiwan_*` (lung) and `bird_*` (bird), served from the `public/data_v1` bundle. The sample set will move to later bundles with new ids — **do not validate or enumerate sample ids server-side.** |
@@ -85,15 +90,73 @@ Batch sizes are small: the client flushes every 5 s or at 20 events, whichever f
 
 Not every session contains every event type: the `noxai` control condition logs minimally (only `session_start`/`session_end`, `audio_*`, `visibility`, `iframe_focus`/`iframe_blur` — no `click` or `scroll_depth`). Don't treat missing event types as an error.
 
-## Storage
+## Storage: append-only JSONL, one file per mount
 
-Lowest-risk approach (recommended): **append-only JSONL**.
+```
+DATA_DIR / f"{response_id}_{session_id}.jsonl"
+```
 
-- One line per received batch: the batch object plus server-added fields `receivedAt` (ISO, server clock) and optionally the client IP.
-- Strip the `apiKey` field from the body before writing.
-- File per day: `logs/study/YYYY-MM-DD.jsonl`. Create the directory if missing.
-- Append with a lock or single-writer discipline sufficient for the server's concurrency model (a `threading.Lock` around the append is fine for FastAPI with default workers; if running multiple processes, use one file per worker or an O_APPEND single-write of the full line, which is atomic enough for lines < 4 KB on POSIX).
-- No database needed. Analysis will load the JSONL into pandas; dedupe there on `(sessionId, seq)`.
+Opened in `"a"` mode, **one JSON object per event** (not per batch), then `f.flush()` and `os.fsync()`. Do the write via `asyncio.to_thread` (or `aiofiles`) so the event loop stays unblocked.
+
+**Never a single shared JSON array file.** Read-parse-append-rewrite is not atomic; concurrent requests silently drop events or truncate the file.
+
+### Explode the batch into rows
+
+The client sends one envelope containing N events. Storage wants N flat rows, with the session metadata denormalized onto each. Field mapping:
+
+| Stored field | Source |
+|---|---|
+| `event_id` | *(none — see note below)* |
+| `seq` | `events[].seq` |
+| `response_id` | `responseId` |
+| `user_id` / `prolific_pid` | `userId` / `prolificPid` (omit if absent) |
+| `session_id` | `sessionId` |
+| `condition` | `xaiType` |
+| `domain`, `mode`, `sample_id` | `domain`, `mode`, `sampleId` |
+| `event_type` | `events[].type` |
+| `payload` | `events[].payload` (free-form; new fields must not require a migration mid-pilot) |
+| `client_ts` | `events[].t` — browser clock, only valid for reaction-time *deltas*. Participant clocks are wrong. |
+| `t_ms` | `events[].tMs` — ms since page mount; prefer this over `client_ts` deltas |
+| `server_ts` | Stamped server-side per event at receipt. **Authoritative for ordering.** |
+| `batch_client_ts` | `clientTime` (when the batch was sent, not when the event happened) |
+
+**On `event_id`:** the client does not generate a per-event UUID. It sends a 1-based `seq` per session, so the dedupe key is **`(session_id, seq)`** — which is strictly better than a UUID here, because it also reveals *gaps* (a batch lost entirely) rather than just duplicates. Dedupe in pandas on `(session_id, seq)`, keeping the first `server_ts`. Duplicates are expected: the client retries a failed batch once.
+
+- Strip `apiKey` from the body before writing anything.
+- Optionally add the client IP. `__requeued: true` inside a payload marks a retried event — keep it as a retry marker or strip it, but don't treat it as an error.
+- Create `DATA_DIR` if missing. No database needed.
+
+### Sanitize the ids before they touch a filename
+
+`responseId` and `sessionId` arrive over HTTP as user-controlled input (they come from URL query params). Both must match:
+
+```
+^[A-Za-z0-9_-]{1,64}$
+```
+
+Anything else is a path-traversal risk. Qualtrics `ResponseID` (`R_1a2B3c4D5e6F7g8`), the client's UUID `sessionId`, and the `"unknown"` fallback all pass. A failure here goes to quarantine — **do not** build the path first and validate after.
+
+### Quarantine
+
+Sanitization must not become a way to lose data, which would contradict the log-and-accept rule above. So nothing is ever rejected on content:
+
+- Body isn't valid JSON, **or** `responseId`/`sessionId` fail the regex → append the **raw request body** plus `{"_error": "<reason>", "server_ts": ..., "client_ip": ...}` to `DATA_DIR / "_invalid.jsonl"`.
+- Still return `204`.
+- The filename `_invalid.jsonl` is a server constant, so no untrusted input reaches the filesystem on this path.
+- Check this file during the daily health check; a non-empty `_invalid.jsonl` means a survey link is malformed, and it's recoverable by hand.
+
+### File count — expected, not a bug
+
+`sessionId` is per iframe **mount** = per Qualtrics question view, **not** per participant. A participant who sees ~20 items produces ~20 files; a few hundred participants means low thousands of small files. This is intentional: separate files per mount means concurrent requests never contend for the same file, so no lock is needed at all. Merging per participant happens manually afterwards (`glob` + concat on `response_id`), not on the write path.
+
+## Hard caps
+
+The shared secret is visible in client-side JS, so it is friction, not security. These caps are the real protection:
+
+- **Max `Content-Length`**: 1 MB. Real batches are a few KB; the client's buffer is capped at 500 events.
+- **Max events per batch**: 1000 (client flushes at 20, hard-caps its buffer at 500).
+- **Per-IP rate limit**: generous enough for legitimate use — every participant flushes every ~5 s, and a whole lab may share one NAT'd IP. Something like 120 requests/min/IP.
+- Over the cap → `413`. This is the one case where dropping data is correct.
 
 ## CORS (critical — the frontend is on a different origin)
 
@@ -107,34 +170,61 @@ The SPA is served from GitHub Pages (origin `https://lycheesodaa.github.io`). Th
 ## Acceptance tests
 
 ```bash
-# 1. Normal path — JSON + header auth → 204
+# 1. Normal path — JSON + header auth → 204, 2 rows in R_test1_sess-1.jsonl
 curl -i -X POST "$SERVER_URL/log" \
   -H "Content-Type: application/json" -H "X-API-Key: $API_KEY" \
-  -d '{"sessionId":"test-1","pid":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[{"seq":1,"t":"2026-07-06T00:00:00Z","tMs":1,"type":"session_start","payload":{}}]}'
+  -d '{"sessionId":"sess-1","responseId":"R_test1","userId":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[{"seq":1,"t":"2026-07-06T00:00:00Z","tMs":1,"type":"session_start","payload":{}},{"seq":2,"t":"2026-07-06T00:00:01Z","tMs":900,"type":"audio_play","payload":{"audioId":"original"}}]}'
 
 # 2. Beacon path — text/plain + apiKey in body → 204
 curl -i -X POST "$SERVER_URL/log" \
   -H "Content-Type: text/plain" \
-  -d '{"sessionId":"test-2","apiKey":"'$API_KEY'","pid":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[]}'
+  -d '{"sessionId":"sess-2","apiKey":"'$API_KEY'","responseId":"R_test2","domain":"lung","mode":"post","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[]}'
 
 # 3. No key anywhere → 401
-curl -i -X POST "$SERVER_URL/log" -H "Content-Type: application/json" -d '{"sessionId":"test-3","events":[]}'
+curl -i -X POST "$SERVER_URL/log" -H "Content-Type: application/json" -d '{"sessionId":"sess-3","events":[]}'
 
-# 4. Malformed body WITH valid key → still 204 (stored with error marker)
+# 4. Malformed body WITH valid key → still 204, one row in _invalid.jsonl
 curl -i -X POST "$SERVER_URL/log" -H "Content-Type: text/plain" -H "X-API-Key: $API_KEY" -d 'not json{{{'
 
-# 5. CORS preflight → 2xx with correct Access-Control-Allow-* headers, no auth required
+# 5. Path traversal in responseId → still 204, quarantined, NO file written outside DATA_DIR
+curl -i -X POST "$SERVER_URL/log" \
+  -H "Content-Type: application/json" -H "X-API-Key: $API_KEY" \
+  -d '{"sessionId":"sess-5","responseId":"../../etc/passwd","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[{"seq":1,"t":"2026-07-06T00:00:00Z","tMs":1,"type":"session_start"}]}'
+
+# 6. Duplicate batch (simulates the client's retry) → 204; two rows share
+#    (session_id, seq) and collapse to one on dedupe. Re-run test 1 verbatim.
+
+# 7. Oversized batch → 413
+python3 -c 'import json;print(json.dumps({"sessionId":"sess-7","responseId":"R_test7","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[{"seq":i,"t":"2026-07-06T00:00:00Z","tMs":i,"type":"click","payload":{"logId":"x"*200}} for i in range(5000)]}))' \
+  | curl -i -X POST "$SERVER_URL/log" -H "Content-Type: application/json" -H "X-API-Key: $API_KEY" --data-binary @-
+
+# 8. CORS preflight → 2xx with correct Access-Control-Allow-* headers, no auth required
 curl -i -X OPTIONS "$SERVER_URL/log" \
   -H "Origin: https://lycheesodaa.github.io" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: content-type, x-api-key"
 ```
 
-After each 204, confirm a new line appended to today's JSONL with `receivedAt` set and no `apiKey` field.
+After each 204, confirm: one line **per event** appended to `{response_id}_{session_id}.jsonl`, each with `server_ts` set, `condition`/`response_id` denormalized onto it, and no `apiKey` field anywhere.
+
+## Deployment & ops
+
+The server is a single uvicorn process on a university machine, exposed via a Cloudflare **named** tunnel (stable hostname — not a `trycloudflare.com` quick tunnel). Scale is a few hundred participants total, ~20–50 concurrent: no load balancer, no queue, no Postgres. (If a local GPU model is ever served from the same app, *that* needs a real request queue — out of scope here.)
+
+- `async def` handlers throughout; `httpx.AsyncClient` for any outbound call, never sync `def` + `requests`. One blocking write on the event loop stalls every concurrent participant.
+- Run uvicorn and `cloudflared` as systemd services with `Restart=always` **and** `systemctl enable` — lab machines reboot for patches unannounced, and a study that silently stops logging looks like a study with no data.
+- Keep `DATA_DIR` off scratch space subject to a cleanup policy. Verify this before piloting, not after.
+- Nightly cron: rsync `DATA_DIR` to institutional storage.
+- Daily health check: count today's events and alert if zero; also alert if `_invalid.jsonl` grew.
+- Ship a small read-only loader that globs the JSONL into pandas/SQLite for inspection during piloting, deduping on `(session_id, seq)`. The JSONL files remain the source of truth — corrections are new rows, never edits.
+- If any endpoint proxies to a third-party LLM API (e.g. `/generate-from-simile`): hard `max_tokens` cap, and keep responses under the ~100 s Cloudflare tunnel timeout (error 524) — stream if needed.
 
 ## Frontend reference (do not modify — for understanding only)
 
 Client transport lives in the UI repo at `src/app/study/logger.ts`:
-- Primary: `fetch(url, { method:'POST', keepalive:true, headers:{'Content-Type':'application/json','X-API-Key':...}, body })`
-- Unload fallback: `navigator.sendBeacon(url, new Blob([body], { type:'text/plain' }))` with `apiKey` in the body
+- Primary: `fetch(url, { method:'POST', keepalive:true, signal: AbortSignal.timeout(10_000), headers:{'Content-Type':'application/json','X-API-Key':...}, body })`
+- Unload fallback: `navigator.sendBeacon(url, new Blob([body], { type:'text/plain' }))` with `apiKey` in the body. Fired on `visibilitychange`→`hidden` and on `pagehide` — deliberately **not** `beforeunload`, which is unreliable on mobile.
 - Failed batches are retried once with `"__requeued": true` injected into event payloads → server may receive duplicates; dedupe key is `(sessionId, seq)`.
+- Identity comes from URL query params set by Qualtrics, read in `src/app/study/StudyView.tsx`:
+  `?rid=${e://Field/ResponseID}&uid=${e://Field/user_id}&ppid=${e://Field/PROLIFIC_PID}&xai=<condition>&pos=<loop position>`
+  (`rid` also accepted as `pid` for links fielded before the rename). No cookies or localStorage — the iframe is third-party context, where Safari ITP and Chrome storage partitioning break both silently.

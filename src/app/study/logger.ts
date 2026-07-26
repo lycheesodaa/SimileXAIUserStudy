@@ -3,9 +3,17 @@
 // failures are swallowed (failed batches are re-queued once, buffer bounded).
 
 export interface StudyLoggerContext {
-  pid: string;
+  // Qualtrics ResponseID — the join key against the survey export, and the
+  // only participant id guaranteed present in every deployment phase. Also
+  // names the server-side log file, so it must stay filename-safe.
+  responseId: string;
+  // Secondary ids, logged but never keyed on: a manually assigned pilot label
+  // and (once deployed) the Prolific PID. Absent when Qualtrics doesn't pass
+  // them, which is why they're optional rather than "unknown".
+  userId?: string;
+  prolificPid?: string;
   domain: string;
-  mode: string; // "guide" | "train" | "test" | "tutorial"
+  mode: string; // "guide" | "test" | "post" | "tutorial"
   sampleId: string; // "none" in guide mode
   xaiType: string;
 }
@@ -28,6 +36,19 @@ export interface StudyLogger {
 const FLUSH_EVERY_MS = 5000;
 const FLUSH_AT_EVENTS = 20;
 const MAX_BUFFER = 500;
+const REQUEST_TIMEOUT_MS = 10000;
+
+// A stalled tunnel would otherwise hold a `keepalive` request open for the
+// browser default (minutes) and burn one of the few keepalive slots. Undefined
+// on browsers without AbortSignal.timeout — no timeout is still better than a
+// synchronous throw inside flush().
+const requestSignal = (): AbortSignal | undefined => {
+  try {
+    return AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  } catch {
+    return undefined;
+  }
+};
 
 export function createStudyLogger(ctx: StudyLoggerContext): StudyLogger {
   const sessionId =
@@ -45,7 +66,9 @@ export function createStudyLogger(ctx: StudyLoggerContext): StudyLogger {
   const makeBody = (events: StudyEvent[], includeApiKey: boolean) =>
     JSON.stringify({
       sessionId,
-      pid: ctx.pid,
+      responseId: ctx.responseId,
+      ...(ctx.userId ? { userId: ctx.userId } : {}),
+      ...(ctx.prolificPid ? { prolificPid: ctx.prolificPid } : {}),
       domain: ctx.domain,
       mode: ctx.mode,
       sampleId: ctx.sampleId,
@@ -71,6 +94,7 @@ export function createStudyLogger(ctx: StudyLoggerContext): StudyLogger {
     fetch(url, {
       method: 'POST',
       keepalive: true,
+      signal: requestSignal(),
       headers: {
         'Content-Type': 'application/json',
         ...(apiKey ? { 'X-API-Key': apiKey } : {}),
