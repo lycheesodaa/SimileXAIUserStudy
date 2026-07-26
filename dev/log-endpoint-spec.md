@@ -4,6 +4,8 @@
 
 The frontend (Simile-based-Audio-XAI-UI — a Vite/React SPA on GitHub Pages, embedded as an iframe in a Qualtrics survey) now has a "study mode" that batches UI interaction events (audio plays, clicks, scroll depth, dwell time) and POSTs them to this server. The frontend is done and deployed; this endpoint is the only missing piece before the study can collect data.
 
+The events that matter for analysis are those from `mode: "test"` and `mode: "post"`; `"guide"` and `"tutorial"` sessions are logged too but can be filtered out downstream. The server should not distinguish between them — accept and store all four the same way.
+
 The frontend already talks to this server at one endpoint: `POST /generate-from-simile`, authenticated with an `X-API-Key` header. The new `/log` endpoint must use the **same API key** and live on the same server (the frontend reads one `VITE_SERVER_URL`).
 
 ## Endpoint contract
@@ -42,7 +44,7 @@ Each POST is one batch: session metadata + an array of events.
   "domain": "lung",
   "mode": "test",
   "sampleId": "icbhi_222_1b1_Pr_sc_Meditron_11",
-  "xaiType": "similes_v3",
+  "xaiType": "similes",
   "clientTime": "2026-07-06T10:32:16.001Z",
   "apiKey": "<present ONLY in the sendBeacon fallback — strip before storing>",
   "events": [
@@ -68,10 +70,10 @@ Field semantics:
 |---|---|
 | `sessionId` | Random UUID per iframe mount (= per Qualtrics question view). Unique per (participant × item view). |
 | `pid` | Participant id (Prolific PID / Qualtrics ResponseID), or `"unknown"`. Opaque string. |
-| `domain` | Study domain, currently `"lung"`. More domains later. |
-| `mode` | `"train"` (practice page, no sample) or `"test"` (one sample's explanation). |
-| `sampleId` | Dataset sample id; `"none"` in train mode. Opaque string — currently `icbhi_*` (v3 dataset: similes_v3, noxai) or `lungausc_<n>` (v2 dataset aliases: rexnet, rexnet_foil, onomatopoeia, examples). The audio sample set will eventually move to a v4 set with new ids — **do not validate or enumerate sample ids server-side.** |
-| `xaiType` | Explanation UI condition. Currently one of `"similes_v3"`, `"rexnet"`, `"rexnet_foil"`, `"onomatopoeia"`, `"examples"`, `"noxai"`. More variants later (e.g. `"similes_v4"`) — accept any string. |
+| `domain` | Study domain, currently `"lung"` or `"bird"`. More domains later. |
+| `mode` | `"test"` or `"post"` — both are one sample's explanation, drawn from the main (`testing.csv`) and post-test (`post-test.csv`) splits respectively. **These two are the analysis-relevant modes.** Also possible but not analysed: `"guide"` (practice/overview page, `sampleId` = `"none"`) and `"tutorial"` (static guided tour over a real sample). The old `"train"` mode is retired — its samples now surface on the guide page. |
+| `sampleId` | Dataset sample id; `"none"` in guide mode. Opaque string — currently `icbhi_*` / `hflung_*` / `sprsound_*` / `fraiwan_*` (lung) and `bird_*` (bird), served from the `public/data_v1` bundle. The sample set will move to later bundles with new ids — **do not validate or enumerate sample ids server-side.** |
+| `xaiType` | Explanation UI condition. Currently one of `"similes"`, `"similes_dualview_approx"`, `"onomatopoeia"`, `"onomatopoeia_dualview_approx"`, `"rexnet"`, `"examples"`, `"noxai"`. Note: activation-view variants (`"similes_actv"`, `"similes_dualview_actv"`, `"onomatopoeia_actv"`, `"onomatopoeia_dualview_actv"`) are still routable but are no longer part of the study design — expect them only from dev/exploratory sessions. More variants later — **accept any string.** |
 | `clientTime` | Wall-clock time the batch was sent. |
 | `events[].seq` | 1-based counter within the session. `(sessionId, seq)` is the dedupe key — the client re-sends a failed batch once, so duplicates are possible. |
 | `events[].t` | Wall-clock ISO timestamp of the event. |
@@ -108,12 +110,12 @@ The SPA is served from GitHub Pages (origin `https://lycheesodaa.github.io`). Th
 # 1. Normal path — JSON + header auth → 204
 curl -i -X POST "$SERVER_URL/log" \
   -H "Content-Type: application/json" -H "X-API-Key: $API_KEY" \
-  -d '{"sessionId":"test-1","pid":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes_v3","clientTime":"2026-07-06T00:00:00Z","events":[{"seq":1,"t":"2026-07-06T00:00:00Z","tMs":1,"type":"session_start","payload":{}}]}'
+  -d '{"sessionId":"test-1","pid":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[{"seq":1,"t":"2026-07-06T00:00:00Z","tMs":1,"type":"session_start","payload":{}}]}'
 
 # 2. Beacon path — text/plain + apiKey in body → 204
 curl -i -X POST "$SERVER_URL/log" \
   -H "Content-Type: text/plain" \
-  -d '{"sessionId":"test-2","apiKey":"'$API_KEY'","pid":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes_v3","clientTime":"2026-07-06T00:00:00Z","events":[]}'
+  -d '{"sessionId":"test-2","apiKey":"'$API_KEY'","pid":"curl","domain":"lung","mode":"test","sampleId":"x","xaiType":"similes","clientTime":"2026-07-06T00:00:00Z","events":[]}'
 
 # 3. No key anywhere → 401
 curl -i -X POST "$SERVER_URL/log" -H "Content-Type: application/json" -d '{"sessionId":"test-3","events":[]}'
