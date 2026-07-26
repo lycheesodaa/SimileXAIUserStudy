@@ -330,7 +330,10 @@ export function SimileExplanationV3({
         {filteredSimiles.length === 0 ? (
           <p className="text-gray-500 italic">No strong evidence found.</p>
         ) : (
-          <div className={`w-full ${plotWidthClass} flex flex-col gap-3 mt-6`}>
+          <div
+            className={`w-full ${plotWidthClass} flex flex-col gap-3 mt-6`}
+            data-tutorial="evidence-plot"
+          >
             <div className={`grid ${rowGridClass} gap-4 items-center mb-2`}>
               <div></div>
               <div className="relative w-full flex text-xs font-semibold text-gray-500 uppercase tracking-wider" data-tutorial="evidence-axis">

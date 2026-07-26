@@ -6,7 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { DataRoot, RexnetReport } from '../../study/dataV1';
+import { DataRoot, RexnetContrast, RexnetCueRow, RexnetReport } from '../../study/dataV1';
+import { pinnedFoilClass } from '../../study/foilOverrides';
 import { ClassBadge } from '../ClassBadge';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
 
@@ -90,7 +91,7 @@ export function prettifyCueName(cueName: string, isBird: boolean, isV7: boolean 
   return (isV7 ? CUE_NAME_MAP_BIRD_V7[key] : CUE_NAME_MAP_BIRD_V1[key]) || CUE_NAME_MAP_LUNG[key] || cueName;
 }
 
-function getDeterministicFoil<T>(sampleId: string, options: T[]): T | undefined {
+export function getDeterministicFoil<T>(sampleId: string, options: T[]): T | undefined {
   if (options.length === 0) return undefined;
   let hash = 0;
   for (let i = 0; i < sampleId.length; i++) {
@@ -100,53 +101,48 @@ function getDeterministicFoil<T>(sampleId: string, options: T[]): T | undefined 
   return options[index];
 }
 
-export function CuesExplanationV1({
-  audioUrl,
-  report,
-  sampleId,
-  randomFoil = false,
-  hideDropdown: hideDropdownProp,
-  domain,
-  root,
-}: CuesExplanationV1Props) {
-  const hideDropdown = import.meta.env.PROD ? (hideDropdownProp ?? true) : false;
-  const contrasts = report.contrasts;
-  const deterministicFoil =
-    randomFoil && sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
+// The counterfactual class this sample is shown against. Study samples (the
+// ones listed in a bundle's training/testing/post-test CSVs) are pinned in
+// FOIL_OVERRIDES so the choice never shifts between bundles or rebuilds;
+// anything else — dev browsing, a bundle without split lists — falls back to
+// the id hash. Shared with the tutorial, which must show the same contrast.
+export function resolveFoilContrast(
+  sampleId: string | undefined,
+  contrasts: RexnetContrast[],
+  root?: DataRoot
+): RexnetContrast | undefined {
+  if (contrasts.length === 0) return undefined;
+  const pinned = pinnedFoilClass(root, sampleId);
+  if (pinned) {
+    const match = contrasts.find(
+      (c) => c.contrastClass.trim().toLowerCase() === pinned.trim().toLowerCase()
+    );
+    if (match) return match;
+  }
+  return sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
+}
 
-  const birdClasses = new Set([
-    'Eastern Towhee',
-    'Wood Thrush',
-    'Black-capped Chickadee',
-    'Tufted Titmouse',
-    'Ovenbird',
-    'Blue Jay',
-  ]);
-  const isBird =
-    domain === 'bird' ||
-    contrasts.some((c) => birdClasses.has(c.contrastClass));
-  const effectiveDomain = isBird ? 'bird' : 'lung';
-  const domainNoun = isBird ? 'bird sound' : 'lung sound';
+const BIRD_CLASSES = new Set([
+  'Eastern Towhee',
+  'Wood Thrush',
+  'Black-capped Chickadee',
+  'Tufted Titmouse',
+  'Ovenbird',
+  'Blue Jay',
+]);
 
-  const [selectedClass, setSelectedClass] = useState(
-    deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
-  );
+// Shared with the tutorial, which has to reproduce exactly what the participant
+// sees (same contrast, same visible cue rows) to talk about a concrete row.
+export function resolveIsBird(domain: string | undefined, contrasts: RexnetContrast[]): boolean {
+  return domain === 'bird' || contrasts.some((c) => BIRD_CLASSES.has(c.contrastClass));
+}
 
-  // Re-derive the initial selection only when the sample/report changes;
-  // selectedClass is deliberately excluded so user picks aren't reverted.
-  useEffect(() => {
-    const initial =
-      randomFoil && sampleId ? getDeterministicFoil(sampleId, contrasts) : contrasts[0];
-    if (initial) {
-      setSelectedClass(initial.contrastClass);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contrasts, randomFoil, sampleId]);
-
-  const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
-
-  const isV7 = root === 'data_v7';
-  const visibleCues = selected?.cues.filter((cue) => {
+export function filterVisibleCues(
+  cues: RexnetCueRow[],
+  isBird: boolean,
+  isV7: boolean
+): RexnetCueRow[] {
+  return cues.filter((cue) => {
     const raw = cue.cue.toLowerCase();
     const pretty = prettifyCueName(cue.cue, isBird, isV7).toLowerCase();
 
@@ -179,7 +175,46 @@ export function CuesExplanationV1({
     }
 
     return true;
-  }) ?? [];
+  });
+}
+
+export function CuesExplanationV1({
+  audioUrl,
+  report,
+  sampleId,
+  randomFoil = false,
+  hideDropdown: hideDropdownProp,
+  domain,
+  root,
+}: CuesExplanationV1Props) {
+  const hideDropdown = import.meta.env.PROD ? (hideDropdownProp ?? true) : false;
+  const contrasts = report.contrasts;
+  const deterministicFoil =
+    randomFoil && sampleId ? resolveFoilContrast(sampleId, contrasts, root) : contrasts[0];
+
+  const isBird = resolveIsBird(domain, contrasts);
+  const effectiveDomain = isBird ? 'bird' : 'lung';
+  const domainNoun = isBird ? 'bird sound' : 'lung sound';
+
+  const [selectedClass, setSelectedClass] = useState(
+    deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
+  );
+
+  // Re-derive the initial selection only when the sample/report changes;
+  // selectedClass is deliberately excluded so user picks aren't reverted.
+  useEffect(() => {
+    const initial =
+      randomFoil && sampleId ? resolveFoilContrast(sampleId, contrasts, root) : contrasts[0];
+    if (initial) {
+      setSelectedClass(initial.contrastClass);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contrasts, randomFoil, sampleId, root]);
+
+  const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
+
+  const isV7 = root === 'data_v7';
+  const visibleCues = selected ? filterVisibleCues(selected.cues, isBird, isV7) : [];
   const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
 
   return (
@@ -271,7 +306,8 @@ export function CuesExplanationV1({
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-400">
                     {visibleCues.map((cue) => (
-                      <tr key={cue.cue}>
+                      // data-cue lets the tutorial spotlight one specific cue row.
+                      <tr key={cue.cue} data-cue={prettifyCueName(cue.cue, isBird, isV7)}>
                         <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">
                           {prettifyCueName(cue.cue, isBird, isV7)}
                         </td>
@@ -457,7 +493,7 @@ export function ReferenceTableV1({ domain = 'lung', root }: { domain?: string; r
           </thead>
           <tbody className="bg-white divide-y divide-gray-400">
             {rows.map((row) => (
-              <tr key={row.cue}>
+              <tr key={row.cue} data-cue-ref={row.cue}>
                 <td className="px-4 py-2 font-medium text-gray-900">
                   {row.cue}
                 </td>

@@ -1,5 +1,16 @@
+import { useMemo } from 'react';
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
-import { CuesExplanationV1 } from '../cues/CuesExplanationV1';
+import {
+  BIRD_CUE_ROWS_V1,
+  BIRD_CUE_ROWS_V7,
+  CueReferenceRow,
+  CuesExplanationV1,
+  LUNG_CUE_ROWS,
+  filterVisibleCues,
+  prettifyCueName,
+  resolveFoilContrast,
+  resolveIsBird,
+} from '../cues/CuesExplanationV1';
 import { DataRoot, RexnetReport } from '../../study/dataV1';
 
 // Guided tour of the acoustic-cue (RExNet) explanation UI, rendered from a
@@ -11,6 +22,138 @@ interface CuesTutorialProps {
   sampleId?: string;
   domain?: string;
   root?: DataRoot;
+}
+
+// ─── Worked example ──────────────────────────────────────────────────────────
+// The last tour steps walk through the reasoning on one concrete cue row, so
+// they have to reproduce exactly what the participant sees: the same
+// pinned contrast class (FOIL_OVERRIDES) and the same filtered cue list as
+// CuesExplanationV1 renders (randomFoil + hideDropdown, as configured below).
+
+interface WorkedExample {
+  /** Prettified cue name — also the key of the matching reference-table row. */
+  cueName: string;
+  contrastClass: string;
+  relation: 'higher' | 'lower' | 'similar';
+  ranking: string;
+  /** Classes the relation points towards, read off the reference ranking. */
+  candidates: string[];
+}
+
+// "Normal < Crackle < Wheeze ~ Rhonchi ~ Stridor" → [[Normal], [Crackle],
+// [Wheeze, Rhonchi, Stridor]], ordered low → high. '~' ties share a tier.
+function parseRanking(ranking: string): string[][] {
+  return ranking
+    .split(/[<≪«]/)
+    .map((tier) => tier.split('~').map((c) => c.trim()).filter(Boolean))
+    .filter((tier) => tier.length > 0);
+}
+
+function referenceRows(isBird: boolean, isV7: boolean): CueReferenceRow[] {
+  if (!isBird) return LUNG_CUE_ROWS;
+  return isV7 ? BIRD_CUE_ROWS_V7 : BIRD_CUE_ROWS_V1;
+}
+
+function buildWorkedExample(
+  report: RexnetReport,
+  sampleId: string | undefined,
+  domain: string | undefined,
+  root: DataRoot | undefined
+): WorkedExample | null {
+  const contrasts = report.contrasts;
+  const selected = resolveFoilContrast(sampleId, contrasts, root) ?? contrasts[0];
+  if (!selected) return null;
+
+  const isBird = resolveIsBird(domain, contrasts);
+  const isV7 = root === 'data_v7';
+  const rows = referenceRows(isBird, isV7);
+
+  const candidates: WorkedExample[] = [];
+  for (const cue of filterVisibleCues(selected.cues, isBird, isV7)) {
+    const cueName = prettifyCueName(cue.cue, isBird, isV7);
+    const row = rows.find((r) => r.cue === cueName);
+    if (!row) continue;
+
+    const predicted = cue.predictedRelation.toUpperCase();
+    const relation: WorkedExample['relation'] = predicted.includes('HIGHER')
+      ? 'higher'
+      : predicted.includes('LOWER')
+        ? 'lower'
+        : 'similar';
+
+    const tiers = parseRanking(row.ranking);
+    const tierIdx = tiers.findIndex((tier) => tier.includes(selected.contrastClass));
+    if (tierIdx === -1) continue;
+
+    const pointsTo =
+      relation === 'higher'
+        ? tiers.slice(tierIdx + 1).flat()
+        : relation === 'lower'
+          ? tiers.slice(0, tierIdx).flat()
+          : tiers[tierIdx].filter((c) => c !== selected.contrastClass);
+    if (pointsTo.length === 0) continue;
+
+    candidates.push({
+      cueName,
+      contrastClass: selected.contrastClass,
+      relation,
+      ranking: row.ranking,
+      candidates: pointsTo,
+    });
+  }
+
+  // Pick the most instructive row: a directional relation reads far more
+  // clearly than "similar", and a relation that rules some categories out
+  // teaches more than one that merely excludes the contrast class itself.
+  const classCount = new Set(rows.flatMap((r) => parseRanking(r.ranking).flat())).size;
+  const score = (c: WorkedExample) =>
+    (c.relation === 'similar' ? 0 : 2) + (c.candidates.length < classCount - 1 ? 1 : 0);
+  return candidates.sort((a, b) => score(b) - score(a))[0] ?? null;
+}
+
+function joinClasses(names: string[]): string {
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`;
+}
+
+function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
+  if (!w) return [];
+  const relationPhrase =
+    w.relation === 'higher' ? 'higher than' : w.relation === 'lower' ? 'lower than' : 'similar to';
+  const positionPhrase =
+    w.relation === 'higher'
+      ? <>ranks <b>above</b> {w.contrastClass}</>
+      : w.relation === 'lower'
+        ? <>ranks <b>below</b> {w.contrastClass}</>
+        : <>sits at a <b>similar level</b> to {w.contrastClass}</>;
+
+  return [
+    {
+      target: `[data-cue="${w.cueName}"]`,
+      title: 'Example: reading one row',
+      body: (
+        <>
+          Take this row. It says the <b>{w.cueName}</b> of this recording is{' '}
+          <b>{relationPhrase}</b> that of a typical <b>{w.contrastClass}</b> sound.
+        </>
+      ),
+    },
+    {
+      target: `[data-cue-ref="${w.cueName}"]`,
+      title: 'Example: what that suggests',
+      body: (
+        <>
+          The reference table ranks {w.cueName} across categories as{' '}
+          <b>{w.ranking}</b>. So a sound that {positionPhrase} on this cue could
+          be <b>{joinClasses(w.candidates)}</b>.
+          <br />
+          <br />
+          Reading every row this way — and weighing which categories the cues agree on — is how
+          you can narrow down what the system heard.
+        </>
+      ),
+    },
+  ];
 }
 
 const STEPS: TutorialStep[] = [
@@ -101,8 +244,15 @@ const STEPS: TutorialStep[] = [
 ];
 
 export function CuesTutorial({ audioUrl, report, sampleId, domain, root }: CuesTutorialProps) {
+  // Stable identity: a fresh steps array on every render would reset the tour.
+  const steps = useMemo(() => {
+    const worked = buildWorkedExample(report, sampleId, domain, root);
+    const done = STEPS[STEPS.length - 1];
+    return [...STEPS.slice(0, -1), ...workedExampleSteps(worked), done];
+  }, [report, sampleId, domain, root]);
+
   return (
-    <TutorialOverlay steps={STEPS}>
+    <TutorialOverlay steps={steps}>
       <CuesExplanationV1
         audioUrl={audioUrl}
         report={report}

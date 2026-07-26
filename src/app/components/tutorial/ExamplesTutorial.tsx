@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
-import { ExampleExplanation, ExampleItem } from '../examples/ExampleExplanation';
+import { ExampleExplanation, ExampleItem, contributionOf } from '../examples/ExampleExplanation';
 
 // Renamed from ExamplesPractice: the intro text now doubles as the header of a
 // guided tour of the example-based explanation UI. Without a sample (the
@@ -9,6 +10,64 @@ interface ExamplesTutorialProps {
   examples?: ExampleItem[];
   originalAudioUrl?: string;
   domain?: string;
+}
+
+// ─── Worked example ──────────────────────────────────────────────────────────
+// A closing step that reasons over the actual top rows on screen, so
+// participants see how the plot is meant to be read, not just what it contains.
+
+const TOP_N = 3;
+
+function workedExampleSteps(examples: ExampleItem[]): TutorialStep[] {
+  const sorted = [...examples].sort((a, b) => contributionOf(b) - contributionOf(a));
+  const top = sorted.slice(0, TOP_N);
+  if (top.length < 2) return [];
+
+  // Share of the plot's total contribution held by the leading class's rows in
+  // the top group — the basis for calling the evidence strong or weak.
+  const total = sorted.reduce((sum, e) => sum + Math.abs(contributionOf(e)), 0);
+  const counts = new Map<string, number>();
+  top.forEach((e) => counts.set(e.className, (counts.get(e.className) ?? 0) + 1));
+  const [leadClass, leadCount] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+  const leadShare =
+    total > 0
+      ? top
+          .filter((e) => e.className === leadClass)
+          .reduce((sum, e) => sum + Math.abs(contributionOf(e)), 0) / total
+      : 0;
+  const strength = leadShare >= 0.5 ? 'high' : leadShare >= 0.3 ? 'moderate' : 'low';
+  const values = top.map((e) => contributionOf(e).toFixed(2)).join(', ');
+  const unanimous = leadCount === top.length;
+  const pct = Math.round(leadShare * 100);
+
+  return [
+    {
+      target: '[data-tutorial="examples-plot"]',
+      title: 'Example: reading the plot',
+      body: unanimous ? (
+        <>
+          Here the top {top.length} examples all belong to <b>{leadClass}</b>, and they carry fair contribution values.
+          Several strongly-contributing examples of a single class suggest a <b>{strength}</b> likelihood
+          that the recording is {leadClass} too.
+          <br />
+          <br />
+          Short bars with lower contribution values would instead mean the
+          evidence is weak or mixed.
+        </>
+      ) : (
+        <>
+          Here the top {top.length} examples are <b>split across classes</b> ({leadClass} leads
+          with {leadCount} of {top.length}; contributions {values}). When the strongest examples
+          disagree, no single class is strongly supported — this points to a <b>{strength}</b>{' '}
+          likelihood for {leadClass}.
+          <br />
+          <br />
+          Had all {top.length} come from one class with long bars, that would instead suggest a
+          high likelihood of that class.
+        </>
+      ),
+    },
+  ];
 }
 
 const STEPS: TutorialStep[] = [
@@ -119,11 +178,17 @@ function Intro() {
 }
 
 export function ExamplesTutorial({ examples, originalAudioUrl, domain }: ExamplesTutorialProps) {
+  // Stable identity: a fresh steps array on every render would reset the tour.
+  const steps = useMemo(() => {
+    const done = STEPS[STEPS.length - 1];
+    return [...STEPS.slice(0, -1), ...workedExampleSteps(examples ?? []), done];
+  }, [examples]);
+
   if (!examples?.length) {
     return <Intro />;
   }
   return (
-    <TutorialOverlay steps={STEPS}>
+    <TutorialOverlay steps={steps}>
       <Intro />
       <ExampleExplanation
         audioName=""

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
 import { SimileExplanationV3, SimileItem } from '../similes/SimileExplanationV3';
+import { resolveConceptCategory } from '../ClassBadge';
 
 // Guided tour of the simile / onomatopoeia explanation UI (plain and both
 // dual-view variants). Rendered from a real sample; the dual-view-only steps
@@ -18,7 +19,75 @@ interface SimileTutorialProps {
   domain?: string;
 }
 
-function buildSteps(isOnomatopoeia: boolean): TutorialStep[] {
+// ─── Worked example ──────────────────────────────────────────────────────────
+// A closing step that reasons over the rows actually on screen. It mirrors
+// SimileExplanationV3's own filtering/ordering (threshold 0, the 0.01 evidence
+// floor, sorted by magnitude, top 3 shown) so "the top three" means the three
+// bars the participant can see.
+
+const TOP_N = 3;
+
+function workedExampleSteps(similes: SimileItem[], nounPlural: string): TutorialStep[] {
+  const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
+  const shown = similes.filter((s) => magnitude(s) >= 0.01).sort((a, b) => magnitude(b) - magnitude(a));
+  const top = shown.slice(0, TOP_N);
+  if (top.length < 2) return [];
+
+  // Only positive bars argue *for* a class, so the reasoning is built on those.
+  const positives = top
+    .map((s) => ({ s, category: resolveConceptCategory(s.text, s.category) }))
+    .filter((e) => e.s.confidence >= 0 && e.category);
+  if (positives.length === 0) return [];
+
+  const counts = new Map<string, number>();
+  positives.forEach((e) => counts.set(e.category!, (counts.get(e.category!) ?? 0) + 1));
+  const [leadClass, leadCount] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+
+  const total = shown.reduce((sum, s) => sum + magnitude(s), 0);
+  const leadShare =
+    total > 0
+      ? positives
+          .filter((e) => e.category === leadClass)
+          .reduce((sum, e) => sum + magnitude(e.s), 0) / total
+      : 0;
+  const strength = leadShare >= 0.5 ? 'high' : leadShare >= 0.3 ? 'moderate' : 'low';
+  const unanimous = leadCount === top.length;
+  const pct = Math.round(leadShare * 100);
+  const leadTexts = positives
+    .filter((e) => e.category === leadClass)
+    .map((e) => `"${e.s.text}"`)
+    .join(', ');
+
+  return [
+    {
+      target: '[data-tutorial="evidence-plot"]',
+      title: 'Example: reading the plot',
+      body: unanimous ? (
+        <>
+          Here the top {top.length} {nounPlural} — <i>{leadTexts}</i> — are all positive evidence and all
+          associated with <b>{leadClass}</b>. Several strong {nounPlural} pointing at one category suggest 
+          a <b>{strength}</b> likelihood that the recording is {leadClass}.
+          <br />
+          <br />
+          Short bars, low values, or negative evidence, may instead mean the prediction is weak or mixed.
+        </>
+      ) : (
+        <>
+          Here the strongest evidence is <b>mixed</b>: {leadClass} leads with {leadCount} of the
+          top {top.length} {nounPlural} (<i>{leadTexts}</i>).
+          The remaining bars are negative, which counts against the classification, so this suggests
+          only a <b>fair</b> likelihood for <b>{leadClass}</b>.
+          <br />
+          <br />
+          Had all {top.length} {nounPlural}'s evidences been positive, that
+          may suggest a <i>higher</i> likelihood of {leadClass}.
+        </>
+      ),
+    },
+  ];
+}
+
+function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialStep[] {
   const noun = isOnomatopoeia ? 'onomatopoeia' : 'simile';
   const nounPlural = isOnomatopoeia ? 'onomatopoeia' : 'similes';
   return [
@@ -153,6 +222,8 @@ function buildSteps(isOnomatopoeia: boolean): TutorialStep[] {
         </>
       ),
     },
+    // ── Worked example, after every component has been introduced ────────────
+    ...workedExampleSteps(similes, nounPlural),
     {
       title: "That's it!",
       body: (
@@ -174,7 +245,7 @@ export function SimileTutorial({
   domain,
 }: SimileTutorialProps) {
   // Stable identity: a fresh steps array on every render would reset the tour.
-  const steps = useMemo(() => buildSteps(isOnomatopoeia), [isOnomatopoeia]);
+  const steps = useMemo(() => buildSteps(isOnomatopoeia, similes), [isOnomatopoeia, similes]);
   return (
     <TutorialOverlay steps={steps}>
       <SimileExplanationV3

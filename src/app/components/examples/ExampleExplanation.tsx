@@ -30,6 +30,11 @@ interface ExampleExplanationProps {
   cheatsheet?: ReactNode;
 }
 
+// Bar value for one example. Exported so the tutorial can rank the examples
+// exactly as they are displayed when it talks about "the top three".
+export const contributionOf = (e: ExampleItem) =>
+  e.contribution ?? (e.similarity !== undefined ? e.similarity * e.weight : e.weight);
+
 // Only one example plays at a time: starting one pauses whichever was playing.
 // Module-level so it spans every row without threading state through props.
 let currentlyPlaying: HTMLAudioElement | null = null;
@@ -96,9 +101,6 @@ export function ExampleExplanation({
   const getAudioUrl = (path: string) =>
     // v1 data uses absolute S3 URLs; legacy v2 paths are root-relative.
     path.startsWith('http') ? path : `${import.meta.env.BASE_URL.replace(/\/$/, '')}${path}`;
-
-  const contributionOf = (e: ExampleItem) =>
-    e.contribution ?? (e.similarity !== undefined ? e.similarity * e.weight : e.weight);
 
   const sorted = [...examples].sort((a, b) => contributionOf(b) - contributionOf(a));
   const maxContribution = Math.max(...sorted.map(contributionOf), 0);
@@ -198,7 +200,10 @@ export function ExampleExplanation({
         ) : (
           // Single grid so every row shares the auto-sized label column,
           // which hugs the widest label instead of opening a left gutter.
-          <div className="w-full max-w-2xl mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 items-center">
+          <div
+            className="w-full max-w-2xl mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 items-center"
+            data-tutorial="examples-plot"
+          >
             <div></div>
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-2">
               Contribution
