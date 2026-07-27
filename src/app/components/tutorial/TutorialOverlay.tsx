@@ -17,11 +17,25 @@ export interface TutorialStep {
   target?: string;
   title: string;
   body: ReactNode;
+  /** Keep the step even if its target isn't in the DOM at mount time — for
+   *  elements that only appear once the step is reached (e.g. a drawer opened
+   *  via onStepChange). The per-frame rect tracker picks the target up once it
+   *  mounts. Without this, such steps would be dropped by the availability
+   *  filter that runs before the drawer is open. */
+  alwaysShow?: boolean;
+  /** Force the tooltip to the left of the spotlight instead of above/below.
+   *  For a tall, right-edge spotlight (the cheatsheet drawer) the default
+   *  above/below placement runs off screen. */
+  placement?: 'left';
 }
 
 interface TutorialOverlayProps {
   steps: TutorialStep[];
   children: ReactNode;
+  /** Called with the active step whenever it changes (including on mount and
+   *  when the tour restarts). Lets the host react to the tour position — e.g.
+   *  open a drawer when its describing step becomes active. */
+  onStepChange?: (step: TutorialStep | undefined) => void;
 }
 
 const SPOT_PAD = 6;
@@ -37,7 +51,7 @@ interface SpotRect {
   height: number;
 }
 
-export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
+export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverlayProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   // Steps whose target exists in the mounted content; null until measured.
   const [available, setAvailable] = useState<TutorialStep[] | null>(null);
@@ -47,11 +61,19 @@ export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
   useEffect(() => {
     const root = contentRef.current;
     if (!root) return;
-    setAvailable(steps.filter((s) => !s.target || root.querySelector(s.target)));
+    setAvailable(steps.filter((s) => !s.target || s.alwaysShow || root.querySelector(s.target)));
     setIndex(0);
   }, [steps]);
 
   const step = available?.[index];
+
+  // Notify the host of the active step so it can open/close drawers etc. Held
+  // in a ref so an inline callback doesn't retrigger this on every render.
+  const onStepChangeRef = useRef(onStepChange);
+  onStepChangeRef.current = onStepChange;
+  useEffect(() => {
+    onStepChangeRef.current?.(step);
+  }, [step]);
 
   // Bring the target into view when the step changes.
   useEffect(() => {
@@ -93,6 +115,18 @@ export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
   const goPrev = () => setIndex((i) => Math.max(0, i - 1));
   const goNext = () => setIndex((i) => Math.min(count - 1, i + 1));
 
+  // Editable step counter: lets the user type a step number to jump directly.
+  // `draft` holds the in-progress text so partial input isn't clamped as typed;
+  // it commits on Enter/blur and resets to reflect the active step otherwise.
+  const [draft, setDraft] = useState<string | null>(null);
+  const commitJump = () => {
+    if (draft !== null) {
+      const n = parseInt(draft, 10);
+      if (!Number.isNaN(n)) setIndex(Math.min(Math.max(n - 1, 0), count - 1));
+    }
+    setDraft(null);
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') setIndex((i) => Math.min(count - 1, i + 1));
@@ -104,6 +138,12 @@ export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
 
   // Tooltip placement: centered when there is no target; otherwise below the
   // spotlight if it fits, else above, horizontally clamped to the viewport.
+  // Steps can opt into `placement: 'left'` for a tall right-edge spotlight (the
+  // cheatsheet drawer), where above/below would run off screen.
+  // Every branch caps the card at the viewport height; the body then scrolls
+  // internally (see below) rather than spilling off a fixed-position card that
+  // the page can't scroll to.
+  const vh = window.innerHeight;
   let tooltipStyle: CSSProperties;
   if (!rect) {
     tooltipStyle = {
@@ -113,24 +153,38 @@ export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
       transform: 'translate(-50%, -50%)',
       width: TOOLTIP_W,
       maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100vh - 24px)',
+    };
+  } else if (step?.placement === 'left') {
+    // Sit to the left of the spotlight, vertically centered on it.
+    const left = Math.max(rect.left - SPOT_PAD - TOOLTIP_GAP - TOOLTIP_W, 12);
+    tooltipStyle = {
+      position: 'fixed',
+      left,
+      top: rect.top + rect.height / 2,
+      transform: 'translateY(-50%)',
+      width: TOOLTIP_W,
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100vh - 24px)',
     };
   } else {
     const vw = window.innerWidth;
-    const vh = window.innerHeight;
     const below = rect.top + rect.height + SPOT_PAD + TOOLTIP_GAP;
     const placeBelow = below + TOOLTIP_H_EST < vh || rect.top < TOOLTIP_H_EST + TOOLTIP_GAP;
     const left = Math.min(
       Math.max(rect.left + rect.width / 2 - TOOLTIP_W / 2, 12),
       Math.max(vw - TOOLTIP_W - 12, 12)
     );
+    const top = placeBelow ? Math.min(below, vh - 60) : undefined;
+    const bottom = placeBelow ? undefined : Math.max(vh - rect.top + SPOT_PAD + TOOLTIP_GAP, 12);
     tooltipStyle = {
       position: 'fixed',
       left,
       width: TOOLTIP_W,
       maxWidth: 'calc(100vw - 24px)',
-      ...(placeBelow
-        ? { top: Math.min(below, vh - 60) }
-        : { bottom: Math.max(vh - rect.top + SPOT_PAD + TOOLTIP_GAP, 12) }),
+      // Fit within whichever side it's pinned to, leaving a 12px margin.
+      maxHeight: placeBelow ? vh - (top ?? 0) - 12 : vh - (bottom ?? 0) - 12,
+      ...(placeBelow ? { top } : { bottom }),
     };
   }
 
@@ -177,11 +231,34 @@ export function TutorialOverlay({ steps, children }: TutorialOverlayProps) {
         >
           <div className="flex items-baseline justify-between gap-3">
             <h3 className="font-semibold text-cyan-800">{step.title}</h3>
-            <span className="text-xs text-gray-400 whitespace-nowrap">
-              {index + 1} / {count}
+            <span className="text-xs text-gray-400 whitespace-nowrap flex items-center gap-0.5">
+              <input
+                type="text"
+                inputMode="numeric"
+                aria-label="Jump to step"
+                value={draft ?? String(index + 1)}
+                onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ''))}
+                onFocus={(e) => e.target.select()}
+                onBlur={commitJump}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    commitJump();
+                    e.currentTarget.blur();
+                  } else if (e.key === 'Escape') {
+                    setDraft(null);
+                    e.currentTarget.blur();
+                  }
+                  // Don't let the global arrow-key handler also advance the step.
+                  e.stopPropagation();
+                }}
+                className="w-6 text-center text-xs text-gray-500 bg-transparent border-b border-gray-300 focus:border-cyan-500 focus:outline-none"
+              />
+              / {count}
             </span>
           </div>
-          <div className="text-sm text-gray-600 leading-relaxed">{step.body}</div>
+          <div className="text-sm text-gray-600 leading-relaxed flex-1 min-h-0 overflow-y-auto">
+            {step.body}
+          </div>
           <div className={`flex items-center pt-1 ${isLast ? 'justify-start' : 'justify-between'}`}>
             {!isLast && (
               <button

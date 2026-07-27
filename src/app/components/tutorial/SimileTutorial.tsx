@@ -1,7 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
 import { SimileExplanationV3, SimileItem } from '../similes/SimileExplanationV3';
+import { ConceptCheatsheet } from '../concepts/ConceptCheatsheet';
+import { ConceptSet } from '../../study/dataV1';
 import { resolveConceptCategory } from '../ClassBadge';
+
+// The cheatsheet step opens the drawer and spotlights its panel; shared here so
+// the step definition and the onStepChange handler agree on the selector.
+const CHEATSHEET_TARGET = '[data-tutorial="cheatsheet-panel"]';
 
 // Guided tour of the simile / onomatopoeia explanation UI (plain and both
 // dual-view variants). Rendered from a real sample; the dual-view-only steps
@@ -212,18 +218,27 @@ function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialSte
         </>
       ),
     },
+    // ── Worked example, after every component has been introduced ────────────
+    ...workedExampleSteps(similes, nounPlural),
+    // ── Cheatsheet, last, once participants can already read the plot ─────────
     {
-      target: '[data-tutorial="cheatsheet-button"]',
+      target: CHEATSHEET_TARGET,
+      alwaysShow: true,
+      placement: 'left',
       title: 'The cheatsheet',
       body: (
         <>
-          This button opens a reference list of all {nounPlural} with playable audio, in case
-          you want to refresh your memory during the study.
+          The floating button in the <b>bottom right corner</b> opens this <b>cheatsheet</b> — a reference list you can
+          pull up at any time during the study. Every {noun} is grouped under the sound category it
+          is typically associated with.
+          <br />
+          <br />
+          The play button beside each entry plays a <b>generated audio sample</b> of that {noun}, so
+          you can hear what it refers to. <i>These samples are synthesised and may not perfectly
+          match the text — treat them as a rough guide.</i>
         </>
       ),
     },
-    // ── Worked example, after every component has been introduced ────────────
-    ...workedExampleSteps(similes, nounPlural),
     {
       title: "That's it!",
       body: (
@@ -246,8 +261,14 @@ export function SimileTutorial({
 }: SimileTutorialProps) {
   // Stable identity: a fresh steps array on every render would reset the tour.
   const steps = useMemo(() => buildSteps(isOnomatopoeia, similes), [isOnomatopoeia, similes]);
+  // Physically reveal the cheatsheet drawer while its describing step is active.
+  const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
+  const set: ConceptSet = isOnomatopoeia ? 'onomatopoeia' : 'similes';
   return (
-    <TutorialOverlay steps={steps}>
+    <TutorialOverlay
+      steps={steps}
+      onStepChange={(step) => setCheatsheetOpen(step?.target === CHEATSHEET_TARGET)}
+    >
       <SimileExplanationV3
         audioName={audioName}
         classification={classification}
@@ -256,6 +277,8 @@ export function SimileTutorial({
         isOnomatopoeia={isOnomatopoeia}
         threshold={0}
         domain={domain}
+        cheatsheet={<ConceptCheatsheet domain={domain ?? 'lung'} set={set} />}
+        forceDrawerOpen={cheatsheetOpen}
       />
     </TutorialOverlay>
   );

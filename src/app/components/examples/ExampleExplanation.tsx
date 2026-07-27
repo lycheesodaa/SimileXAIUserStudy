@@ -28,6 +28,9 @@ interface ExampleExplanationProps {
   /** Cheatsheet drawer content (per-class example recordings). Omit to hide
    *  the floating reference button entirely. */
   cheatsheet?: ReactNode;
+  /** Force the cheatsheet drawer open regardless of the internal toggle. Used
+   *  by the tutorial to physically reveal the drawer on its cheatsheet step. */
+  forceDrawerOpen?: boolean;
 }
 
 // Bar value for one example. Exported so the tutorial can rank the examples
@@ -92,11 +95,13 @@ export function ExampleExplanation({
   originalAudioUrl,
   domain,
   cheatsheet,
+  forceDrawerOpen = false,
 }: ExampleExplanationProps) {
   // Word the recording prompt for the input domain; fall back to lung wording.
   const domainNoun = domain === 'bird' ? 'bird sound' : 'lung sound';
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const drawerOpen = forceDrawerOpen || isDrawerOpen;
 
   const getAudioUrl = (path: string) =>
     // v1 data uses absolute S3 URLs; legacy v2 paths are root-relative.
@@ -228,7 +233,7 @@ export function ExampleExplanation({
           </button>
 
           {/* Drawer Overlay */}
-          {isDrawerOpen && (
+          {drawerOpen && (
             <div className="fixed inset-0 z-50 flex justify-end">
               {/* Backdrop */}
               <div
@@ -237,7 +242,10 @@ export function ExampleExplanation({
               />
 
               {/* Drawer content */}
-              <div className="relative w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
+              <div
+                className="relative w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300"
+                data-tutorial="cheatsheet-panel"
+              >
                 <div className="flex items-center justify-between p-4 border-b bg-gray-50">
                   <h2 className="text-xl font-semibold text-cyan-800">Example Cheatsheet</h2>
                   <button

@@ -1,6 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { TutorialOverlay, TutorialStep } from './TutorialOverlay';
 import { ExampleExplanation, ExampleItem, contributionOf } from '../examples/ExampleExplanation';
+import { ExamplesCheatsheet } from '../examples/ExamplesCheatsheet';
+
+// The cheatsheet step opens the drawer and spotlights its panel; shared here so
+// the step definition and the onStepChange handler agree on the selector.
+const CHEATSHEET_TARGET = '[data-tutorial="cheatsheet-panel"]';
 
 // Renamed from ExamplesPractice: the intro text now doubles as the header of a
 // guided tour of the example-based explanation UI. Without a sample (the
@@ -159,6 +164,26 @@ const STEPS: TutorialStep[] = [
   },
 ];
 
+// Shown last, after the worked example, so the reference drawer is introduced
+// once participants already understand how to read the plot.
+const CHEATSHEET_STEP: TutorialStep = {
+  target: CHEATSHEET_TARGET,
+  alwaysShow: true,
+  placement: 'left',
+  title: 'The cheatsheet',
+  body: (
+    <>
+      The floating button in the <b>bottom right corner</b> opens this <b>cheatsheet</b> — a reference list you can
+      pull up at any time during the study. It groups a handful of training recordings under each
+      sound category.
+      <br />
+      <br />
+      The play button beside each entry plays one of those <b>real training example
+      recordings</b>, so you can familiarise yourself with how each category tends to sound.
+    </>
+  ),
+};
+
 function Intro() {
   return (
     <div className="flex flex-col gap-6 my-6 mx-3 text-gray-700">
@@ -181,14 +206,20 @@ export function ExamplesTutorial({ examples, originalAudioUrl, domain }: Example
   // Stable identity: a fresh steps array on every render would reset the tour.
   const steps = useMemo(() => {
     const done = STEPS[STEPS.length - 1];
-    return [...STEPS.slice(0, -1), ...workedExampleSteps(examples ?? []), done];
+    return [...STEPS.slice(0, -1), ...workedExampleSteps(examples ?? []), CHEATSHEET_STEP, done];
   }, [examples]);
+
+  // Physically reveal the cheatsheet drawer while its describing step is active.
+  const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
 
   if (!examples?.length) {
     return <Intro />;
   }
   return (
-    <TutorialOverlay steps={steps}>
+    <TutorialOverlay
+      steps={steps}
+      onStepChange={(step) => setCheatsheetOpen(step?.target === CHEATSHEET_TARGET)}
+    >
       <Intro />
       <ExampleExplanation
         audioName=""
@@ -197,6 +228,8 @@ export function ExamplesTutorial({ examples, originalAudioUrl, domain }: Example
         examples={examples}
         originalAudioUrl={originalAudioUrl}
         domain={domain}
+        cheatsheet={<ExamplesCheatsheet domain={domain ?? 'lung'} />}
+        forceDrawerOpen={cheatsheetOpen}
       />
     </TutorialOverlay>
   );

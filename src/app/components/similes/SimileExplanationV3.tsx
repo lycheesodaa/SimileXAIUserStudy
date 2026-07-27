@@ -40,6 +40,9 @@ interface SimileExplanationV3Props {
   activationView?: boolean;
   /** Drawer content; defaults to the legacy hardcoded SimilePractice. */
   cheatsheet?: ReactNode;
+  /** Force the cheatsheet drawer open regardless of the internal toggle. Used
+   *  by the tutorial to physically reveal the drawer on its cheatsheet step. */
+  forceDrawerOpen?: boolean;
   /** Study domain ('lung' | 'bird'), used to word the recording label.
    *  Defaults to lung wording when unset. */
   domain?: string;
@@ -123,6 +126,7 @@ export function SimileExplanationV3({
   threshold = 0.25,
   activationView = false,
   cheatsheet,
+  forceDrawerOpen = false,
   domain,
 }: SimileExplanationV3Props) {
   // Word the recording prompt for the input domain; fall back to lung wording.
@@ -149,6 +153,7 @@ export function SimileExplanationV3({
   const rowGridClass = isOnomatopoeia ? 'grid-cols-[16rem_1fr]' : 'grid-cols-[1fr_2fr]';
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const drawerOpen = forceDrawerOpen || isDrawerOpen;
   const [showMinor, setShowMinor] = useState(false);
 
   // Only the top MAX_MAJOR_COUNT bars are visible by default; everything else
@@ -378,16 +383,19 @@ export function SimileExplanationV3({
       </button>
 
       {/* Drawer Overlay */}
-      {isDrawerOpen && (
+      {drawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/40 transition-opacity"
             onClick={() => setIsDrawerOpen(false)}
           />
-          
+
           {/* Drawer content */}
-          <div className="relative w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
+          <div
+            className="relative w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300"
+            data-tutorial="cheatsheet-panel"
+          >
             <div className="flex items-center justify-between p-4 border-b bg-gray-50">
               <h2 className="text-xl font-semibold text-cyan-800">{isOnomatopoeia ? 'Onomatopoeia' : 'Simile'} Cheatsheet</h2>
               <button 
