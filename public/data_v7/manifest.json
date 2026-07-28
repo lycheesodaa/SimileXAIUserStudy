@@ -1,6 +1,6 @@
 {
   "schema_version": "v7",
-  "generated_at": "2026-07-22T12:52:20.936264+00:00",
+  "generated_at": "2026-07-28T17:03:46.662613+00:00",
   "audio_base_url": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/",
   "concept_audio_base_url": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/",
   "domains": [
@@ -192,6 +192,128 @@
         "family": "Proto"
       }
     ]
+  },
+  "provenance": {
+    "bird": {
+      "lf_cbm_similes_adapted": {
+        "run_dir": "outputs/lf_cbm_similes_birdsounds_v2_adapted_v7",
+        "run_config": null
+      },
+      "lf_cbm_onomatopoeia_adapted": {
+        "run_dir": "outputs/lf_cbm_onomatopoeia_birdsounds_v2_adapted_v7",
+        "run_config": null
+      },
+      "fused_simile_bird": {
+        "run_dir": "outputs/fused_simile_birdsounds_v2_v7",
+        "run_config": null,
+        "beta": 0.5
+      },
+      "fused_onomatopoeia_bird": {
+        "run_dir": "outputs/fused_onomatopoeia_birdsounds_v2_v7",
+        "run_config": null,
+        "beta": 0.25
+      },
+      "rexnet": {
+        "run_dir": "outputs/rexnet_xai_eval/bird_sounds_v2",
+        "script": "scripts/inference/evaluate_rexnet_xai.py",
+        "written_at": "2026-07-28T06:50:55.086199+00:00",
+        "git": {
+          "commit": "d7672dc",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": "bird_sounds_v2",
+          "cue_keys": [
+            "spectral_centroid_hi",
+            "tonality",
+            "energy_level",
+            "hf_content",
+            "fm_extent",
+            "peak_frequency"
+          ]
+        }
+      },
+      "proto": {
+        "run_dir": "outputs/proto_xai_eval/bird_sounds_v2",
+        "run_config": null
+      }
+    },
+    "lung": {
+      "lf_cbm_similes_adapted": {
+        "run_dir": "outputs/lf_cbm_similes_adapted_v6.1",
+        "run_config": null
+      },
+      "lf_cbm_onomatopoeia_adapted": {
+        "run_dir": "outputs/lf_cbm_onomatopoeia_adapted_v6.1",
+        "run_config": null
+      },
+      "fused_simile_lung": {
+        "run_dir": "outputs/fused_simile_lung_v6.1",
+        "run_config": null,
+        "beta": 0.5
+      },
+      "fused_onomatopoeia_lung": {
+        "run_dir": "outputs/fused_onomatopoeia_lung_v6.1",
+        "run_config": null,
+        "beta": 0.5
+      },
+      "rexnet": {
+        "run_dir": "outputs/rexnet_xai_eval/lung_sounds",
+        "run_config": null
+      },
+      "proto": {
+        "run_dir": "outputs/proto_xai_eval/lung_sounds",
+        "run_config": null
+      }
+    }
+  },
+  "sa3": {
+    "bird": {
+      "modes": [
+        "style"
+      ],
+      "n_samples": 5,
+      "n_clips": 100,
+      "referents": [
+        "onomatopoeia",
+        "similes"
+      ],
+      "params": {
+        "style": {
+          "steps": 8,
+          "cfg_scale": 1.0,
+          "seed": 42,
+          "noise_level": 0.6
+        }
+      },
+      "source": "resources/sa3_generated/<mode>/bird"
+    },
+    "lung": {
+      "modes": [
+        "style"
+      ],
+      "n_samples": 5,
+      "n_clips": 100,
+      "referents": [
+        "onomatopoeia",
+        "similes"
+      ],
+      "params": {
+        "style": {
+          "steps": 8,
+          "cfg_scale": 1.0,
+          "seed": 42,
+          "noise_level": 0.6
+        }
+      },
+      "source": "resources/sa3_generated/<mode>/lung"
+    }
+  },
+  "build_git": {
+    "commit": "d7672dc",
+    "branch": "main",
+    "dirty": true
   },
   "annotation_csv": "samples_annotation.csv"
 }

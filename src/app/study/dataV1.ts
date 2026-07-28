@@ -137,6 +137,11 @@ export interface ConceptEntry {
   concept: string;
   category: string;
   audio: string;
+  /** Optional (v7+): the concept rendered in the domain's own timbre — a real
+   *  recording (`styled_from`) restyled by this concept, rather than the plain
+   *  generated referent clip in `audio`. */
+  styled_audio?: string;
+  styled_from?: string;
 }
 
 export type ConceptSet = 'similes' | 'onomatopoeia';

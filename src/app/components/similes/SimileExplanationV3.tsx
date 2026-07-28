@@ -67,7 +67,24 @@ export const GENERATED_SAMPLE_NOTE =
   'Note that these generated samples may not be entirely representative of the given text. ' +
   'You can choose to rely on your subjective experience of the text instead.';
 
-export function SimileAudioPlayer({ url, logId }: { url: string; logId?: string }) {
+// Blue is the plain generated referent clip; amber is the same concept applied
+// to a real recording of the class (the cheatsheet's styled_audio).
+const AUDIO_PLAYER_VARIANTS = {
+  blue: 'text-blue-600 hover:bg-blue-50',
+  amber: 'text-amber-500 hover:bg-amber-50',
+};
+
+export function SimileAudioPlayer({
+  url,
+  logId,
+  variant = 'blue',
+  tooltip = GENERATED_SAMPLE_NOTE,
+}: {
+  url: string;
+  logId?: string;
+  variant?: keyof typeof AUDIO_PLAYER_VARIANTS;
+  tooltip?: ReactNode;
+}) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -90,16 +107,16 @@ export function SimileAudioPlayer({ url, logId }: { url: string; logId?: string 
         <TooltipTrigger asChild>
           <button
             onClick={togglePlay}
-            className="p-1.5 rounded-full text-blue-600 hover:bg-blue-50 transition-colors"
+            className={`p-1.5 rounded-full transition-colors ${AUDIO_PLAYER_VARIANTS[variant]}`}
             aria-label={isPlaying ? 'Pause' : 'Play'}
             data-log-id={logId}
-            data-tutorial="concept-play"
+            data-tutorial={variant === 'blue' ? 'concept-play' : undefined}
           >
             {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
           </button>
         </TooltipTrigger>
         <TooltipContent side="top" sideOffset={6} className="max-w-xs leading-relaxed">
-          {GENERATED_SAMPLE_NOTE}
+          {tooltip}
         </TooltipContent>
       </Tooltip>
       <audio

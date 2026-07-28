@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
+import { GENERATED_SAMPLE_NOTE, SimileAudioPlayer } from '../similes/SimileExplanationV3';
 import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
 import { ConceptEntry, ConceptSet, DataRoot, loadConcepts, prettifyOnomatopoeia } from '../../study/dataV1';
 import { ClassBadge, CLASS_METADATA, getClassMetadata } from '../ClassBadge';
@@ -67,6 +67,22 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
 
   const noun = isOnomatopoeia ? 'onomatopoeia' : 'simile';
   const nounPlural = isOnomatopoeia ? 'onomatopoeia' : 'similes';
+  const soundNoun = domain === 'bird' ? 'bird sound' : 'lung sound';
+
+  // The two clips per row: the plain generated referent (blue) and, where the
+  // bundle provides one, that referent applied to a real recording (amber).
+  const referentNote = (
+    <>
+      <strong>Original {noun}.</strong>{' '}
+      {GENERATED_SAMPLE_NOTE}
+    </>
+  );
+  const styledNote = (
+    <>
+      <strong>Enhanced with the category's {soundNoun}.</strong>{' '}
+      {GENERATED_SAMPLE_NOTE}
+    </>
+  );
 
   return (
     <div className="my-6 mx-3">
@@ -121,7 +137,16 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
                     <SimileAudioPlayer
                       url={entry.audio}
                       logId={`cheatsheet-${entry.concept.replace(/\W+/g, '-').slice(0, 60)}`}
+                      tooltip={referentNote}
                     />
+                    {entry.styled_audio && (
+                      <SimileAudioPlayer
+                        url={entry.styled_audio}
+                        variant="amber"
+                        logId={`cheatsheet-styled-${entry.concept.replace(/\W+/g, '-').slice(0, 60)}`}
+                        tooltip={styledNote}
+                      />
+                    )}
                     <span>{isOnomatopoeia ? prettifyOnomatopoeia(entry.concept) : entry.concept}</span>
                   </li>
                 ))}
