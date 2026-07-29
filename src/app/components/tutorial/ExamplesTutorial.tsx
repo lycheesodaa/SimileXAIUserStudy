@@ -165,7 +165,20 @@ const STEPS: TutorialStep[] = [
 ];
 
 // Shown last, after the worked example, so the reference drawer is introduced
-// once participants already understand how to read the plot.
+// once participants already understand how to read the plot. The button is
+// spotlighted first (drawer still closed), then the panel it opens — otherwise
+// the drawer appears with no explanation of where from.
+const CHEATSHEET_BUTTON_STEP: TutorialStep = {
+  target: '[data-tutorial="cheatsheet-button"]',
+  title: 'The cheatsheet button',
+  body: (
+    <>
+      This floating button in the <b>bottom right corner</b> is always there. It opens the{' '}
+      <b>cheatsheet</b>, which you can pull up at any time during the study — let's open it now.
+    </>
+  ),
+};
+
 const CHEATSHEET_STEP: TutorialStep = {
   target: CHEATSHEET_TARGET,
   alwaysShow: true,
@@ -173,9 +186,8 @@ const CHEATSHEET_STEP: TutorialStep = {
   title: 'The cheatsheet',
   body: (
     <>
-      The floating button in the <b>bottom right corner</b> opens this <b>cheatsheet</b> — a reference list you can
-      pull up at any time during the study. It groups a handful of training recordings under each
-      sound category.
+      This is the <b>cheatsheet</b> — a reference list that groups a handful of training recordings
+      under each sound category.
       <br />
       <br />
       The play button beside each entry plays one of those <b>real training example
@@ -206,7 +218,13 @@ export function ExamplesTutorial({ examples, originalAudioUrl, domain }: Example
   // Stable identity: a fresh steps array on every render would reset the tour.
   const steps = useMemo(() => {
     const done = STEPS[STEPS.length - 1];
-    return [...STEPS.slice(0, -1), ...workedExampleSteps(examples ?? []), CHEATSHEET_STEP, done];
+    return [
+      ...STEPS.slice(0, -1),
+      ...workedExampleSteps(examples ?? []),
+      CHEATSHEET_BUTTON_STEP,
+      CHEATSHEET_STEP,
+      done,
+    ];
   }, [examples]);
 
   // Physically reveal the cheatsheet drawer while its describing step is active.

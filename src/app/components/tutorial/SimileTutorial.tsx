@@ -221,6 +221,18 @@ function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialSte
     // ── Worked example, after every component has been introduced ────────────
     ...workedExampleSteps(similes, nounPlural),
     // ── Cheatsheet, last, once participants can already read the plot ─────────
+    // The button is spotlighted first (drawer still closed), then the panel it
+    // opens — otherwise the drawer appears with no explanation of where from.
+    {
+      target: '[data-tutorial="cheatsheet-button"]',
+      title: 'The cheatsheet button',
+      body: (
+        <>
+          This floating button in the <b>bottom right corner</b> is always there. It opens the{' '}
+          <b>cheatsheet</b>, which you can pull up at any time during the study — let's open it now.
+        </>
+      ),
+    },
     {
       target: CHEATSHEET_TARGET,
       alwaysShow: true,
@@ -228,9 +240,8 @@ function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialSte
       title: 'The cheatsheet',
       body: (
         <>
-          The floating button in the <b>bottom right corner</b> opens this <b>cheatsheet</b> — a reference list you can
-          pull up at any time during the study. Every {noun} is grouped under the sound category it
-          is typically associated with.
+          This is the <b>cheatsheet</b> — a reference list of every {noun}, grouped under the sound
+          category it is typically associated with.
           <br />
           <br />
           The play button beside each entry plays a <b>generated audio sample</b> of that {noun}, so
