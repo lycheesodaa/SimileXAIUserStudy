@@ -69,17 +69,20 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
   const nounPlural = isOnomatopoeia ? 'onomatopoeia' : 'similes';
   const soundNoun = domain === 'bird' ? 'bird sound' : 'lung sound';
 
-  // The two clips per row: the plain generated referent (blue) and, where the
-  // bundle provides one, that referent applied to a real recording (amber).
+  // One clip per row. Similes play the bundle's styled_audio (a real recording
+  // of the category restyled by the simile) where v7+ provides one; onomatopoeia
+  // play the plain generated referent. Bundles without styled_audio fall back to
+  // the referent clip either way.
+  const preferStyledAudio = !isOnomatopoeia;
   const referentNote = (
     <>
-      <strong>Original {noun}.</strong>{' '}
+      <strong>Generated {noun}.</strong>{' '}
       {GENERATED_SAMPLE_NOTE}
     </>
   );
   const styledNote = (
     <>
-      <strong>Enhanced with the category's {soundNoun}.</strong>{' '}
+      <strong>Enhanced {noun} with the category's {soundNoun}.</strong>{' '}
       {GENERATED_SAMPLE_NOTE}
     </>
   );
@@ -135,18 +138,10 @@ export function ConceptCheatsheet({ domain, set, root, withClassGuide }: Concept
                 {entries.map((entry) => (
                   <li key={entry.concept} className="flex items-center gap-1">
                     <SimileAudioPlayer
-                      url={entry.audio}
+                      url={preferStyledAudio && entry.styled_audio ? entry.styled_audio : entry.audio}
                       logId={`cheatsheet-${entry.concept.replace(/\W+/g, '-').slice(0, 60)}`}
-                      tooltip={referentNote}
+                      tooltip={preferStyledAudio && entry.styled_audio ? styledNote : referentNote}
                     />
-                    {entry.styled_audio && (
-                      <SimileAudioPlayer
-                        url={entry.styled_audio}
-                        variant="amber"
-                        logId={`cheatsheet-styled-${entry.concept.replace(/\W+/g, '-').slice(0, 60)}`}
-                        tooltip={styledNote}
-                      />
-                    )}
                     <span>{isOnomatopoeia ? prettifyOnomatopoeia(entry.concept) : entry.concept}</span>
                   </li>
                 ))}
