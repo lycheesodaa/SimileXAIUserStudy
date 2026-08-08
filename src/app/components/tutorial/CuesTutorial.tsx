@@ -12,6 +12,7 @@ import {
   resolveIsBird,
 } from '../cues/CuesExplanationV1';
 import { DataRoot, RexnetReport } from '../../study/dataV1';
+import { ClassBadge } from '../ClassBadge';
 
 // Guided tour of the acoustic-cue (RExNet) explanation UI, rendered from a
 // real sample in the same static configuration participants see in the study
@@ -111,6 +112,27 @@ function buildWorkedExample(
   return candidates.sort((a, b) => score(b) - score(a))[0] ?? null;
 }
 
+// Class names in the tour text are rendered as the same coloured pill the
+// participant sees on the screen behind the card, so the worked example is
+// visually tied to the counterfactual badge and the reference-table rows.
+function classBadge(name: string) {
+  return <ClassBadge className={name} size="xs" extraClasses="align-middle mx-0.5" />;
+}
+
+// Ranking strings ("Normal < Crackle < Wheeze ~ Rhonchi") spell class names out
+// verbatim, so the counterfactual can be swapped for its badge in place — the
+// participant can then see at a glance where it sits in the order.
+function renderRanking(ranking: string, highlight: string) {
+  const parts = ranking.split(highlight);
+  if (parts.length === 1) return <b>{ranking}</b>;
+  return parts.map((part, i) => (
+    <span key={i}>
+      {i > 0 && classBadge(highlight)}
+      <b>{part}</b>
+    </span>
+  ));
+}
+
 function joinClasses(names: string[]): string {
   if (names.length === 1) return names[0];
   return `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`;
@@ -120,12 +142,13 @@ function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
   if (!w) return [];
   const relationPhrase =
     w.relation === 'higher' ? 'higher than' : w.relation === 'lower' ? 'lower than' : 'similar to';
+  const contrastBadge = classBadge(w.contrastClass);
   const positionPhrase =
     w.relation === 'higher'
-      ? <>ranks <b>above</b> {w.contrastClass}</>
+      ? <>ranks <b>above</b> {contrastBadge}</>
       : w.relation === 'lower'
-        ? <>ranks <b>below</b> {w.contrastClass}</>
-        : <>sits at a <b>similar level</b> to {w.contrastClass}</>;
+        ? <>ranks <b>below</b> {contrastBadge}</>
+        : <>sits at a <b>similar level</b> to {contrastBadge}</>;
 
   return [
     {
@@ -134,7 +157,8 @@ function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
       body: (
         <>
           Take this row. It says the <b>{w.cueName}</b> of this recording is{' '}
-          <b>{relationPhrase}</b> that of a typical <b>{w.contrastClass}</b> sound.
+          <b>{relationPhrase}</b> that of a typical {contrastBadge} sound — the counterfactual
+          class pinned in the badge above the table.
         </>
       ),
     },
@@ -144,12 +168,12 @@ function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
       body: (
         <>
           The reference table ranks {w.cueName} across categories as{' '}
-          <b>{w.ranking}</b>. So a sound that {positionPhrase} on this cue could
-          be <b>{joinClasses(w.candidates)}</b>.
+          {renderRanking(w.ranking, w.contrastClass)}. So a sound that {positionPhrase} on this cue
+          could be <b>{joinClasses(w.candidates)}</b>.
           <br />
           <br />
           Reading every row this way — and weighing which categories the cues agree on — is how
-          you can narrow down what the system heard.
+          you can narrow down what the <b>system predicted</b>.
         </>
       ),
     },

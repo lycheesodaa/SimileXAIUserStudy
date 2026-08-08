@@ -389,14 +389,15 @@ export function SimileExplanationV3({
     </div>
 
       {/* Floating Button */}
-      <button 
+      <button
         onClick={() => setIsDrawerOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-cyan-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-cyan-700 transition-colors z-40"
+        className="fixed bottom-6 right-6 h-14 px-5 bg-cyan-600 text-white rounded-full shadow-xl flex items-center justify-center gap-2 hover:bg-cyan-700 transition-colors z-40"
         title="Open Simile Cheatsheet"
         data-log-id="cheatsheet-open"
         data-tutorial="cheatsheet-button"
       >
-        <HelpCircle size={28} />
+        <HelpCircle size={24} />
+        <span className="font-semibold">Cheatsheet</span>
       </button>
 
       {/* Drawer Overlay */}
