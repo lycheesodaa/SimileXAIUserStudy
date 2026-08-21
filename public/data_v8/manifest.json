@@ -1,0 +1,417 @@
+{
+  "schema_version": "v8",
+  "generated_at": "2026-08-20T09:55:37.877584+00:00",
+  "audio_base_url": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/",
+  "concept_audio_base_url": "https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/",
+  "domains": [
+    "lung_v8",
+    "bird_v2_v8"
+  ],
+  "counts": {
+    "lung_v8": 225,
+    "bird_v2_v8": 225
+  },
+  "models": {
+    "lung_v8": [
+      {
+        "key": "lf_cbm_similes_adapted",
+        "family": "LF-CBM",
+        "concept_set": "similes",
+        "mode": "adapted"
+      },
+      {
+        "key": "lf_cbm_similes_adapted_activations",
+        "family": "LF-CBM-Activations",
+        "concept_set": "similes",
+        "mode": "adapted",
+        "view": "activation_only",
+        "of": "lf_cbm_similes_adapted"
+      },
+      {
+        "key": "lf_cbm_onomatopoeia_adapted",
+        "family": "LF-CBM",
+        "concept_set": "onomatopoeia",
+        "mode": "adapted"
+      },
+      {
+        "key": "lf_cbm_onomatopoeia_adapted_activations",
+        "family": "LF-CBM-Activations",
+        "concept_set": "onomatopoeia",
+        "mode": "adapted",
+        "view": "activation_only",
+        "of": "lf_cbm_onomatopoeia_adapted"
+      },
+      {
+        "key": "fused_simile_lung",
+        "family": "Fused-LF-CBM",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_simile_lung_activations",
+        "family": "Fused-LF-CBM-Activations",
+        "concept_set": "similes",
+        "beta": 0.5,
+        "view": "activation_only",
+        "of": "fused_simile_lung"
+      },
+      {
+        "key": "fused_beta_breakdown_simile_lung",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_attr_breakdown_simile_lung",
+        "family": "Fused-Attr-Breakdown",
+        "concept_set": "similes",
+        "beta": 0.5
+      },
+      {
+        "key": "fused_onomatopoeia_lung",
+        "family": "Fused-LF-CBM",
+        "concept_set": "onomatopoeia",
+        "beta": 0.75
+      },
+      {
+        "key": "fused_onomatopoeia_lung_activations",
+        "family": "Fused-LF-CBM-Activations",
+        "concept_set": "onomatopoeia",
+        "beta": 0.75,
+        "view": "activation_only",
+        "of": "fused_onomatopoeia_lung"
+      },
+      {
+        "key": "fused_beta_breakdown_onomatopoeia_lung",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "onomatopoeia",
+        "beta": 0.75
+      },
+      {
+        "key": "fused_attr_breakdown_onomatopoeia_lung",
+        "family": "Fused-Attr-Breakdown",
+        "concept_set": "onomatopoeia",
+        "beta": 0.75
+      },
+      {
+        "key": "rexnet",
+        "family": "RExNet"
+      },
+      {
+        "key": "proto",
+        "family": "Proto"
+      }
+    ],
+    "bird_v2_v8": [
+      {
+        "key": "lf_cbm_similes_adapted",
+        "family": "LF-CBM",
+        "concept_set": "similes",
+        "mode": "adapted"
+      },
+      {
+        "key": "lf_cbm_similes_adapted_activations",
+        "family": "LF-CBM-Activations",
+        "concept_set": "similes",
+        "mode": "adapted",
+        "view": "activation_only",
+        "of": "lf_cbm_similes_adapted"
+      },
+      {
+        "key": "lf_cbm_onomatopoeia_adapted",
+        "family": "LF-CBM",
+        "concept_set": "onomatopoeia",
+        "mode": "adapted"
+      },
+      {
+        "key": "lf_cbm_onomatopoeia_adapted_activations",
+        "family": "LF-CBM-Activations",
+        "concept_set": "onomatopoeia",
+        "mode": "adapted",
+        "view": "activation_only",
+        "of": "lf_cbm_onomatopoeia_adapted"
+      },
+      {
+        "key": "fused_simile_bird",
+        "family": "Fused-LF-CBM",
+        "concept_set": "similes",
+        "beta": 0.75
+      },
+      {
+        "key": "fused_simile_bird_activations",
+        "family": "Fused-LF-CBM-Activations",
+        "concept_set": "similes",
+        "beta": 0.75,
+        "view": "activation_only",
+        "of": "fused_simile_bird"
+      },
+      {
+        "key": "fused_beta_breakdown_simile_bird",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "similes",
+        "beta": 0.75
+      },
+      {
+        "key": "fused_attr_breakdown_simile_bird",
+        "family": "Fused-Attr-Breakdown",
+        "concept_set": "similes",
+        "beta": 0.75
+      },
+      {
+        "key": "fused_onomatopoeia_bird",
+        "family": "Fused-LF-CBM",
+        "concept_set": "onomatopoeia",
+        "beta": 0.25
+      },
+      {
+        "key": "fused_onomatopoeia_bird_activations",
+        "family": "Fused-LF-CBM-Activations",
+        "concept_set": "onomatopoeia",
+        "beta": 0.25,
+        "view": "activation_only",
+        "of": "fused_onomatopoeia_bird"
+      },
+      {
+        "key": "fused_beta_breakdown_onomatopoeia_bird",
+        "family": "Fused-Beta-Breakdown",
+        "concept_set": "onomatopoeia",
+        "beta": 0.25
+      },
+      {
+        "key": "fused_attr_breakdown_onomatopoeia_bird",
+        "family": "Fused-Attr-Breakdown",
+        "concept_set": "onomatopoeia",
+        "beta": 0.25
+      },
+      {
+        "key": "rexnet",
+        "family": "RExNet"
+      },
+      {
+        "key": "proto",
+        "family": "Proto"
+      }
+    ]
+  },
+  "provenance": {
+    "lung_v8": {
+      "lf_cbm_similes_adapted": {
+        "run_dir": "outputs/lf_cbm_similes_adapted_v8",
+        "script": "scripts/inference/cbm/lf_cbm.py",
+        "written_at": "2026-08-20T09:45:55.060140+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": null,
+          "frontend_tag": "pp_fe1"
+        }
+      },
+      "lf_cbm_onomatopoeia_adapted": {
+        "run_dir": "outputs/lf_cbm_onomatopoeia_adapted_v8",
+        "script": "scripts/inference/cbm/lf_cbm.py",
+        "written_at": "2026-08-20T09:46:15.374964+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": null,
+          "frontend_tag": "pp_fe1"
+        }
+      },
+      "fused_simile_lung": {
+        "run_dir": "outputs/fused_simile_lung_v8",
+        "script": "scripts/inference/cbm/fused_simile_cbm.py",
+        "written_at": "2026-08-20T09:46:29.997346+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": null,
+          "frontend_tag": "pp_fe1"
+        },
+        "beta": 0.5
+      },
+      "fused_onomatopoeia_lung": {
+        "run_dir": "outputs/fused_onomatopoeia_lung_v8",
+        "script": "scripts/inference/cbm/fused_simile_cbm.py",
+        "written_at": "2026-08-20T09:46:46.873017+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": null,
+          "frontend_tag": "pp_fe1"
+        },
+        "beta": 0.75
+      },
+      "rexnet": {
+        "run_dir": "outputs/rexnet_xai_eval/lung_sounds",
+        "run_config": null
+      },
+      "proto": {
+        "run_dir": "outputs/proto_xai_eval/lung_sounds_v8",
+        "script": "scripts/inference/evaluate_proto_xai.py",
+        "written_at": "2026-08-20T09:55:16.465997+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": "lung_sounds"
+        }
+      }
+    },
+    "bird_v2_v8": {
+      "lf_cbm_similes_adapted": {
+        "run_dir": "outputs/lf_cbm_similes_birdsounds_v2_adapted_v8",
+        "script": "scripts/inference/cbm/lf_cbm.py",
+        "written_at": "2026-08-20T09:47:01.481819+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": "bird_sounds_v2",
+          "frontend_tag": "rawln_fe1"
+        }
+      },
+      "lf_cbm_onomatopoeia_adapted": {
+        "run_dir": "outputs/lf_cbm_onomatopoeia_birdsounds_v2_adapted_v8",
+        "script": "scripts/inference/cbm/lf_cbm.py",
+        "written_at": "2026-08-20T09:47:13.937391+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": "bird_sounds_v2",
+          "frontend_tag": "rawln_fe1"
+        }
+      },
+      "fused_simile_bird": {
+        "run_dir": "outputs/fused_simile_birdsounds_v2_v8",
+        "script": "scripts/inference/cbm/fused_simile_cbm.py",
+        "written_at": "2026-08-20T09:47:24.744004+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": null,
+          "frontend_tag": "pp_fe1"
+        },
+        "beta": 0.75
+      },
+      "fused_onomatopoeia_bird": {
+        "run_dir": "outputs/fused_onomatopoeia_birdsounds_v2_v8",
+        "script": "scripts/inference/cbm/fused_simile_cbm.py",
+        "written_at": "2026-08-20T09:47:35.909353+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": null,
+          "frontend_tag": "pp_fe1"
+        },
+        "beta": 0.25
+      },
+      "rexnet": {
+        "run_dir": "outputs/rexnet_xai_eval/bird_sounds_v2",
+        "script": "scripts/inference/evaluate_rexnet_xai.py",
+        "written_at": "2026-07-28T06:50:55.086199+00:00",
+        "git": {
+          "commit": "d7672dc",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": "bird_sounds_v2",
+          "cue_keys": [
+            "spectral_centroid_hi",
+            "tonality",
+            "energy_level",
+            "hf_content",
+            "fm_extent",
+            "peak_frequency"
+          ]
+        }
+      },
+      "proto": {
+        "run_dir": "outputs/proto_xai_eval/bird_sounds_v2_v8",
+        "script": "scripts/inference/evaluate_proto_xai.py",
+        "written_at": "2026-08-20T09:55:16.480839+00:00",
+        "git": {
+          "commit": "66948f4",
+          "branch": "main",
+          "dirty": true
+        },
+        "context": {
+          "domain": "bird_sounds_v2"
+        }
+      }
+    }
+  },
+  "sa3": {
+    "lung_v8": {
+      "modes": [
+        "style"
+      ],
+      "n_samples": 5,
+      "n_clips": 100,
+      "referents": [
+        "onomatopoeia",
+        "similes"
+      ],
+      "params": {
+        "style": {
+          "steps": 8,
+          "cfg_scale": 1.0,
+          "seed": 42,
+          "noise_level": 0.6
+        }
+      },
+      "source": "resources/sa3_generated/<mode>/lung"
+    },
+    "bird_v2_v8": {
+      "modes": [
+        "style"
+      ],
+      "n_samples": 5,
+      "n_clips": 100,
+      "referents": [
+        "onomatopoeia",
+        "similes"
+      ],
+      "params": {
+        "style": {
+          "steps": 8,
+          "cfg_scale": 1.0,
+          "seed": 42,
+          "noise_level": 0.6
+        }
+      },
+      "source": "resources/sa3_generated/<mode>/bird"
+    }
+  },
+  "build_git": {
+    "commit": "66948f4",
+    "branch": "main",
+    "dirty": true
+  },
+  "annotation_csv": "samples_annotation.csv"
+}

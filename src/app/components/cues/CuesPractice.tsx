@@ -1,6 +1,6 @@
 import { ReferenceTableV1 } from './CuesExplanationV1';
 import { ClassClipButtons, useClassSections } from '../guide/ClassGuide';
-import { DataRoot } from '../../study/dataV1';
+import { DataRoot, usesV7BirdCues } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
 
 const LUNG_CLASSES = ['Crackle', 'Normal', 'Wheeze', 'Rhonchi', 'Stridor'];
@@ -28,7 +28,7 @@ interface CuesPracticeProps {
 
 export function CuesPractice({ domain, root }: CuesPracticeProps) {
   const isBird = domain === 'bird';
-  const isV7 = root === 'data_v7';
+  const isV7 = usesV7BirdCues(root);
   const classes = isBird ? (isV7 ? BIRD_CLASSES_V7 : BIRD_CLASSES_V1) : LUNG_CLASSES;
   const sections = useClassSections(isBird ? 'bird' : 'lung', root);
   const sectionFor = (c: string) => sections?.find((s) => s.label === c);

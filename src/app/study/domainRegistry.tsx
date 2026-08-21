@@ -345,20 +345,31 @@ interface ProtoView {
   cheatsheetRoot: DataRoot;
 }
 
+// How many prototypes the examples condition surfaces. v1-v7 ship exactly
+// three per sample; the v8 bundles ship five, which is more rows than the
+// condition is designed around (and than the tutorial's "top three" wording
+// assumes), so the view is capped here rather than per bundle. Prototype rank
+// already follows contribution order in every shipped bundle, so ranks 1-3 are
+// the three largest bars — the ones a participant would have seen on top.
+const MAX_PROTO_EXAMPLES = 3;
+
 const protoVariant = (domain: string): StudyXaiVariant<ProtoView> => ({
   getSample: async (sampleId, root) => {
     const sample = await loadSample(domain, sampleId, root);
     const model = sample?.models.proto;
     if (!sample || !model?.prototypes?.length) return undefined;
-    const examples: ExampleItem[] = model.prototypes.map((p) => ({
-      id: `example-rank${p.rank}`,
-      rank: p.rank,
-      className: p.proto_class,
-      weight: p.weight,
-      similarity: p.similarity,
-      contribution: p.contribution,
-      audioUrl: p.audio,
-    }));
+    const examples: ExampleItem[] = [...model.prototypes]
+      .sort((a, b) => a.rank - b.rank)
+      .slice(0, MAX_PROTO_EXAMPLES)
+      .map((p) => ({
+        id: `example-rank${p.rank}`,
+        rank: p.rank,
+        className: p.proto_class,
+        weight: p.weight,
+        similarity: p.similarity,
+        contribution: p.contribution,
+        audioUrl: p.audio,
+      }));
     return {
       sample,
       examples,

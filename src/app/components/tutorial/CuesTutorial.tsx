@@ -11,7 +11,7 @@ import {
   resolveFoilContrast,
   resolveIsBird,
 } from '../cues/CuesExplanationV1';
-import { DataRoot, RexnetReport } from '../../study/dataV1';
+import { DataRoot, RexnetReport, usesV7BirdCues } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
 
 // Guided tour of the acoustic-cue (RExNet) explanation UI, rendered from a
@@ -66,7 +66,7 @@ function buildWorkedExample(
   if (!selected) return null;
 
   const isBird = resolveIsBird(domain, contrasts);
-  const isV7 = root === 'data_v7';
+  const isV7 = usesV7BirdCues(root);
   const rows = referenceRows(isBird, isV7);
 
   const candidates: WorkedExample[] = [];

@@ -1,0 +1,32 @@
+<!-- ============================================================
+     Gold-MSI — Musical Training subscale (7 items)
+     Qualtrics QUESTION HTML  (Text/Graphic question, <> HTML view)
+     Items are injected by gold-msi-musical-training.js so the wording
+     lives in one place. Paste that file into the JS panel.
+     ============================================================ -->
+
+<div id="gmsi-root" style="max-width:680px;margin:0 auto;line-height:1.5;">
+  <p style="margin-bottom:16px;">
+    Please answer the following questions about your musical background.
+  </p>
+  <div id="gmsi-items"></div>
+  <p id="gmsi-warn" style="display:none;color:#c0392b;font-size:14px;margin-top:10px;">
+    Please answer every question before continuing.
+  </p>
+</div>
+
+<style>
+  .gmsi-item{padding:14px 0;border-top:1px solid #e3e3e3;}
+  .gmsi-item:first-child{border-top:none;}
+  .gmsi-q{font-size:15px;margin-bottom:8px;}
+  .gmsi-opts{display:flex;gap:4px;flex-wrap:wrap;}
+  .gmsi-opts label{
+    flex:1 1 74px;text-align:center;font-size:12.5px;line-height:1.2;
+    border:1px solid #c4c4c4;border-radius:5px;padding:7px 3px;cursor:pointer;
+    background:#fff;color:#222;
+  }
+  .gmsi-opts label:hover{background:#eef4fb;border-color:#2a6ebb;}
+  .gmsi-opts input{display:block;margin:0 auto 4px;}
+  .gmsi-opts input:checked + span{font-weight:700;}
+  .gmsi-item.gmsi-missing{background:#fdf1f0;}
+</style>

@@ -1,0 +1,68 @@
+<!-- ============================================================
+     mini-PROMS — single subtest (Melody) — Qualtrics QUESTION HTML
+     Question type: Text / Graphic  (Rich Content Editor -> <> HTML view)
+     Paste the contents of mini-proms-melody.js into this question's
+     JavaScript panel.
+     ============================================================ -->
+
+<div id="proms-root" style="max-width:640px;margin:0 auto;font-family:inherit;">
+
+  <div id="proms-load" style="text-align:center;padding:24px 0;color:#555;">
+    Loading audio&hellip; <span id="proms-load-pct">0%</span>
+  </div>
+
+  <div id="proms-intro" style="display:none;line-height:1.55;">
+    <p><strong>Listening task</strong></p>
+    <p>On each trial you will hear a short melody played <strong>twice</strong>,
+       then a <strong>third</strong> melody. Decide whether the third melody is
+       the <strong>same as</strong> or <strong>different from</strong> the first two.</p>
+    <p>Please wear headphones, set a comfortable volume, and stay in a quiet place.
+       Each trial plays <strong>once only</strong>.</p>
+    <p style="text-align:center;margin-top:20px;">
+      <button type="button" id="proms-start" class="proms-btn">Start</button>
+    </p>
+  </div>
+
+  <div id="proms-task" style="display:none;">
+    <div id="proms-progress" style="font-size:13px;color:#666;text-align:center;margin-bottom:8px;"></div>
+
+    <div style="text-align:center;padding:10px 0;">
+      <button type="button" id="proms-play" class="proms-btn">Play</button>
+    </div>
+
+    <div id="proms-nowplaying" style="text-align:center;min-height:26px;font-size:14px;color:#444;"></div>
+
+    <div id="proms-resp" style="display:none;margin-top:14px;">
+      <p style="text-align:center;font-size:14px;color:#444;margin-bottom:10px;">
+        Was the third melody the same or different?
+      </p>
+      <div class="proms-scale">
+        <button type="button" class="proms-opt" data-v="2">Definitely<br>same</button>
+        <button type="button" class="proms-opt" data-v="1">Probably<br>same</button>
+        <button type="button" class="proms-opt" data-v="0">Don't<br>know</button>
+        <button type="button" class="proms-opt" data-v="-1">Probably<br>different</button>
+        <button type="button" class="proms-opt" data-v="-2">Definitely<br>different</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="proms-done" style="display:none;text-align:center;padding:20px 0;color:#555;">
+    Thank you &mdash; that part is complete.
+  </div>
+</div>
+
+<style>
+  .proms-btn{
+    font-size:16px;padding:10px 26px;border-radius:6px;border:1px solid #2a6ebb;
+    background:#2a6ebb;color:#fff;cursor:pointer;
+  }
+  .proms-btn:disabled{background:#b9c6d4;border-color:#b9c6d4;cursor:default;}
+  .proms-scale{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+  .proms-opt{
+    flex:1 1 100px;max-width:120px;min-height:58px;font-size:13px;line-height:1.25;
+    padding:8px 4px;border:1px solid #bbb;border-radius:6px;background:#fff;
+    color:#222;cursor:pointer;
+  }
+  .proms-opt:hover{background:#eef4fb;border-color:#2a6ebb;}
+  .proms-opt:disabled{opacity:.45;cursor:default;}
+</style>

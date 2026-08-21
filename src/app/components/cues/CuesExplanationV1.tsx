@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { DataRoot, RexnetContrast, RexnetCueRow, RexnetReport } from '../../study/dataV1';
+import { DataRoot, RexnetContrast, RexnetCueRow, RexnetReport, usesV7BirdCues } from '../../study/dataV1';
 import { pinnedFoilClass } from '../../study/foilOverrides';
 import { ClassBadge } from '../ClassBadge';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
@@ -213,7 +213,7 @@ export function CuesExplanationV1({
 
   const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
 
-  const isV7 = root === 'data_v7';
+  const isV7 = usesV7BirdCues(root);
   const visibleCues = selected ? filterVisibleCues(selected.cues, isBird, isV7) : [];
   const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
 
@@ -477,7 +477,7 @@ export const BIRD_CUE_ROWS = BIRD_CUE_ROWS_V1;
 
 export function ReferenceTableV1({ domain = 'lung', root }: { domain?: string; root?: DataRoot }) {
   const isBird = domain === 'bird';
-  const isV7 = root === 'data_v7';
+  const isV7 = usesV7BirdCues(root);
   const rows = isBird ? (isV7 ? BIRD_CUE_ROWS_V7 : BIRD_CUE_ROWS_V1) : LUNG_CUE_ROWS;
 
   return (

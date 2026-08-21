@@ -206,11 +206,28 @@ export const BUNDLE_VERSIONS = [
   { version: 'v5', root: 'data_v5' },
   { version: 'v6', root: 'data_v6' },
   { version: 'v6.1', root: 'data_v6.1' },
-  { version: 'v7', root: 'data_v7' },
+  // v7+ ship the refreshed bird class set (Blue Jay in place of Ovenbird) and
+  // its cue vocabulary; earlier bundles keep the original list.
+  { version: 'v7', root: 'data_v7', birdCuesV7: true },
+  // v8 names its per-domain folders after the bundle ("lung_v8",
+  // "bird_v2_v8") rather than the plain domain, so it carries a domainDirs
+  // map; sample ids, model keys and class labels are unchanged from v7.
+  {
+    version: 'v8',
+    root: 'data_v8',
+    birdCuesV7: true,
+    domainDirs: { lung: 'lung_v8', bird: 'bird_v2_v8' },
+  },
+  // v8.1/v8.2 (sigmoid and presence+nonneg heads) went back to plain
+  // bird/lung folder names, so they need no domainDirs.
+  { version: 'v8.1', root: 'data_v8_1', birdCuesV7: true },
+  { version: 'v8.2', root: 'data_v8_2', birdCuesV7: true },
 ] as const satisfies readonly {
   version: string;
   root: string;
   negativeWeightsAsNot?: boolean;
+  birdCuesV7?: boolean;
+  domainDirs?: Readonly<Record<string, string>>;
 }[];
 
 // DATA_V1_TRAIN_ROOT is an optional sibling bundle with the same per-domain
@@ -231,6 +248,23 @@ export const dataRootForVersion = (version: string): DataRoot =>
 
 export const versionForRoot = (root: DataRoot): string =>
   BUNDLE_VERSIONS.find((b) => b.root === root)?.version ?? 'v1';
+
+// A bundle's folder name for a logical domain ("bird"/"lung"). v1-v7 name the
+// folder after the domain itself; v8+ suffix it with the bundle ("bird_v2_v8"),
+// so every bundle-relative path goes through this map. Unlisted bundles (and
+// the train subset) use the domain unchanged.
+export const bundleDomainDir = (domain: string, root: DataRoot = DATA_V1_ROOT): string => {
+  const entry = BUNDLE_VERSIONS.find((b) => b.root === root);
+  const dirs: Record<string, string> | undefined =
+    entry && 'domainDirs' in entry ? entry.domainDirs : undefined;
+  return dirs?.[domain] ?? domain;
+};
+
+// Whether the bundle uses the v7+ bird class set (Blue Jay, not Ovenbird) and
+// its cue vocabulary. Drives the cues condition's reference table and the cue
+// rows it hides; the train subset follows the live v1 bundle (false).
+export const usesV7BirdCues = (root: DataRoot | undefined): boolean =>
+  BUNDLE_VERSIONS.some((b) => b.root === root && 'birdCuesV7' in b && b.birdCuesV7 === true);
 
 // Whether the bundle encodes negative head weights as descriptor negations
 // ("NOT like a whistle"). The train subset follows the live v1 bundle (false).
@@ -287,7 +321,7 @@ export function loadSample(
   root: DataRoot = DATA_V1_ROOT
 ): Promise<V1Sample | undefined> {
   return fetchJson<V1Sample>(
-    dataV1Url(`${domain}/samples/${encodeURIComponent(sampleId)}.json`, root)
+    dataV1Url(`${bundleDomainDir(domain, root)}/samples/${encodeURIComponent(sampleId)}.json`, root)
   );
 }
 
@@ -302,7 +336,9 @@ export function loadCoreSamples(
   domain: string,
   root: DataRoot = DATA_V1_ROOT
 ): Promise<CoreSampleInfo[] | undefined> {
-  return fetchJson<CoreSampleInfo[]>(dataV1Url(`${domain}/core_samples.json`, root));
+  return fetchJson<CoreSampleInfo[]>(
+    dataV1Url(`${bundleDomainDir(domain, root)}/core_samples.json`, root)
+  );
 }
 
 // ─── Study splits (training.csv / testing.csv / post-test.csv) ───────────────
@@ -347,8 +383,10 @@ export async function loadSplitSamples(
   const samples: CoreSampleInfo[] = [];
   for (const line of hasHeader ? lines.slice(1) : lines) {
     const cells = line.split(',');
-    // The domain filter also drops non-data lines (e.g. training.csv's note row).
-    if (cells[col.domain]?.trim() !== domain) continue;
+    // The domain filter also drops non-data lines (e.g. training.csv's note
+    // row). v8+ CSVs spell the domain as the bundle's folder name.
+    const cell = cells[col.domain]?.trim();
+    if (cell !== domain && cell !== bundleDomainDir(domain, root)) continue;
     const sampleId = cells[col.id]?.trim();
     if (!sampleId) continue;
     samples.push({ sample_id: sampleId, true_label: labelById.get(sampleId) ?? '' });
@@ -379,7 +417,9 @@ export function loadExampleBank(
   domain: string,
   root: DataRoot = DATA_V1_ROOT
 ): Promise<ExampleBankEntry[] | undefined> {
-  return fetchJson<ExampleBankEntry[]>(dataV1Url(`${domain}/example_bank.json`, root));
+  return fetchJson<ExampleBankEntry[]>(
+    dataV1Url(`${bundleDomainDir(domain, root)}/example_bank.json`, root)
+  );
 }
 
 // ─── Class description notes (guide mode) ────────────────────────────────────
@@ -437,7 +477,9 @@ export async function loadConcepts(
   set: ConceptSet,
   root: DataRoot = DATA_V1_ROOT
 ): Promise<Map<string, ConceptEntry> | undefined> {
-  const entries = await fetchJson<ConceptEntry[]>(dataV1Url(`${domain}/concepts/${set}.json`, root));
+  const entries = await fetchJson<ConceptEntry[]>(
+    dataV1Url(`${bundleDomainDir(domain, root)}/concepts/${set}.json`, root)
+  );
   if (!entries) return undefined;
   return new Map(entries.map((e) => [e.concept, e]));
 }
