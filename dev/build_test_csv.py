@@ -21,7 +21,8 @@ DOMAINS = ['bird', 'lung']
 
 
 def get_audio_url(sample_id: str, domain: str, version: str) -> str:
-    sample_json_path = REPO / 'public' / f'data_{version}' / domain / 'samples' / f'{sample_id}.json'
+    data_dir_version = version.replace('.', '_')
+    sample_json_path = REPO / 'public' / f'data_{data_dir_version}' / domain / 'samples' / f'{sample_id}.json'
     if sample_json_path.exists():
         try:
             with open(sample_json_path, 'r', encoding='utf-8') as f:
@@ -31,12 +32,13 @@ def get_audio_url(sample_id: str, domain: str, version: str) -> str:
         except Exception:
             pass
     # Fallback to standard URL construction
-    return f"https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/data_{version}/{domain}/audio/{sample_id}.wav"
+    return f"https://simile-xai-audio.s3.ap-southeast-2.amazonaws.com/data_{data_dir_version}/{domain}/audio/{sample_id}.wav"
 
 
-def build_test_csv(version: str = 'v7', out_path: Path = None):
+def build_test_csv(version: str = 'v8.2', out_path: Path = None):
+    data_dir_version = version.replace('.', '_')
     if out_path is None:
-        out_path = HERE / 'test_main_conditions.csv'
+        out_path = HERE / f'test_main_conditions_{data_dir_version}.csv'
 
     # Preload similes predictions: (domain, sample_id) -> ai_prediction
     similes_preds = {}
@@ -83,10 +85,19 @@ def build_test_csv(version: str = 'v7', out_path: Path = None):
 
 
 if __name__ == '__main__':
-    # v7 (latest / current study)
-    build_test_csv('v7', HERE / 'test_main_conditions.csv')
-    build_test_csv('v7', HERE / 'loop-and-merge' / 'v7' / 'test_main_conditions.csv')
+    import sys
+    target_version = sys.argv[1] if len(sys.argv) > 1 else 'v8.2'
     
-    # v6
+    # Generate for requested or default v8.2
+    v_clean = target_version.replace('.', '_')
+    build_test_csv(target_version, HERE / f'test_main_conditions_{v_clean}.csv')
+    if '.' in target_version:
+        build_test_csv(target_version, HERE / f'test_main_conditions_{target_version}.csv')
+    build_test_csv(target_version, HERE / 'test_main_conditions.csv')
+    build_test_csv(target_version, HERE / 'loop-and-merge' / target_version / 'test_main_conditions.csv')
+    
+    # Also keep v7 and v6 generators
+    build_test_csv('v7', HERE / 'test_main_conditions_v7.csv')
     build_test_csv('v6', HERE / 'test_main_conditions_v6.csv')
-    build_test_csv('v6', HERE / 'loop-and-merge' / 'v6' / 'test_main_conditions.csv')
+
+
