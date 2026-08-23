@@ -219,14 +219,16 @@ export const BUNDLE_VERSIONS = [
     domainDirs: { lung: 'lung_v8', bird: 'bird_v2_v8' },
   },
   // v8.1/v8.2 (sigmoid and presence+nonneg heads) went back to plain
-  // bird/lung folder names, so they need no domainDirs.
-  { version: 'v8.1', root: 'data_v8_1', birdCuesV7: true },
-  { version: 'v8.2', root: 'data_v8_2', birdCuesV7: true },
+  // bird/lung folder names, so they need no domainDirs. They use positive-only
+  // evidence contribution plots for similes/onomatopoeia.
+  { version: 'v8.1', root: 'data_v8_1', birdCuesV7: true, positiveOnlySimiles: true },
+  { version: 'v8.2', root: 'data_v8_2', birdCuesV7: true, positiveOnlySimiles: true },
 ] as const satisfies readonly {
   version: string;
   root: string;
   negativeWeightsAsNot?: boolean;
   birdCuesV7?: boolean;
+  positiveOnlySimiles?: boolean;
   domainDirs?: Readonly<Record<string, string>>;
 }[];
 
@@ -265,6 +267,13 @@ export const bundleDomainDir = (domain: string, root: DataRoot = DATA_V1_ROOT): 
 // rows it hides; the train subset follows the live v1 bundle (false).
 export const usesV7BirdCues = (root: DataRoot | undefined): boolean =>
   BUNDLE_VERSIONS.some((b) => b.root === root && 'birdCuesV7' in b && b.birdCuesV7 === true);
+
+// Whether the bundle renders similes and onomatopoeia as positive-evidence-only
+// contribution plots (v8.1 and v8.2).
+export const isPositiveOnlySimiles = (root: DataRoot | undefined): boolean =>
+  BUNDLE_VERSIONS.some(
+    (b) => b.root === root && 'positiveOnlySimiles' in b && b.positiveOnlySimiles === true
+  );
 
 // Whether the bundle encodes negative head weights as descriptor negations
 // ("NOT like a whistle"). The train subset follows the live v1 bundle (false).

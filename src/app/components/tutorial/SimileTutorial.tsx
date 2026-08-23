@@ -21,6 +21,8 @@ interface SimileTutorialProps {
   isOnomatopoeia?: boolean;
   /** Whether the underlying condition splits bars into branch segments. */
   dualview?: boolean;
+  /** Positive-only evidence view (v8.1 and v8.2). */
+  positiveOnly?: boolean;
   /** Study domain ('lung' | 'bird'), forwarded to word the recording label. */
   domain?: string;
 }
@@ -33,7 +35,7 @@ interface SimileTutorialProps {
 
 const TOP_N = 3;
 
-function workedExampleSteps(similes: SimileItem[], nounPlural: string): TutorialStep[] {
+function workedExampleSteps(similes: SimileItem[], nounPlural: string, positiveOnly?: boolean): TutorialStep[] {
   const magnitude = (s: SimileItem) => Math.abs(s.displayValue ?? s.confidence);
   const shown = similes.filter((s) => magnitude(s) >= 0.01).sort((a, b) => magnitude(b) - magnitude(a));
   const top = shown.slice(0, TOP_N);
@@ -70,30 +72,41 @@ function workedExampleSteps(similes: SimileItem[], nounPlural: string): Tutorial
       title: 'Example: reading the plot',
       body: unanimous ? (
         <>
-          Here the top {top.length} {nounPlural} — <i>{leadTexts}</i> — are all positive evidence and all
-          associated with <b>{leadClass}</b>. Several strong {nounPlural} pointing at one category suggest 
-          a <b>{strength}</b> likelihood that the recording is {leadClass}.
+          Here the top {top.length} {nounPlural} — <i>{leadTexts}</i> — are all{' '}
+          {positiveOnly ? '' : 'positive evidence and all '}associated with <b>{leadClass}</b>. Several strong{' '}
+          {nounPlural} pointing at one category suggest a <b>{strength}</b> likelihood that the recording is{' '}
+          {leadClass}.
           <br />
           <br />
-          Short bars, low values, or negative evidence, may instead mean the prediction is weak or mixed.
+          Short bars{positiveOnly ? ' or low values' : ', low values, or negative evidence'} may instead mean the
+          prediction is weak or mixed.
         </>
       ) : (
         <>
-          Here the strongest evidence is <b>mixed</b>: {leadClass} leads with {leadCount} of the
-          top {top.length} {nounPlural} (<i>{leadTexts}</i>).
-          The remaining bars are negative, which counts against the classification, so this suggests
-          only a <b>fair</b> likelihood for <b>{leadClass}</b>.
-          <br />
-          <br />
-          Had all {top.length} {nounPlural}'s evidences been positive, that
-          may suggest a <i>higher</i> likelihood of {leadClass}.
+          Here the strongest evidence is <b>mixed</b>: {leadClass} leads with {leadCount} of the top {top.length}{' '}
+          {nounPlural} (<i>{leadTexts}</i>).{' '}
+          {positiveOnly ? (
+            <>
+              The remaining bars point to other sound categories, so this suggests only a <b>fair</b> likelihood
+              for <b>{leadClass}</b>.
+            </>
+          ) : (
+            <>
+              The remaining bars are negative, which counts against the classification, so this suggests only a{' '}
+              <b>fair</b> likelihood for <b>{leadClass}</b>.
+              <br />
+              <br />
+              Had all {top.length} {nounPlural}'s evidences been positive, that may suggest a <i>higher</i> likelihood
+              of {leadClass}.
+            </>
+          )}
         </>
       ),
     },
   ];
 }
 
-function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialStep[] {
+function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[], positiveOnly?: boolean): TutorialStep[] {
   const noun = isOnomatopoeia ? 'onomatopoeia' : 'simile';
   const nounPlural = isOnomatopoeia ? 'onomatopoeia' : 'similes';
   return [
@@ -135,8 +148,12 @@ function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialSte
     },
     {
       target: '[data-tutorial="evidence-axis"]',
-      title: 'Positive vs negative evidence',
-      body: (
+      title: positiveOnly ? 'Contribution' : 'Positive vs negative evidence',
+      body: positiveOnly ? (
+        <>
+          Each bar shows how much that {noun} contributed as evidence for the classification.
+        </>
+      ) : (
         <>
           Each {noun} counts either <b>for</b> the classification (bars pointing right, in blue)
           or <b>against</b> it (bars pointing left, in red).
@@ -177,7 +194,12 @@ function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialSte
     {
       target: '[data-tutorial="evidence-bar"]',
       title: 'Evidence strength',
-      body: (
+      body: positiveOnly ? (
+        <>
+          The bar's <b>length</b> shows how strongly this {noun} influenced the system. The
+          number is the raw contribution value.
+        </>
+      ) : (
         <>
           The bar's <b>length and direction</b> show how strongly, and in which direction, this{' '}
           {noun} influenced the system. The number is the raw evidence value.
@@ -219,7 +241,7 @@ function buildSteps(isOnomatopoeia: boolean, similes: SimileItem[]): TutorialSte
       ),
     },
     // ── Worked example, after every component has been introduced ────────────
-    ...workedExampleSteps(similes, nounPlural),
+    ...workedExampleSteps(similes, nounPlural, positiveOnly),
     // ── Cheatsheet, last, once participants can already read the plot ─────────
     // The button is spotlighted first (drawer still closed), then the panel it
     // opens — otherwise the drawer appears with no explanation of where from.
@@ -268,10 +290,11 @@ export function SimileTutorial({
   similes,
   originalAudioUrl,
   isOnomatopoeia = false,
+  positiveOnly = false,
   domain,
 }: SimileTutorialProps) {
   // Stable identity: a fresh steps array on every render would reset the tour.
-  const steps = useMemo(() => buildSteps(isOnomatopoeia, similes), [isOnomatopoeia, similes]);
+  const steps = useMemo(() => buildSteps(isOnomatopoeia, similes, positiveOnly), [isOnomatopoeia, similes, positiveOnly]);
   // Physically reveal the cheatsheet drawer while its describing step is active.
   const [cheatsheetOpen, setCheatsheetOpen] = useState(false);
   const set: ConceptSet = isOnomatopoeia ? 'onomatopoeia' : 'similes';
@@ -287,6 +310,7 @@ export function SimileTutorial({
         originalAudioUrl={originalAudioUrl}
         isOnomatopoeia={isOnomatopoeia}
         threshold={0}
+        positiveOnly={positiveOnly}
         domain={domain}
         cheatsheet={<ConceptCheatsheet domain={domain ?? 'lung'} set={set} />}
         forceDrawerOpen={cheatsheetOpen}

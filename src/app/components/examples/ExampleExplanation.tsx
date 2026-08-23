@@ -127,18 +127,20 @@ export function ExampleExplanation({
     return (
       <Fragment key={e.id}>
         <div
-          className="flex justify-end items-center gap-2 text-sm text-gray-700 leading-tight text-right"
+          className="flex justify-between items-center gap-2 text-sm text-gray-700 leading-tight"
           data-tutorial="example-card"
         >
-          <div data-tutorial="example-class">
-            <ClassBadge className={e.className} size="sm" />
+          <div className="w-11 flex justify-start flex-shrink-0" data-tutorial="example-class">
+            <ClassBadge className={e.className} useAbbrev size="xs" />
           </div>
-          <span data-tutorial="example-rank">Training example #{e.rank}</span>
-          <ExampleAudioPlayer
-            url={getAudioUrl(e.audioUrl)}
-            logId={`example-play-${e.id}`}
-            label={`similar training example ${e.rank}`}
-          />
+          <div className="flex justify-end items-center gap-2 text-right">
+            <span data-tutorial="example-rank">Training example #{e.rank}</span>
+            <ExampleAudioPlayer
+              url={getAudioUrl(e.audioUrl)}
+              logId={`example-play-${e.id}`}
+              label={`similar training example ${e.rank}`}
+            />
+          </div>
         </div>
         <div
           className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm"

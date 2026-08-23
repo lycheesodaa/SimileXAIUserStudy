@@ -29,9 +29,39 @@
 const fs = require('fs');
 const path = require('path');
 
-const VERSION = process.argv[2] || 'v1';
+const BUNDLE_VERSIONS = [
+  { version: 'v1', root: 'data_v1' },
+  { version: 'v2', root: 'data_v2', negativeWeightsAsNot: true },
+  { version: 'v3', root: 'data_v3' },
+  { version: 'v4', root: 'data_v4', negativeWeightsAsNot: true },
+  { version: 'v5', root: 'data_v5' },
+  { version: 'v6', root: 'data_v6' },
+  { version: 'v6.1', root: 'data_v6.1' },
+  { version: 'v7', root: 'data_v7', birdCuesV7: true },
+  {
+    version: 'v8',
+    root: 'data_v8',
+    birdCuesV7: true,
+    domainDirs: { lung: 'lung_v8', bird: 'bird_v2_v8' },
+  },
+  { version: 'v8.1', root: 'data_v8_1', birdCuesV7: true },
+  { version: 'v8.2', root: 'data_v8_2', birdCuesV7: true },
+];
+
+const RAW_VERSION = process.argv[2] || 'v1';
+const bundleEntry = BUNDLE_VERSIONS.find(
+  (b) =>
+    b.version === RAW_VERSION ||
+    b.version === `v${RAW_VERSION}` ||
+    b.root === RAW_VERSION ||
+    b.root === `data_${RAW_VERSION}` ||
+    b.root === `data_v${RAW_VERSION}`
+);
+const VERSION = bundleEntry ? bundleEntry.version : RAW_VERSION;
+const DATA_ROOT_NAME = bundleEntry
+  ? bundleEntry.root
+  : (RAW_VERSION.startsWith('data_') ? RAW_VERSION : `data_${RAW_VERSION}`);
 const ROOT = path.join(__dirname, '..');
-const DATA_ROOT_NAME = `data_${VERSION}`;
 const DATA_V1 = path.join(ROOT, 'public', DATA_ROOT_NAME);
 const OUT_ROOT = path.join(__dirname, 'loop-and-merge', VERSION);
 const XAI_CONDITIONS = [
@@ -51,17 +81,16 @@ const XAI_CONDITIONS = [
 // The conditions the formative table samples from, in output/priority order.
 const FORMATIVE_CONDITIONS = ['similes', 'onomatopoeia', 'examples', 'rexnet'];
 
-const BUNDLE_VERSIONS = [
-  { version: 'v1', root: 'data_v1' },
-  { version: 'v2', root: 'data_v2', negativeWeightsAsNot: true },
-  { version: 'v3', root: 'data_v3' },
-  { version: 'v4', root: 'data_v4', negativeWeightsAsNot: true },
-  { version: 'v5', root: 'data_v5' },
-  { version: 'v6', root: 'data_v6' },
-  { version: 'v6.1', root: 'data_v6.1' },
-  { version: 'v7', root: 'data_v7' },
-  { version: 'v8', root: 'data_v8' },
-];
+function bundleDomainDir(domain, root) {
+  const entry = BUNDLE_VERSIONS.find((b) => b.root === root);
+  return entry?.domainDirs?.[domain] ?? domain;
+}
+
+function usesV7BirdCues(root) {
+  return BUNDLE_VERSIONS.some(
+    (b) => b.root === root && b.birdCuesV7 === true
+  );
+}
 
 function negativeWeightsAsNot(root) {
   return BUNDLE_VERSIONS.some(
@@ -261,7 +290,7 @@ function extractComponents(sample, xai, domain, root) {
   if (!sample || !sample.models) return [];
   const models = sample.models;
   const isBird = domain === 'bird';
-  const isV7 = root === 'data_v7' || root === 'data_v8';
+  const isV7 = usesV7BirdCues(root);
   let fields = [];
 
   // 1. Similes
@@ -472,13 +501,14 @@ function generateForSplit(splitIdsByDomain, splitDir) {
     const ids = splitIdsByDomain.get(domain);
     if (!ids || ids.length === 0) continue;
 
-    const core = JSON.parse(fs.readFileSync(path.join(DATA_V1, domain, 'core_samples.json'), 'utf8'));
+    const domainDir = bundleDomainDir(domain, DATA_ROOT_NAME);
+    const core = JSON.parse(fs.readFileSync(path.join(DATA_V1, domainDir, 'core_samples.json'), 'utf8'));
     const trueLabelById = new Map(core.map((s) => [s.sample_id, s.true_label]));
 
     const samplesById = new Map();
     const predictionsById = new Map();
     for (const id of ids) {
-      const samplePath = path.join(DATA_V1, domain, 'samples', `${id}.json`);
+      const samplePath = path.join(DATA_V1, domainDir, 'samples', `${id}.json`);
       const sample = JSON.parse(fs.readFileSync(samplePath, 'utf8'));
       samplesById.set(id, sample);
       const byModelKey = {};
@@ -518,13 +548,23 @@ function generateForSplit(splitIdsByDomain, splitDir) {
   }
 }
 
-if (parseFloat(VERSION.replace(/^v/i, '')) < 6) {
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
-} else {
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing-formative.csv')), 'test-formative');
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training-formative.csv')), 'train-formative');
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'testing.csv')), 'test');
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'training.csv')), 'train');
-  generateForSplit(parseSplitCsv(path.join(DATA_V1, 'post-test.csv')), 'post-test');
+const splitsToRun =
+  parseFloat(VERSION.replace(/^v/i, '')) < 6
+    ? [
+        { file: 'testing.csv', dir: 'test' },
+        { file: 'training.csv', dir: 'train' },
+      ]
+    : [
+        { file: 'testing-formative.csv', dir: 'test-formative' },
+        { file: 'training-formative.csv', dir: 'train-formative' },
+        { file: 'testing.csv', dir: 'test' },
+        { file: 'training.csv', dir: 'train' },
+        { file: 'post-test.csv', dir: 'post-test' },
+      ];
+
+for (const { file, dir } of splitsToRun) {
+  const csvPath = path.join(DATA_V1, file);
+  if (fs.existsSync(csvPath)) {
+    generateForSplit(parseSplitCsv(csvPath), dir);
+  }
 }

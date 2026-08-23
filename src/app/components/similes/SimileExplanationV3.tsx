@@ -1,4 +1,4 @@
-import { ReactNode, useState, useRef } from 'react';
+import { Fragment, ReactNode, useState, useRef } from 'react';
 import { Play, Pause, HelpCircle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { SimilePractice } from './SimilePractice';
 import { ClassBadge, resolveConceptCategory } from '../ClassBadge';
@@ -38,6 +38,9 @@ interface SimileExplanationV3Props {
    *  evidence for the prediction: swaps the copy/axis wording and shows the
    *  per-item usedByHead badge. */
   activationView?: boolean;
+  /** Positive-only evidence view (like in examples condition): one-sided bar plot
+   *  with baseline at left edge, "Contribution" header, no negative axis. */
+  positiveOnly?: boolean;
   /** Drawer content; defaults to the legacy hardcoded SimilePractice. */
   cheatsheet?: ReactNode;
   /** Force the cheatsheet drawer open regardless of the internal toggle. Used
@@ -142,6 +145,7 @@ export function SimileExplanationV3({
   isOnomatopoeia = false,
   threshold = 0.25,
   activationView = false,
+  positiveOnly = false,
   cheatsheet,
   forceDrawerOpen = false,
   domain,
@@ -166,8 +170,18 @@ export function SimileExplanationV3({
   );
   // Onomatopoeia tokens are much shorter than simile sentences; a narrower
   // plot and label column avoid a large empty gutter on the left.
-  const plotWidthClass = isOnomatopoeia ? 'max-w-4xl' : 'max-w-4xl';
-  const rowGridClass = isOnomatopoeia ? 'grid-cols-[16rem_1fr]' : 'grid-cols-[1fr_2fr]';
+  const plotWidthClass = positiveOnly
+    ? 'max-w-2xl'
+    : isOnomatopoeia
+    ? 'max-w-4xl'
+    : 'max-w-4xl';
+  const rowGridClass = positiveOnly
+    ? isOnomatopoeia
+      ? 'grid-cols-[14rem_1fr]'
+      : 'grid-cols-[16rem_1fr]'
+    : isOnomatopoeia
+    ? 'grid-cols-[16rem_1fr]'
+    : 'grid-cols-[1fr_2fr]';
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerOpen = forceDrawerOpen || isDrawerOpen;
@@ -222,15 +236,27 @@ export function SimileExplanationV3({
     // from the center line, so its segments render reversed.
     const orderedSegments = isPositive ? segments : [...segments].reverse();
 
+    const breakdown =
+      s.clapValue !== undefined && s.beatsValue !== undefined
+        ? `language ${s.clapValue.toFixed(2)} + acoustic ${s.beatsValue.toFixed(2)}`
+        : undefined;
+
+    const labelFits = Math.abs(s.confidence) >= 0.15;
+
     const bar = (
       <div
-        className={`h-6 ${isPositive ? 'rounded-r-sm' : 'rounded-l-sm'} flex overflow-hidden relative flex-shrink-0`}
+        className={`h-6 ${isPositive ? 'rounded-r-sm' : 'rounded-l-sm'} flex overflow-hidden relative flex-shrink-0 items-center`}
         style={{ width: barWidth, minWidth: '4px' }}
         data-tutorial={orderedSegments.length > 1 ? 'split-bar' : undefined}
       >
         {orderedSegments.map((seg, i) => (
           <div key={i} className={`h-full ${seg.cls}`} style={{ width: `${seg.frac * 100}%` }} />
         ))}
+        {positiveOnly && labelFits && (
+          <span className="text-xs text-white pl-1.5 whitespace-nowrap absolute left-0 z-10" title={breakdown}>
+            {barLabel}
+          </span>
+        )}
       </div>
     );
     // The value always sits in the half opposite the coloured bar, flush
@@ -244,44 +270,63 @@ export function SimileExplanationV3({
 
     const categoryClass = resolveConceptCategory(s.text, s.category);
 
-    return (
-      <div key={s.id} className={`grid ${rowGridClass} gap-4 items-center mb-2`} data-tutorial="evidence-row">
-        <div className="flex justify-between items-center gap-2 text-sm text-gray-700 leading-tight">
-          <div
-            className="flex items-center gap-1 flex-shrink-0"
-            data-tutorial={categoryClass ? 'category-badge' : undefined}
-          >
-            <div className="w-11 flex justify-start">
-              {categoryClass && (
-                <ClassBadge className={categoryClass} useAbbrev size="xs" />
-              )}
-            </div>
-            {activationView && (
-              <div className="w-10 flex justify-start">
-                {s.usedByHead && (
-                  <span
-                    className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700 bg-cyan-50 border border-cyan-200 rounded px-1 flex-shrink-0"
-                    title="The classifier uses this concept in its decision"
-                    data-tutorial="used-badge"
-                  >
-                    used
-                  </span>
-                )}
-              </div>
+    const labelContent = (
+      <div className="flex justify-between items-center gap-2 text-sm text-gray-700 leading-tight">
+        <div
+          className="flex items-center gap-1 flex-shrink-0"
+          data-tutorial={categoryClass ? 'category-badge' : undefined}
+        >
+          <div className="w-11 flex justify-start">
+            {categoryClass && (
+              <ClassBadge className={categoryClass} useAbbrev size="xs" />
             )}
           </div>
-          <div className="flex justify-end items-center gap-2 text-right">
-            <span>
-              {s.negate && (
-                <span className="font-semibold text-red-600 uppercase mr-1">not</span>
+          {activationView && (
+            <div className="w-10 flex justify-start">
+              {s.usedByHead && (
+                <span
+                  className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700 bg-cyan-50 border border-cyan-200 rounded px-1 flex-shrink-0"
+                  title="The classifier uses this concept in its decision"
+                  data-tutorial="used-badge"
+                >
+                  used
+                </span>
               )}
-              {s.text}
-            </span>
-            {/* {s.withinClassAudioUrl && (
-              <SimileAudioPlayer url={getAudioUrl(s.withinClassAudioUrl)} logId={`simile-play-${s.id}`} />
-            )} */}
-          </div>
+            </div>
+          )}
         </div>
+        <div className="flex justify-end items-center gap-2 text-right">
+          <span>
+            {s.negate && (
+              <span className="font-semibold text-red-600 uppercase mr-1">not</span>
+            )}
+            {s.text}
+          </span>
+        </div>
+      </div>
+    );
+
+    if (positiveOnly) {
+      return (
+        <Fragment key={s.id}>
+          <div data-tutorial="evidence-row">{labelContent}</div>
+          <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm" data-tutorial="evidence-bar">
+            {/* Divider marking the bar baseline at left edge */}
+            <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-400 z-10" />
+            {bar}
+            {!labelFits && (
+              <span className="text-xs text-gray-600 ml-1" title={breakdown}>
+                {barLabel}
+              </span>
+            )}
+          </div>
+        </Fragment>
+      );
+    }
+
+    return (
+      <div key={s.id} className={`grid ${rowGridClass} gap-4 items-center mb-2`} data-tutorial="evidence-row">
+        {labelContent}
         <div className="relative w-full h-8 flex items-center bg-gray-50 rounded-sm" data-tutorial="evidence-bar">
           {/* Center line */}
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-400 z-10" />
@@ -324,33 +369,70 @@ export function SimileExplanationV3({
         </div>
       </div>
 
-      {/* Tornado Plot Section */}
+      {/* Tornado / Contribution Plot Section */}
       <div className="mb-6">
         <div className="mb-4" data-tutorial="explanation-header">
           <h2 className="text-xl font-semibold mb-2">{isOnomatopoeia ? 'Onomatopoeia' : 'Simile'} Explanation</h2>
           <p className="text-gray-600">
             {activationView
               ? `Each bar shows how strongly the system hears each ${isOnomatopoeia ? 'onomatopoeia' : 'simile'} in this recording — including ones the classifier does not use in its decision.`
+              : positiveOnly
+              ? `The system detects the following ${isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} as evidence for this classification. Each bar shows how much that ${isOnomatopoeia ? 'onomatopoeia' : 'simile'} contributed.`
               : `The system detects the following ${isOnomatopoeia ? 'onomatopoeia(s)' : 'simile(s)'} as positive or negative evidence for this classification.`}
           </p>
           {isDualView && (
             <p className="text-sm text-gray-500 mt-2 italic" data-tutorial="dualview-legend">
               Each bar splits the {activationView ? 'match' : 'evidence'} between the system's two listening branches:{' '}
               <span className="inline-block w-3 h-3 rounded-sm bg-blue-400 align-middle ml-0.5 mb-0.5" />
-              <span className="inline-block w-3 h-3 rounded-sm bg-red-400 align-middle ml-0.5 mr-0.5 mb-0.5" />{' '}
+              {!positiveOnly && (
+                <span className="inline-block w-3 h-3 rounded-sm bg-red-400 align-middle ml-0.5 mr-0.5 mb-0.5" />
+              )}{' '}
               lighter = language,{' '}
               <span className="inline-block w-3 h-3 rounded-sm bg-blue-600 align-middle ml-0.5 mb-0.5" />
-              <span className="inline-block w-3 h-3 rounded-sm bg-red-600 align-middle ml-0.5 mr-0.5 mb-0.5" />{' '}
+              {!positiveOnly && (
+                <span className="inline-block w-3 h-3 rounded-sm bg-red-600 align-middle ml-0.5 mr-0.5 mb-0.5" />
+              )}{' '}
               darker = acoustic.
-              <br/>
-              When the two branches disagree, only the net
-              {activationView ? ' match' : ' evidence'} is shown, in the shade of the branch that dominates.
+              {!positiveOnly && (
+                <>
+                  <br/>
+                  When the two branches disagree, only the net
+                  {activationView ? ' match' : ' evidence'} is shown, in the shade of the branch that dominates.
+                </>
+              )}
             </p>
           )}
         </div>
 
         {filteredSimiles.length === 0 ? (
           <p className="text-gray-500 italic">No strong evidence found.</p>
+        ) : positiveOnly ? (
+          <div
+            className={`w-full ${plotWidthClass} mt-4 grid ${rowGridClass} gap-x-4 gap-y-3 items-center`}
+            data-tutorial="evidence-plot"
+          >
+            <div></div>
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-2" data-tutorial="evidence-axis">
+              Contribution
+            </div>
+
+            {majorSimiles.map((s) => renderRow(s))}
+
+            {minorSimiles.length > 0 && (
+              <>
+                <button
+                  onClick={() => setShowMinor((v) => !v)}
+                  className="col-span-2 flex items-center justify-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors py-1"
+                  data-log-id="minor-evidence-toggle"
+                  data-tutorial="weaker-toggle"
+                >
+                  {showMinor ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  {showMinor ? 'Hide weaker evidence' : 'Show weaker evidence'}
+                </button>
+                {showMinor && minorSimiles.map((s) => renderRow(s))}
+              </>
+            )}
+          </div>
         ) : (
           <div
             className={`w-full ${plotWidthClass} flex flex-col gap-3 mt-6`}
@@ -375,10 +457,7 @@ export function SimileExplanationV3({
                   data-tutorial="weaker-toggle"
                 >
                   {showMinor ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                  {showMinor
-                    ? 'Hide weaker evidence'
-                    // : `Show ${minorSimiles.length} weaker ${isOnomatopoeia ? 'onomatopoeia' : 'simile'}${minorSimiles.length === 1 ? '' : 's'} (|evidence| < ${MINOR_BELOW})`}
-                    : `Show weaker evidence`}
+                  {showMinor ? 'Hide weaker evidence' : 'Show weaker evidence'}
                 </button>
                 {showMinor && minorSimiles.map((s) => renderRow(s))}
               </>

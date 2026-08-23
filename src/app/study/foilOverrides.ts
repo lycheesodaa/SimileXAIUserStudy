@@ -377,6 +377,50 @@ export const FOIL_OVERRIDES: Record<string, Record<string, string>> = {
     'bird_Recording_2_Recording_2_Segment_05_31': 'Blue Jay', // training-formative, training
     'bird_Recording_4_Recording_4_Segment_01_173': 'Wood Thrush', // training-formative, training
   },
+  'data_v8_2': {
+    // ── lung ──
+    'fraiwan_287': 'Stridor', // testing
+    'fraiwan_55': 'Stridor', // testing
+    'hflung_steth_20190102_10_27_06_2': 'Normal', // testing
+    'hflung_steth_20190102_10_27_06_4': 'Stridor', // testing
+    'hflung_trunc_2019-05-07-16-03-02-L2_10_1': 'Normal', // testing
+    'hflung_trunc_2019-05-28-14-44-45-L6_0_2': 'Normal', // testing
+    'hflung_trunc_2019-05-28-14-44-45-L6_0_3': 'Crackle', // testing
+    'hflung_trunc_2019-07-16-10-41-27-L4_10_5': 'Wheeze', // testing
+    'hflung_trunc_2019-07-16-11-46-52-L2_7_3': 'Normal', // testing
+    'hflung_trunc_2019-08-08-09-36-47-L6_4_11': 'Normal', // testing
+    'icbhi_115_1b1_Ar_sc_Meditron_5': 'Crackle', // testing
+    'icbhi_156_5b3_Ll_mc_AKGC417L_6': 'Wheeze', // testing
+    'sprsound_41042359_9.0_1_p2_21901_1': 'Stridor', // testing
+    'sprsound_41091768_7.7_0_p1_853_2': 'Rhonchi', // testing
+    'sprsound_41132911_3.0_0_p2_6066_2': 'Wheeze', // testing
+    'sprsound_41184079_6.2_0_p3_5761_0': 'Rhonchi', // testing
+    'sprsound_64007452_4.6_0_p4_3034_2': 'Crackle', // testing
+    'sprsound_64743918_7.0_0_p1_2518_0': 'Rhonchi', // testing
+    'sprsound_65043263_2.0_0_p3_319_4': 'Rhonchi', // testing
+    'sprsound_65099422_0.5_0_p2_2760_0': 'Rhonchi', // testing
+    // ── bird ──
+    'bird_Recording_1_Recording_1_Segment_04_38': 'Tufted Titmouse', // testing
+    'bird_Recording_1_Recording_1_Segment_06_19': 'Blue Jay', // testing
+    'bird_Recording_1_Recording_1_Segment_08_75': 'Blue Jay', // testing
+    'bird_Recording_1_Recording_1_Segment_10_80': 'Eastern Towhee', // testing
+    'bird_Recording_1_Recording_1_Segment_12_150': 'Black-capped Chickadee', // testing
+    'bird_Recording_1_Recording_1_Segment_12_175': 'Tufted Titmouse', // testing
+    'bird_Recording_1_Recording_1_Segment_23_169': 'Black-capped Chickadee', // testing
+    'bird_Recording_1_Recording_1_Segment_34_17': 'Tufted Titmouse', // testing
+    'bird_Recording_1_Recording_1_Segment_36_12': 'Blue Jay', // testing
+    'bird_Recording_2_Recording_2_Segment_01_17': 'Black-capped Chickadee', // testing
+    'bird_Recording_2_Recording_2_Segment_02_110': 'Tufted Titmouse', // testing
+    'bird_Recording_2_Recording_2_Segment_03_180': 'Blue Jay', // testing
+    'bird_Recording_2_Recording_2_Segment_07_299': 'Tufted Titmouse', // testing
+    'bird_Recording_2_Recording_2_Segment_08_22': 'Eastern Towhee', // testing
+    'bird_Recording_2_Recording_2_Segment_08_284': 'Wood Thrush', // testing
+    'bird_Recording_2_Recording_2_Segment_10_238': 'Wood Thrush', // testing
+    'bird_Recording_4_Recording_4_Segment_01_205': 'Eastern Towhee', // testing
+    'bird_Recording_4_Recording_4_Segment_02_200': 'Eastern Towhee', // testing
+    'bird_Recording_4_Recording_4_Segment_02_85': 'Tufted Titmouse', // testing
+    'bird_Recording_4_Recording_4_Segment_19_142': 'Black-capped Chickadee', // testing
+  },
 };
 
 /** The pinned counterfactual class for a study sample, or undefined when the

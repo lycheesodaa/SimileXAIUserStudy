@@ -16,6 +16,7 @@ import {
   DATA_V1_ROOT,
   DATA_V1_TRAIN_ROOT,
   DataRoot,
+  isPositiveOnlySimiles,
   negativeWeightsAsNot,
   RexnetReport,
   V1ActivationsModel,
@@ -97,6 +98,7 @@ interface FusedView {
    *  maps to the live v1 bundle, which it mirrors and has no concepts/ of
    *  its own). */
   conceptsRoot: DataRoot;
+  root?: DataRoot;
 }
 
 // The practice subset has no concepts/ dir; its cheatsheets read the live v1
@@ -162,7 +164,7 @@ const fusedVariant = (
           withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
         };
       });
-      return { sample, items, predictedLabel: actv.predicted_label, conceptsRoot };
+      return { sample, items, predictedLabel: actv.predicted_label, conceptsRoot, root };
     }
 
     if (mode === 'attr') {
@@ -194,7 +196,7 @@ const fusedVariant = (
         ];
       });
       if (!items.length) return undefined;
-      return { sample, items, predictedLabel: model.predicted_label, conceptsRoot };
+      return { sample, items, predictedLabel: model.predicted_label, conceptsRoot, root };
     }
 
     if (mode === 'beta') {
@@ -233,7 +235,7 @@ const fusedVariant = (
       const items: SimileItem[] = dualItems
         .sort((a, b) => Math.abs(b.net) - Math.abs(a.net))
         .map(({ net, ...rest }) => ({ ...rest, confidence: net / maxAbs, displayValue: net }));
-      return { sample, items, predictedLabel: model.predicted_label, conceptsRoot };
+      return { sample, items, predictedLabel: model.predicted_label, conceptsRoot, root };
     }
 
     // Bar width is normalized to the sample's max |contribution|; the raw
@@ -248,7 +250,7 @@ const fusedVariant = (
       negate: negate(c.head_weight),
       withinClassAudioUrl: conceptMap?.get(c.concept)?.audio,
     }));
-    return { sample, items, predictedLabel: model.predicted_label, conceptsRoot };
+    return { sample, items, predictedLabel: model.predicted_label, conceptsRoot, root };
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => {
@@ -264,6 +266,7 @@ const fusedVariant = (
       isOnomatopoeia={set === 'onomatopoeia'}
       threshold={0}
       activationView={mode === 'actv' || mode === 'actv_dual'}
+      positiveOnly={isPositiveOnlySimiles(view.root)}
       cheatsheet={<ConceptCheatsheet domain={domain} set={set} root={view.conceptsRoot} />}
       domain={domain}
     />
@@ -282,6 +285,7 @@ const fusedVariant = (
       originalAudioUrl={view.sample.audio}
       isOnomatopoeia={set === 'onomatopoeia'}
       dualview={mode === 'beta' || mode === 'attr' || mode === 'actv_dual'}
+      positiveOnly={isPositiveOnlySimiles(view.root)}
       domain={domain}
     />
   ),
