@@ -18,8 +18,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const VERSION = process.argv[2] || 'v1';
-const DATA_V1 = path.join(__dirname, '..', 'public', `data_${VERSION}`);
+const RAW_VERSION = process.argv[2] || 'v1';
+const VERSION = RAW_VERSION;
+const DATA_ROOT_NAME = RAW_VERSION.replace(/\./g, '_').startsWith('data_')
+  ? RAW_VERSION.replace(/\./g, '_')
+  : `data_${RAW_VERSION.replace(/\./g, '_')}`;
+const DATA_V1 = path.join(__dirname, '..', 'public', DATA_ROOT_NAME);
 const CONCEPT_SETS = ['similes', 'onomatopoeia'];
 
 const prettifyOnomatopoeia = (concept) =>

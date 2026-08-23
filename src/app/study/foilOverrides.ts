@@ -379,7 +379,7 @@ export const FOIL_OVERRIDES: Record<string, Record<string, string>> = {
   },
   'data_v8_2': {
     // ── lung ──
-    'fraiwan_287': 'Stridor', // testing
+    'fraiwan_11': 'Wheeze', // testing
     'fraiwan_55': 'Stridor', // testing
     'hflung_steth_20190102_10_27_06_2': 'Normal', // testing
     'hflung_steth_20190102_10_27_06_4': 'Stridor', // testing
@@ -399,6 +399,11 @@ export const FOIL_OVERRIDES: Record<string, Record<string, string>> = {
     'sprsound_64743918_7.0_0_p1_2518_0': 'Rhonchi', // testing
     'sprsound_65043263_2.0_0_p3_319_4': 'Rhonchi', // testing
     'sprsound_65099422_0.5_0_p2_2760_0': 'Rhonchi', // testing
+    'fraiwan_140': 'Rhonchi', // training
+    'hflung_trunc_2019-05-28-14-44-45-L5_5_12': 'Crackle', // training
+    'hflung_trunc_2019-07-16-11-46-52-L5_11_18': 'Wheeze', // training
+    'icbhi_116_1b2_Pl_sc_Meditron_3': 'Rhonchi', // training
+    'sprsound_41161556_1.7_0_p4_3098_3': 'Normal', // training
     // ── bird ──
     'bird_Recording_1_Recording_1_Segment_04_38': 'Tufted Titmouse', // testing
     'bird_Recording_1_Recording_1_Segment_06_19': 'Blue Jay', // testing
@@ -420,6 +425,11 @@ export const FOIL_OVERRIDES: Record<string, Record<string, string>> = {
     'bird_Recording_4_Recording_4_Segment_02_200': 'Eastern Towhee', // testing
     'bird_Recording_4_Recording_4_Segment_02_85': 'Tufted Titmouse', // testing
     'bird_Recording_4_Recording_4_Segment_19_142': 'Black-capped Chickadee', // testing
+    'bird_Recording_1_Recording_1_Segment_07_219': 'Black-capped Chickadee', // training
+    'bird_Recording_1_Recording_1_Segment_33_72': 'Black-capped Chickadee', // training
+    'bird_Recording_2_Recording_2_Segment_01_60': 'Black-capped Chickadee', // training
+    'bird_Recording_2_Recording_2_Segment_05_31': 'Blue Jay', // training
+    'bird_Recording_4_Recording_4_Segment_01_173': 'Wood Thrush', // training
   },
 };
 
