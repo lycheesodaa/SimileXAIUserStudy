@@ -74,3 +74,26 @@ export const CUE_RELATIONS: Record<string, CueRelationData> = {
     }
   }
 };
+
+// Direction glyph for the comparison relations shown in the cue explanations.
+// Glyph only, no colour: the arrow encodes direction without the severity
+// reading a warm/cool palette would add. Matches on the direction word so it
+// works for both the plain 'Higher' form and RExNet's 'Target is HIGHER'.
+export function cueComparisonGlyph(comparison: string): string {
+  if (/(higher|longer)/i.test(comparison)) return '↑';
+  if (/(lower|shorter)/i.test(comparison)) return '↓';
+  return '≈';
+}
+
+// Valence-neutral colour pairing for the same relations, parked in case we want
+// the direction reinforced by hue as well as by the glyph. Amber/teal rather
+// than red/blue so the styling reads as direction, not severity.
+export function cueComparisonStyle(comparison: string): { glyph: string; colorClass: string } {
+  if (/(higher|longer)/i.test(comparison)) {
+    return { glyph: '↑', colorClass: 'text-amber-600 font-medium' };
+  }
+  if (/(lower|shorter)/i.test(comparison)) {
+    return { glyph: '↓', colorClass: 'text-teal-600 font-medium' };
+  }
+  return { glyph: '≈', colorClass: 'text-gray-500 font-medium' };
+}

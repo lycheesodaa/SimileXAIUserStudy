@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { ReferenceTable } from './ReferenceTable';
-import { CUE_RELATIONS } from '../../cueRelations';
+import { CUE_RELATIONS, cueComparisonGlyph /*, cueComparisonStyle */ } from '../../cueRelations';
 import { ClassBadge } from '../ClassBadge';
 
 const BASELINE_TO_CLASS_INDEX: Record<string, string> = {
@@ -160,14 +160,18 @@ export function CuesExplanation({
                   );
                 }
 
-                let colorClass = 'text-gray-500 font-medium';
-                if (comparisonVal === 'Higher' || comparisonVal === 'Longer') colorClass = 'text-red-500 font-medium';
-                if (comparisonVal === 'Lower' || comparisonVal === 'Shorter') colorClass = 'text-blue-500 font-medium';
-                if (comparisonVal === 'Similar') colorClass = 'text-gray-500 font-medium';
+                const glyph = cueComparisonGlyph(comparisonVal);
+                // const { glyph, colorClass } = cueComparisonStyle(comparisonVal);
 
                 return (
                   <li key={index} className="list-disc">
-                    <span className={colorClass}>{comparisonVal}</span>{' '}
+                    <span className="font-medium">
+                      <span aria-hidden="true" className="mr-1">{glyph}</span>{comparisonVal}
+                    </span>{' '}
+                    {/* Coloured variant — swap in with cueComparisonStyle above:
+                    <span className={colorClass}>
+                      <span aria-hidden="true" className="mr-1">{glyph}</span>{comparisonVal}
+                    </span>{' '} */}
                     <span className="capitalize font-semibold">{featureKey}</span>
                   </li>
                 );

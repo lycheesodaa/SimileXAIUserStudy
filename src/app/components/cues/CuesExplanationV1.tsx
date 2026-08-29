@@ -9,6 +9,7 @@ import {
 import { DataRoot, RexnetContrast, RexnetCueRow, RexnetReport, usesV7BirdCues } from '../../study/dataV1';
 import { pinnedFoilClass } from '../../study/foilOverrides';
 import { ClassBadge } from '../ClassBadge';
+import { cueComparisonGlyph, cueComparisonStyle } from '../../cueRelations';
 import { SimileAudioPlayer } from '../similes/SimileExplanationV3';
 
 // Study-mode cues (RExNet) explanation, fed by the structured report parsed
@@ -27,57 +28,82 @@ interface CuesExplanationV1Props {
 }
 
 const CUE_NAME_MAP_BIRD_V1: Record<string, string> = {
-  'peak frequency': 'Song Pitch (high vs low)',
-  'peak_frequency': 'Song Pitch (high vs low)',
-  'spectral bandwidth': 'Note Frequency Span',
-  'spectral_bandwidth': 'Note Frequency Span',
+  'peak frequency': 'Song Pitch',
+  'peak_frequency': 'Song Pitch',
+  'spectral bandwidth': 'Frequency Span',
+  'spectral_bandwidth': 'Frequency Span',
   'high-frequency energy': 'High-Pitch Shrillness',
   'high_frequency_energy': 'High-Pitch Shrillness',
   'hf_content': 'High-Pitch Shrillness',
   'syllable rate': 'Trill / Note Tempo',
   'syllable_rate': 'Trill / Note Tempo',
   'trill rate': 'Trill / Note Tempo',
-  'tonality': 'Pure whistle vs buzzy/broadband',
-  'fm extent': 'Pitch Sweep (frequency glide)',
-  'fm_extent': 'Pitch Sweep (frequency glide)',
+  'tonality': 'Buzziness',
+  'fm extent': 'Pitch Glide',
+  'fm_extent': 'Pitch Glide',
+  // Pre-rename labels, kept so anything already stored against the old
+  // wording still resolves to the current row.
+  'song pitch (high vs low)': 'Song Pitch',
+  'note frequency span': 'Frequency Span',
+  'high-pitch shrillness': 'High-Pitch Shrillness',
+  'trill / note tempo': 'Trill / Note Tempo',
+  'pure whistle vs buzzy/broadband': 'Buzziness',
+  'pitch sweep (frequency glide)': 'Pitch Glide',
 };
 
 const CUE_NAME_MAP_BIRD_V7: Record<string, string> = {
-  'spectral_centroid_hi': 'Song Brightness (high vs low)',
-  'spectral centroid (high)': 'Song Brightness (high vs low)',
-  'spectral centroid': 'Song Brightness (high vs low)',
-  'tonality': 'Pure whistle vs buzzy/broadband',
+  'spectral_centroid_hi': 'Song Brightness',
+  'spectral centroid (high)': 'Song Brightness',
+  'spectral centroid': 'Song Brightness',
+  'tonality': 'Buzziness',
   'energy_level': 'Loudness / Carrying Power',
   'energy level': 'Loudness / Carrying Power',
   'high-frequency energy': 'High-Pitch Shrillness',
   'high_frequency_energy': 'High-Pitch Shrillness',
   'hf_content': 'High-Pitch Shrillness',
-  'fm extent': 'Pitch Sweep (frequency glide)',
-  'fm_extent': 'Pitch Sweep (frequency glide)',
-  'peak frequency': 'Song Pitch (high vs low)',
-  'peak_frequency': 'Song Pitch (high vs low)',
+  'fm extent': 'Pitch Glide',
+  'fm_extent': 'Pitch Glide',
+  'peak frequency': 'Song Pitch',
+  'peak_frequency': 'Song Pitch',
+  // Pre-rename labels, kept so anything already stored against the old
+  // wording still resolves to the current row.
+  'song brightness (high vs low)': 'Song Brightness',
+  'pure whistle vs buzzy/broadband': 'Buzziness',
+  'loudness / carrying power': 'Loudness / Carrying Power',
+  'high-pitch shrillness': 'High-Pitch Shrillness',
+  'pitch sweep (frequency glide)': 'Pitch Glide',
+  'song pitch (high vs low)': 'Song Pitch',
 };
 
 const CUE_NAME_MAP_LUNG: Record<string, string> = {
   'loudness / intensity': 'Loudness / Intensity',
   'energy_level': 'Loudness / Intensity',
   'energy level': 'Loudness / Intensity',
-  'pitch / brightness (high vs low)': 'Pitch / Brightness (high vs low)',
-  'spectral centroid (high)': 'Pitch / Brightness (high vs low)',
-  'spectral_centroid_hi': 'Pitch / Brightness (high vs low)',
-  'spectral bandwidth': 'Spectral Width (broad vs narrow/tonal)',
-  'spectral_bandwidth': 'Spectral Width (broad vs narrow/tonal)',
-  'spectral width (broad vs narrow/tonal)': 'Spectral Width (broad vs narrow/tonal)',
-  'high-frequency energy': 'High-Frequency Shrillness',
-  'high-frequency shrillness': 'High-Frequency Shrillness',
-  'hf_content': 'High-Frequency Shrillness',
-  'crackle spikiness (popping)': 'Spikiness (popping)',
-  'spikiness (popping)': 'Spikiness (popping)',
-  'crest factor': 'Spikiness (popping)',
-  'crest_factor': 'Spikiness (popping)',
+  'pitch / brightness (high vs low)': 'Pitch / Brightness',
+  'spectral centroid (high)': 'Pitch / Brightness',
+  'spectral_centroid_hi': 'Pitch / Brightness',
+  'spectral bandwidth': 'Frequency Span',
+  'spectral_bandwidth': 'Frequency Span',
+  'spectral width (broad vs narrow/tonal)': 'Frequency Span',
+  'high-frequency energy': 'Shrillness',
+  'high-frequency shrillness': 'Shrillness',
+  'hf_content': 'Shrillness',
+  'crackle spikiness (popping)': 'Spikiness',
+  'spikiness (popping)': 'Spikiness',
+  'crest factor': 'Spikiness',
+  'crest_factor': 'Spikiness',
   'crackle / event density': 'Crackle / Event Density',
-  'event_rate': 'Crackle / Event Density',
+  'event_rate': 'Crackle / Event Density (sparse → dense)',
 };
+
+// The reference table spells the poles out ("Frequency Span (narrow/tonal →
+// broad/noisy)"); the cue table shows the bare name so the column stays narrow.
+// Both anchor on the bare name, so anything matching one table against the other
+// — the tutorial's worked example, the data-cue/data-cue-ref spotlights — goes
+// through here rather than comparing the two label forms directly.
+export function cueBaseName(label: string): string {
+  return label.replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
 
 export function prettifyCueName(cueName: string, isBird: boolean, isV7: boolean = false): string {
   const key = cueName.trim().toLowerCase();
@@ -166,7 +192,7 @@ export function filterVisibleCues(
     } else {
       if (
         raw.includes('pitch sweep') ||
-        pretty.includes('pitch sweep') ||
+        pretty.includes('pitch glide') ||
         raw.includes('fm extent') ||
         raw.includes('fm_extent')
       ) {
@@ -314,7 +340,24 @@ export function CuesExplanationV1({
                         {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.targetValue}</td> */}
                         {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.foilValue}</td> */}
                         {/* <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.heuristicRelation}</td> */}
-                        <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.predictedRelation}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-800">
+                          <span aria-hidden="true" className="mr-1">
+                            {cueComparisonGlyph(cue.predictedRelation)}
+                          </span>
+                          {cue.predictedRelation}
+                        </td>
+                        {/* Coloured variant — swap in with cueComparisonStyle: */}
+                        {/* <td className="px-4 py-2 whitespace-nowrap">
+                          {(() => {
+                            const { glyph, colorClass } = cueComparisonStyle(cue.predictedRelation);
+                            return (
+                              <span className={colorClass}>
+                                <span aria-hidden="true" className="mr-1">{glyph}</span>
+                                {cue.predictedRelation}
+                              </span>
+                            );
+                          })()}
+                        </td> */}
                         {/* <td className={`px-4 py-2 whitespace-nowrap text-center font-semibold ${cue.agree ? 'text-emerald-600' : 'text-red-500'}`}>
                           {cue.agree ? '✓' : '✗'}
                         </td> */}
@@ -370,31 +413,31 @@ export const LUNG_CUE_ROWS: CueReferenceRow[] = [
     ranking: 'Normal < Crackle < Wheeze ~ Rhonchi ~ Stridor',
   },
   {
-    cue: 'Pitch / Brightness (high vs low)',
+    cue: 'Pitch / Brightness',
     metric: 'spectral_centroid_hi',
     description: 'Brightness centre of the adventitious sound, measured above the breath fundamental.',
     ranking: 'Normal < Stridor ~ Wheeze ~ Crackle < Rhonchi',
   },
   {
-    cue: 'Spectral Width (broad vs narrow/tonal)',
+    cue: 'Frequency Span',
     metric: 'spectral_bandwidth',
-    description: 'How spread-out the energy is across frequencies (broad/noisy vs narrow/tonal).',
+    description: 'How spread-out the energy is across frequencies (low: narrow/tonal → high: broad/noisy).',
     ranking: 'Stridor < Rhonchi ~ Wheeze < Crackle < Normal',
   },
   {
-    cue: 'High-Frequency Shrillness',
+    cue: 'Shrillness',
     metric: 'hf_content',
-    description: 'Fraction of energy sitting in the high band (shrill vs low rumble).',
+    description: 'Fraction of energy sitting in the high band (low rumble → high shrill).',
     ranking: 'Normal < Stridor < Crackle ~ Wheeze ~ Rhonchi',
   },
   {
-    cue: 'Spikiness (popping)',
+    cue: 'Spikiness',
     metric: 'crest_factor',
     description: 'How impulsive/spiky the peaks are vs the background breath.',
     ranking: 'Stridor ~ Rhonchi ~ Wheeze < Crackle ~ Normal',
   },
   // {
-  //   cue: 'Crackle / Event Density',
+  //   cue: 'Crackle / Event Density (sparse → dense)',
   //   metric: 'event_rate',
   //   description: 'Number of discrete sound events per second.',
   //   ranking: 'Wheeze ~ Crackle ~ Normal ~ Rhonchi ~ Stridor',
@@ -403,21 +446,21 @@ export const LUNG_CUE_ROWS: CueReferenceRow[] = [
 
 export const BIRD_CUE_ROWS_V1: CueReferenceRow[] = [
   {
-    cue: 'Song Pitch (high vs low)',
+    cue: 'Song Pitch',
     metric: 'peak_frequency',
     description: 'Dominant (peak) frequency of the song, tracked over the 0.6–12 kHz band.',
     ranking: 'Tufted Titmouse < Black-capped Chickadee ~ Wood Thrush ~ Eastern Towhee < Ovenbird',
   },
   {
-    cue: 'Note Frequency Span',
+    cue: 'Frequency Span',
     metric: 'spectral_bandwidth',
-    description: 'Frequency spread of the notes (broadband/buzzy vs pure tone).',
+    description: 'Frequency spread of the notes (low: pure tone/whistle → high: broadband/buzzy).',
     ranking: 'Ovenbird ≪ Black-capped Chickadee < Wood Thrush ~ Tufted Titmouse ~ Eastern Towhee',
   },
   {
-    cue: 'High-Pitch Shrillness',
+    cue: 'Shrillness',
     metric: 'hf_content',
-    description: 'Fraction of energy in the high band.',
+    description: 'Fraction of energy in the high band (low rumble → high shrill).',
     ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Eastern Towhee ~ Wood Thrush ≪ Ovenbird',
   },
   {
@@ -427,24 +470,24 @@ export const BIRD_CUE_ROWS_V1: CueReferenceRow[] = [
     ranking: 'Wood Thrush ~ Eastern Towhee ~ Black-capped Chickadee < Tufted Titmouse ≪ Ovenbird',
   },
   {
-    cue: 'Pure whistle vs buzzy/broadband',
+    cue: 'Buzziness',
     metric: 'tonality',
-    description: 'Spectral flatness — low = pure tone/whistle, high = broadband/buzzy.',
+    description: 'Spectral flatness (low: pure tone/whistle → high: broadband/buzzy).',
     ranking: 'Ovenbird < Wood Thrush ~ Tufted Titmouse ~ Black-capped Chickadee ~ Eastern Towhee',
   },
 ];
 
 export const BIRD_CUE_ROWS_V7: CueReferenceRow[] = [
   {
-    cue: 'Song Brightness (high vs low)',
+    cue: 'Song Brightness',
     metric: 'spectral_centroid_hi',
-    description: 'Energy centre above 300 Hz — how bright/piercing the song sits.',
+    description: 'Energy centre above 300 Hz (how bright/piercing the song sits).',
     ranking: 'Wood Thrush < Tufted Titmouse ~ Black-capped Chickadee < Eastern Towhee < Blue Jay',
   },
   {
-    cue: 'Pure whistle vs buzzy/broadband',
+    cue: 'Buzziness',
     metric: 'tonality',
-    description: 'Spectral flatness — low = pure tone/whistle, high = broadband/buzzy.',
+    description: 'Spectral flatness (low: pure tone/whistle → high: broadband/buzzy).',
     ranking: 'Black-capped Chickadee ~ Wood Thrush ~ Tufted Titmouse < Eastern Towhee < Blue Jay',
   },
   {
@@ -454,19 +497,19 @@ export const BIRD_CUE_ROWS_V7: CueReferenceRow[] = [
     ranking: 'Blue Jay < Eastern Towhee ~ Tufted Titmouse ~ Wood Thrush ~ Black-capped Chickadee',
   },
   // {
-  //   cue: 'High-Pitch Shrillness',
+  //   cue: 'Shrillness',
   //   metric: 'hf_content',
   //   description: 'Fraction of energy above 2 kHz.',
   //   ranking: 'Black-capped Chickadee ~ Tufted Titmouse ~ Eastern Towhee ~ Wood Thrush ~ Blue Jay',
   // },
   {
-    cue: 'Pitch Sweep (frequency glide)',
+    cue: 'Pitch Sweep',
     metric: 'fm_extent',
-    description: '10–90th-percentile sweep range of the dominant-frequency contour.',
+    description: '10–90th-percentile sweep range of the dominant-frequency contour (low: steady → high: sweeping).',
     ranking: 'Wood Thrush ~ Tufted Titmouse < Eastern Towhee ~ Blue Jay ~ Black-capped Chickadee',
   },
   // {
-  //   cue: 'Song Pitch (high vs low)',
+  //   cue: 'Song Pitch',
   //   metric: 'peak_frequency',
   //   description: 'Dominant (peak) frequency, tracked over the 0.6–12 kHz band.',
   //   ranking: 'Tufted Titmouse ~ Wood Thrush ~ Eastern Towhee ~ Black-capped Chickadee ~ Blue Jay',
@@ -493,7 +536,7 @@ export function ReferenceTableV1({ domain = 'lung', root }: { domain?: string; r
           </thead>
           <tbody className="bg-white divide-y divide-gray-400">
             {rows.map((row) => (
-              <tr key={row.cue} data-cue-ref={row.cue}>
+              <tr key={row.cue} data-cue-ref={cueBaseName(row.cue)}>
                 <td className="px-4 py-2 font-medium text-gray-900">
                   {row.cue}
                 </td>

@@ -6,6 +6,7 @@ import {
   CueReferenceRow,
   CuesExplanationV1,
   LUNG_CUE_ROWS,
+  cueBaseName,
   filterVisibleCues,
   prettifyCueName,
   resolveFoilContrast,
@@ -72,7 +73,7 @@ function buildWorkedExample(
   const candidates: WorkedExample[] = [];
   for (const cue of filterVisibleCues(selected.cues, isBird, isV7)) {
     const cueName = prettifyCueName(cue.cue, isBird, isV7);
-    const row = rows.find((r) => r.cue === cueName);
+    const row = rows.find((r) => cueBaseName(r.cue) === cueName);
     if (!row) continue;
 
     const predicted = cue.predictedRelation.toUpperCase();
