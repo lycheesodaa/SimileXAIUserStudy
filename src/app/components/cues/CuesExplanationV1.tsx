@@ -32,23 +32,23 @@ const CUE_NAME_MAP_BIRD_V1: Record<string, string> = {
   'peak_frequency': 'Song Pitch',
   'spectral bandwidth': 'Frequency Span',
   'spectral_bandwidth': 'Frequency Span',
-  'high-frequency energy': 'High-Pitch Shrillness',
-  'high_frequency_energy': 'High-Pitch Shrillness',
-  'hf_content': 'High-Pitch Shrillness',
+  'high-frequency energy': 'Shrillness',
+  'high_frequency_energy': 'Shrillness',
+  'hf_content': 'Shrillness',
   'syllable rate': 'Trill / Note Tempo',
   'syllable_rate': 'Trill / Note Tempo',
   'trill rate': 'Trill / Note Tempo',
   'tonality': 'Buzziness',
-  'fm extent': 'Pitch Glide',
-  'fm_extent': 'Pitch Glide',
+  'fm extent': 'Pitch Sweep',
+  'fm_extent': 'Pitch Sweep',
   // Pre-rename labels, kept so anything already stored against the old
   // wording still resolves to the current row.
   'song pitch (high vs low)': 'Song Pitch',
   'note frequency span': 'Frequency Span',
-  'high-pitch shrillness': 'High-Pitch Shrillness',
+  'high-pitch shrillness': 'Shrillness',
   'trill / note tempo': 'Trill / Note Tempo',
   'pure whistle vs buzzy/broadband': 'Buzziness',
-  'pitch sweep (frequency glide)': 'Pitch Glide',
+  'pitch sweep (frequency glide)': 'Pitch Sweep',
 };
 
 const CUE_NAME_MAP_BIRD_V7: Record<string, string> = {
@@ -58,11 +58,11 @@ const CUE_NAME_MAP_BIRD_V7: Record<string, string> = {
   'tonality': 'Buzziness',
   'energy_level': 'Loudness / Carrying Power',
   'energy level': 'Loudness / Carrying Power',
-  'high-frequency energy': 'High-Pitch Shrillness',
-  'high_frequency_energy': 'High-Pitch Shrillness',
-  'hf_content': 'High-Pitch Shrillness',
-  'fm extent': 'Pitch Glide',
-  'fm_extent': 'Pitch Glide',
+  'high-frequency energy': 'Shrillness',
+  'high_frequency_energy': 'Shrillness',
+  'hf_content': 'Shrillness',
+  'fm extent': 'Pitch Sweep',
+  'fm_extent': 'Pitch Sweep',
   'peak frequency': 'Song Pitch',
   'peak_frequency': 'Song Pitch',
   // Pre-rename labels, kept so anything already stored against the old
@@ -70,8 +70,8 @@ const CUE_NAME_MAP_BIRD_V7: Record<string, string> = {
   'song brightness (high vs low)': 'Song Brightness',
   'pure whistle vs buzzy/broadband': 'Buzziness',
   'loudness / carrying power': 'Loudness / Carrying Power',
-  'high-pitch shrillness': 'High-Pitch Shrillness',
-  'pitch sweep (frequency glide)': 'Pitch Glide',
+  'high-pitch shrillness': 'Shrillness',
+  'pitch sweep (frequency glide)': 'Pitch Sweep',
   'song pitch (high vs low)': 'Song Pitch',
 };
 
@@ -93,14 +93,13 @@ const CUE_NAME_MAP_LUNG: Record<string, string> = {
   'crest factor': 'Spikiness',
   'crest_factor': 'Spikiness',
   'crackle / event density': 'Crackle / Event Density',
-  'event_rate': 'Crackle / Event Density (sparse → dense)',
+  'event_rate': 'Crackle / Event Density',
 };
 
-// The reference table spells the poles out ("Frequency Span (narrow/tonal →
-// broad/noisy)"); the cue table shows the bare name so the column stays narrow.
-// Both anchor on the bare name, so anything matching one table against the other
-// — the tutorial's worked example, the data-cue/data-cue-ref spotlights — goes
-// through here rather than comparing the two label forms directly.
+// Both cue tables label rows with the bare name and carry the low → high poles
+// in the description, so cross-table matching — the tutorial's worked example,
+// the data-cue/data-cue-ref spotlights — goes through here, and keeps working
+// if a label ever regains a trailing "(...)" gloss.
 export function cueBaseName(label: string): string {
   return label.replace(/\s*\([^)]*\)\s*$/, '').trim();
 }
@@ -192,7 +191,7 @@ export function filterVisibleCues(
     } else {
       if (
         raw.includes('pitch sweep') ||
-        pretty.includes('pitch glide') ||
+        pretty.includes('pitch sweep') ||
         raw.includes('fm extent') ||
         raw.includes('fm_extent')
       ) {
@@ -437,7 +436,7 @@ export const LUNG_CUE_ROWS: CueReferenceRow[] = [
     ranking: 'Stridor ~ Rhonchi ~ Wheeze < Crackle ~ Normal',
   },
   // {
-  //   cue: 'Crackle / Event Density (sparse → dense)',
+  //   cue: 'Crackle / Event Density',
   //   metric: 'event_rate',
   //   description: 'Number of discrete sound events per second.',
   //   ranking: 'Wheeze ~ Crackle ~ Normal ~ Rhonchi ~ Stridor',
