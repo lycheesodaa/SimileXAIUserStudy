@@ -205,7 +205,7 @@ const STEPS: TutorialStep[] = [
   },
   {
     target: '[data-tutorial="cues-header"]',
-    title: 'Acoustic cue comparison',
+    title: 'Acoustic cue explanation',
     body: (
       <>
         The system explains its classification by comparing this recording against a

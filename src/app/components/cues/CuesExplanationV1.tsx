@@ -257,7 +257,7 @@ export function CuesExplanationV1({
       {/* Cue Relations Section */}
       <div className="mb-6">
         <div className="mb-4" data-tutorial="cues-header">
-          <h2 className="text-xl font-semibold mb-2">Acoustic Cue Comparison</h2>
+          <h2 className="text-xl font-semibold mb-2">Acoustic Cue Explanation</h2>
           <p className="text-gray-600">
             The system compares this sound against a representative example of each
             contrast category using measurable acoustic cues. For each cue, the measured
@@ -266,7 +266,7 @@ export function CuesExplanationV1({
         </div>
 
         {contrasts.length === 0 ? (
-          <p className="text-gray-500 italic">No cue comparisons available for this sample.</p>
+          <p className="text-gray-500 italic">No cue explanations available for this sample.</p>
         ) : (
           <>
             <div className="flex items-center gap-3 mb-4 flex-wrap" data-tutorial="contrast-class">
