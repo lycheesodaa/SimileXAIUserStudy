@@ -12,6 +12,7 @@ import {
   resolveFoilContrast,
   resolveIsBird,
 } from '../cues/CuesExplanationV1';
+import { CuesExplanationV1Abs } from '../cues/CuesExplanationV1_abs';
 import { DataRoot, RexnetReport, usesV7BirdCues } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
 
@@ -24,6 +25,7 @@ interface CuesTutorialProps {
   sampleId?: string;
   domain?: string;
   root?: DataRoot;
+  trueLabel?: string;
 }
 
 // ─── Worked example ──────────────────────────────────────────────────────────
@@ -268,9 +270,56 @@ const STEPS: TutorialStep[] = [
   },
 ];
 
-export function CuesTutorial({ audioUrl, report, sampleId, domain, root }: CuesTutorialProps) {
+const ABS_STEPS: TutorialStep[] = [
+  STEPS[0],
+  STEPS[1],
+  {
+    target: '[data-tutorial="cues-header"]',
+    title: 'Absolute acoustic cues',
+    body: (
+      <>
+        The system describes this recording directly. Each measurable acoustic cue is placed
+        on a <b>Low</b>, <b>Med</b>, or <b>High</b> scale for this sound domain.
+      </>
+    ),
+  },
+  {
+    target: '[data-tutorial="cue-table"]',
+    title: 'The recording\'s cue pattern',
+    body: (
+      <>
+        Read down this table to see the recording's absolute cue pattern. Unlike a contrastive
+        relation, every level stands on its own and does not depend on another category.
+      </>
+    ),
+  },
+  {
+    target: '[data-tutorial="cue-class-hint"]',
+    title: 'Closest pattern hint',
+    body: (
+      <>
+        This hint compares all of the levels above with the class patterns in the reference
+        table and shows the closest overall match.
+      </>
+    ),
+  },
+  {
+    target: '[data-tutorial="reference-table"]',
+    title: 'The absolute reference table',
+    body: (
+      <>
+        Each column is a category's typical Low/Med/High signature. Compare it with the card
+        above to see which cues support or conflict with the hint.
+      </>
+    ),
+  },
+  STEPS[STEPS.length - 1],
+];
+
+export function CuesTutorial({ audioUrl, report, sampleId, domain, root, trueLabel }: CuesTutorialProps) {
   // Stable identity: a fresh steps array on every render would reset the tour.
   const steps = useMemo(() => {
+    if (root === 'data_v8_2') return ABS_STEPS;
     const worked = buildWorkedExample(report, sampleId, domain, root);
     const done = STEPS[STEPS.length - 1];
     return [...STEPS.slice(0, -1), ...workedExampleSteps(worked), done];
@@ -278,15 +327,25 @@ export function CuesTutorial({ audioUrl, report, sampleId, domain, root }: CuesT
 
   return (
     <TutorialOverlay steps={steps}>
-      <CuesExplanationV1
-        audioUrl={audioUrl}
-        report={report}
-        sampleId={sampleId}
-        randomFoil={true}
-        hideDropdown={true}
-        domain={domain}
-        root={root}
-      />
+      {root === 'data_v8_2' ? (
+        <CuesExplanationV1Abs
+          audioUrl={audioUrl}
+          report={report}
+          trueLabel={trueLabel}
+          domain={domain}
+          root={root}
+        />
+      ) : (
+        <CuesExplanationV1
+          audioUrl={audioUrl}
+          report={report}
+          sampleId={sampleId}
+          randomFoil={true}
+          hideDropdown={true}
+          domain={domain}
+          root={root}
+        />
+      )}
     </TutorialOverlay>
   );
 }

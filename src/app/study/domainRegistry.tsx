@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { SimileExplanationV3, SimileItem } from '../components/similes/SimileExplanationV3';
 import { CuesExplanationV1 } from '../components/cues/CuesExplanationV1';
+import { CuesExplanationV1Abs } from '../components/cues/CuesExplanationV1_abs';
 import { CuesPractice } from '../components/cues/CuesPractice';
 import { ExampleExplanation, ExampleItem } from '../components/examples/ExampleExplanation';
 import { ExamplesCheatsheet } from '../components/examples/ExamplesCheatsheet';
@@ -312,17 +313,26 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
   },
   audioIdForSrc: (view, src) =>
     audioIdOrFallback(src, (s) => (s === view.sample.audio ? 'original' : undefined)),
-  render: (view) => (
-    <CuesExplanationV1
-      audioUrl={view.sample.audio}
-      report={view.report}
-      sampleId={view.sample.sample_id}
-      randomFoil={true}
-      hideDropdown={import.meta.env.PROD}
-      domain={domain}
-      root={view.root}
-    />
-  ),
+  render: (view) =>
+    view.root === 'data_v8_2' ? (
+      <CuesExplanationV1Abs
+        audioUrl={view.sample.audio}
+        report={view.report}
+        trueLabel={view.sample.true_label}
+        domain={domain}
+        root={view.root}
+      />
+    ) : (
+      <CuesExplanationV1
+        audioUrl={view.sample.audio}
+        report={view.report}
+        sampleId={view.sample.sample_id}
+        randomFoil={true}
+        hideDropdown={import.meta.env.PROD}
+        domain={domain}
+        root={view.root}
+      />
+    ),
   // Guide page: CuesPractice's own class list carries the per-class example
   // recordings (no descriptions for this condition).
   renderTrain: (root) => <CuesPractice domain={domain} root={root} />,
@@ -333,6 +343,7 @@ const rexnetVariant = (domain: string): StudyXaiVariant<RexnetView> => ({
       sampleId={view.sample.sample_id}
       domain={domain}
       root={view.root}
+      trueLabel={view.sample.true_label}
     />
   ),
 });

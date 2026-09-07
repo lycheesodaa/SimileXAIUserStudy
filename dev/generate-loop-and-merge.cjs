@@ -17,6 +17,14 @@
 //       Field 11: cue 3 name, Field 12: cue 3 predicted relation
 //       Field 13: cue 4 name, Field 14: cue 4 predicted relation
 //       Field 15: cue 5 name, Field 16: cue 5 predicted relation
+//   - rexnet_abs (absolute, non-contrastive recoding of the same cue measurements):
+//       Field 1-5: sampleId, domain, xai, aiPrediction, trueLabel
+//       Field 6: hinted class (signature the cue levels most closely match)
+//       Field 7: cue 1 name, Field 8: cue 1 absolute level (Low/Med/High)
+//       Field 9: cue 2 name, Field 10: cue 2 absolute level
+//       Field 11: cue 3 name, Field 12: cue 3 absolute level
+//       Field 13: cue 4 name, Field 14: cue 4 absolute level
+//       Field 15: cue 5 name, Field 16: cue 5 absolute level
 //   - examples:
 //       Field 1-5: sampleId, domain, xai, aiPrediction, trueLabel
 //       Field 6: example 1 class, Field 7: example 1 audio url, Field 8: example 1 similarity
@@ -74,6 +82,7 @@ const XAI_CONDITIONS = [
   'onomatopoeia_dualview_approx',
   'onomatopoeia_dualview_actv',
   'rexnet',
+  'rexnet_abs',
   'examples',
   'noxai',
 ];
@@ -263,6 +272,78 @@ function readFoilOverrides() {
 
 const FOIL_OVERRIDES = readFoilOverrides();
 
+// ─── Absolute (non-contrastive) cue recoding ──────────────────────────────────
+//
+// The absolute condition reuses the *same* per-sample target measurements the
+// contrastive report already carries, but bins each one against a fixed
+// domain-wide scale (grand mean +/- 0.15 pooled within-class SD) instead of
+// comparing it to a foil clip. The cue specs — aliases, cutoffs and the
+// per-class Low/Med/High reference signatures — live in the UI component so
+// that the TSVs and the rendered condition cannot drift apart; we lift the two
+// array literals straight out of it rather than re-typing them here.
+function readAbsoluteCueSpecs() {
+  const NEWLINE = String.fromCharCode(10);
+  const file = path.join(
+    ROOT, 'src', 'app', 'components', 'cues', 'CuesExplanationV1_abs.tsx'
+  );
+  const text = fs.readFileSync(file, 'utf8');
+  const extract = (name) => {
+    const start = text.indexOf(`const ${name}: AbsoluteCueSpec[] = [`);
+    if (start === -1) throw new Error(`${name} not found in ${file}`);
+    const open = text.indexOf('[', start);
+    const end = text.indexOf(NEWLINE + '];', open);
+    if (end === -1) throw new Error(`${name} literal not terminated in ${file}`);
+    // Commented-out cues inside the literal stay commented out: the JS parser
+    // drops them, exactly as the TSX compiler does.
+    return eval(text.slice(open, end + 2));
+  };
+  return { lung: extract('LUNG_ABS_CUES'), bird: extract('BIRD_ABS_CUES') };
+}
+
+const ABS_CUE_SPECS = readAbsoluteCueSpecs();
+
+// Mirrors absoluteLevel() in CuesExplanationV1_abs.tsx
+function absoluteLevel(value, spec) {
+  if (value < spec.lowCutoff) return 'Low';
+  if (value > spec.highCutoff) return 'High';
+  return 'Med';
+}
+
+// Mirrors closestAbsoluteClass() in CuesExplanationV1_abs.tsx: most cells
+// matching wins, ties broken towards the true label then table order.
+function closestAbsoluteClass(levels, specs, trueLabel) {
+  const classes = Object.keys(specs[0]?.levels ?? {});
+  if (classes.length === 0 || levels.size === 0) return undefined;
+  const matchCounts = classes.map((className) => ({
+    className,
+    matches: specs.reduce((sum, spec) => {
+      const observed = levels.get(spec.metric);
+      return sum + Number(observed !== undefined && observed === spec.levels[className]);
+    }, 0),
+  }));
+  const maximum = Math.max(...matchCounts.map((item) => item.matches));
+  const tied = matchCounts.filter((item) => item.matches === maximum);
+  return tied.find((item) => item.className === trueLabel)?.className ?? tied[0]?.className;
+}
+
+// Reads one absolute row set off a parsed report. Target measurements are
+// repeated in every contrast block, so the first complete block is enough and
+// the chosen foil cannot influence an absolute explanation.
+function absoluteCueRows(report, specs) {
+  const exportedCues = report.contrasts.find((c) => c.cues.length > 0)?.cues ?? [];
+  const rows = [];
+  for (const spec of specs) {
+    const cue = exportedCues.find((c) =>
+      spec.aliases.includes(c.cue.trim().toLowerCase())
+    );
+    if (!cue) continue;
+    const value = Number.parseFloat(cue.targetValue);
+    if (!Number.isFinite(value)) continue;
+    rows.push({ spec, level: absoluteLevel(value, spec) });
+  }
+  return rows;
+}
+
 function getDeterministicFoil(sampleId, options) {
   if (!options || options.length === 0) return undefined;
   let hash = 0;
@@ -371,6 +452,24 @@ function extractComponents(sample, xai, domain, root) {
     while (cuePairs.length < 10) cuePairs.push('');
     fields = [foilClass, ...cuePairs];
   }
+  // 3b. RexNet absolute recoding
+  // Field 6: hinted class, then pairs of (cue name, absolute level)
+  else if (xai === 'rexnet_abs') {
+    const model = models.rexnet;
+    const specs = isBird ? ABS_CUE_SPECS.bird : ABS_CUE_SPECS.lung;
+    let hintedClass = '';
+    let cuePairs = [];
+    if (model && model.explanation_md) {
+      const report = parseRexnetReport(model.explanation_md, model.class_exemplars);
+      const rows = absoluteCueRows(report, specs);
+      const observedLevels = new Map(rows.map(({ spec, level }) => [spec.metric, level]));
+      hintedClass =
+        closestAbsoluteClass(observedLevels, specs, sample.true_label) || '';
+      cuePairs = rows.slice(0, 5).flatMap(({ spec, level }) => [spec.cue, level]);
+    }
+    while (cuePairs.length < 10) cuePairs.push('');
+    fields = [hintedClass, ...cuePairs];
+  }
   // 4. Examples (Proto)
   // Triples of (class, audio url on s3, similarity)
   else if (xai === 'examples') {
@@ -401,7 +500,7 @@ function extractComponents(sample, xai, domain, root) {
 function modelKeyForXai(domain, xai) {
   if (xai.startsWith('onomatopoeia')) return `fused_onomatopoeia_${domain}`;
   if (xai.startsWith('similes')) return `fused_simile_${domain}`;
-  if (xai === 'rexnet') return 'rexnet';
+  if (xai === 'rexnet' || xai === 'rexnet_abs') return 'rexnet';
   if (xai === 'examples') return 'proto';
   return undefined;
 }

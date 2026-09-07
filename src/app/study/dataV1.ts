@@ -126,6 +126,9 @@ export interface V1RexnetModel {
 export interface V1Sample {
   sample_id: string;
   domain: string;
+  /** Present in bundle JSON; kept out of participant UI except for explicitly
+   *  requested, computation-only tie breaking. */
+  true_label?: string;
   audio: string;
   models: Record<string, unknown> & {
     rexnet?: V1RexnetModel;
