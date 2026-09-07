@@ -205,13 +205,20 @@ export function AbsReferenceTable({ domain = 'lung' }: { domain?: string }) {
 
   return (
     <div className="mb-6 overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-400 border-b border-gray-400 text-sm">
+      <table className="w-full table-fixed divide-y divide-gray-400 border-b border-gray-400 text-sm">
+        <colgroup>
+          <col className="w-[18%]" />
+          <col className="w-[32%]" />
+          {classes.map((className) => (
+            <col key={className} className="w-[10%]" />
+          ))}
+        </colgroup>
         <thead>
           <tr>
-            <th className="px-3 py-2 text-left font-medium uppercase text-gray-500">Acoustic Cue</th>
-            <th className="min-w-64 px-3 py-2 text-left font-medium uppercase text-gray-500">Description</th>
+            <th className="px-2 py-2 text-left font-medium uppercase text-gray-500">Acoustic Cue</th>
+            <th className="px-2 py-2 text-left font-medium uppercase text-gray-500">Description</th>
             {classes.map((className) => (
-              <th key={className} className="min-w-28 px-3 py-2 text-center font-medium text-gray-500">
+              <th key={className} className="px-1 py-2 text-center font-medium leading-tight text-gray-500">
                 {className}
               </th>
             ))}
@@ -220,10 +227,10 @@ export function AbsReferenceTable({ domain = 'lung' }: { domain?: string }) {
         <tbody className="divide-y divide-gray-400 bg-white">
           {specs.map((spec) => (
             <tr key={spec.metric} data-cue-ref={cueBaseName(spec.cue)}>
-              <td className="whitespace-nowrap px-3 py-2 font-medium text-gray-900">{spec.cue}</td>
-              <td className="px-3 py-2 text-gray-600">{spec.description}</td>
+              <td className="px-2 py-2 font-medium text-gray-900">{spec.cue}</td>
+              <td className="px-2 py-2 text-gray-600">{spec.description}</td>
               {classes.map((className) => (
-                <td key={className} className="px-3 py-2 text-center">
+                <td key={className} className="px-1 py-2 text-center">
                   <LevelIndicator level={spec.levels[className]} />
                 </td>
               ))}

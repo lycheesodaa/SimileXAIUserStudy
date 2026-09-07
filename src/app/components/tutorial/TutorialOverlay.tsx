@@ -23,10 +23,10 @@ export interface TutorialStep {
    *  mounts. Without this, such steps would be dropped by the availability
    *  filter that runs before the drawer is open. */
   alwaysShow?: boolean;
-  /** Force the tooltip to the left of the spotlight instead of above/below.
-   *  For a tall, right-edge spotlight (the cheatsheet drawer) the default
-   *  above/below placement runs off screen. */
-  placement?: 'left';
+  /** Force the tooltip to a particular side of the spotlight. The vertical
+   *  placements also shift the target within the viewport to reserve room
+   *  for the card on the requested side. */
+  placement?: 'left' | 'above' | 'below';
 }
 
 interface TutorialOverlayProps {
@@ -53,6 +53,7 @@ interface SpotRect {
 
 export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverlayProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   // Steps whose target exists in the mounted content; null until measured.
   const [available, setAvailable] = useState<TutorialStep[] | null>(null);
   const [index, setIndex] = useState(0);
@@ -75,15 +76,66 @@ export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverl
     onStepChangeRef.current?.(step);
   }, [step]);
 
-  // Bring the target into view when the step changes.
+  // Bring the target into view when the step changes. Forced vertical
+  // placements reserve space for both the spotlight and the tooltip instead
+  // of centering the target and hoping the requested side still fits.
   useEffect(() => {
     if (!step?.target) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    contentRef.current
-      ?.querySelector(step.target)
-      ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const target = contentRef.current?.querySelector(step.target);
+    if (!target) return;
+
+    if (step.placement === 'above' || step.placement === 'below') {
+      const targetRect = target.getBoundingClientRect();
+      const viewportMargin = 24;
+      // Forced placements keep their natural height. Measuring the rendered
+      // card lets an above-placement align the viewport to the card's top,
+      // rather than aligning it to the highlighted element beneath it.
+      const tooltipHeight = tooltipRef.current?.getBoundingClientRect().height ?? TOOLTIP_H_EST;
+      const cardRoom = tooltipHeight + TOOLTIP_GAP + SPOT_PAD;
+      const desiredTop =
+        step.placement === 'below'
+          ? Math.max(
+              viewportMargin,
+              Math.min(
+                (window.innerHeight - targetRect.height) / 2,
+                window.innerHeight - targetRect.height - cardRoom - viewportMargin
+              )
+            )
+          : Math.max(
+              viewportMargin,
+              Math.min(cardRoom + viewportMargin, window.innerHeight - targetRect.height - viewportMargin)
+            );
+      window.scrollTo({
+        top: Math.max(0, window.scrollY + targetRect.top - desiredTop),
+        behavior: 'auto',
+      });
+
+      // The tooltip content can be a different height from the preceding
+      // step. Once React has laid out the new card and the spotlight tracker
+      // has caught up, align an above-placed card's actual top edge to the
+      // viewport margin. This prevents its heading from being clipped.
+      if (step.placement === 'above') {
+        let secondFrame = 0;
+        const firstFrame = requestAnimationFrame(() => {
+          secondFrame = requestAnimationFrame(() => {
+            const actualTop = tooltipRef.current?.getBoundingClientRect().top;
+            if (actualTop !== undefined) {
+              window.scrollBy({ top: actualTop - viewportMargin, behavior: 'auto' });
+            }
+          });
+        });
+        return () => {
+          cancelAnimationFrame(firstFrame);
+          cancelAnimationFrame(secondFrame);
+        };
+      }
+      return;
+    }
+
+    target.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }, [step]);
 
   // Track the target's viewport rect every frame: cheap (one rect read), and
@@ -170,7 +222,10 @@ export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverl
   } else {
     const vw = window.innerWidth;
     const below = rect.top + rect.height + SPOT_PAD + TOOLTIP_GAP;
-    const placeBelow = below + TOOLTIP_H_EST < vh || rect.top < TOOLTIP_H_EST + TOOLTIP_GAP;
+    const forceBelow = step?.placement === 'below';
+    const forceAbove = step?.placement === 'above';
+    const placeBelow =
+      forceBelow || (!forceAbove && (below + TOOLTIP_H_EST < vh || rect.top < TOOLTIP_H_EST + TOOLTIP_GAP));
     const left = Math.min(
       Math.max(rect.left + rect.width / 2 - TOOLTIP_W / 2, 12),
       Math.max(vw - TOOLTIP_W - 12, 12)
@@ -182,8 +237,15 @@ export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverl
       left,
       width: TOOLTIP_W,
       maxWidth: 'calc(100vw - 24px)',
-      // Fit within whichever side it's pinned to, leaving a 12px margin.
-      maxHeight: placeBelow ? vh - (top ?? 0) - 12 : vh - (bottom ?? 0) - 12,
+      // Automatic placements stay within the viewport. Explicit above/below
+      // placements keep their natural height and may move off-screen as the
+      // user scrolls, while remaining anchored to the spotlight.
+      maxHeight:
+        forceAbove || forceBelow
+          ? undefined
+          : placeBelow
+            ? vh - (top ?? 0) - 12
+            : vh - (bottom ?? 0) - 12,
       ...(placeBelow ? { top } : { bottom }),
     };
   }
@@ -224,6 +286,7 @@ export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverl
       {/* Tooltip card */}
       {step && (
         <div
+          ref={tooltipRef}
           className="z-[70] bg-white rounded-lg shadow-2xl border border-gray-200 p-4 flex flex-col gap-3"
           style={tooltipStyle}
           role="dialog"

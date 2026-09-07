@@ -17,8 +17,9 @@ import { DataRoot, RexnetReport, usesV7BirdCues } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
 
 // Guided tour of the acoustic-cue (RExNet) explanation UI, rendered from a
-// real sample in the same static configuration participants see in the study
-// (fixed counterfactual class, no dropdown).
+// real sample in the same static configuration participants see in the study.
+// v8.2 uses the absolute-cue tour below; earlier bundles retain the original
+// counterfactual-cue tour.
 interface CuesTutorialProps {
   audioUrl: string;
   report: RexnetReport;
@@ -278,18 +279,21 @@ const ABS_STEPS: TutorialStep[] = [
     title: 'Absolute acoustic cues',
     body: (
       <>
-        The system describes this recording directly. Each measurable acoustic cue is placed
-        on a <b>Low</b>, <b>Med</b>, or <b>High</b> scale for this sound domain.
+        This explanation describes the recording using measurable acoustic properties such as
+        loudness, brightness, or pitch. Each property is placed on a <b>Low</b>, <b>Mid</b>, or{' '}
+        <b>High</b> scale for this type of sound.
       </>
     ),
   },
   {
     target: '[data-tutorial="cue-table"]',
+    placement: 'below',
     title: 'The recording\'s cue pattern',
     body: (
       <>
-        Read down this table to see the recording's absolute cue pattern. Unlike a contrastive
-        relation, every level stands on its own and does not depend on another category.
+        Read down the table to see this recording's cue pattern. A down arrow means <b>Low</b>, a
+        dash means <b>Mid</b>, and an up arrow means <b>High</b>. Together, these levels form an
+        acoustic description of the recording.
       </>
     ),
   },
@@ -298,18 +302,21 @@ const ABS_STEPS: TutorialStep[] = [
     title: 'Closest pattern hint',
     body: (
       <>
-        This hint compares all of the levels above with the class patterns in the reference
-        table and shows the closest overall match.
+        This hint counts how many displayed levels exactly match each pattern in the reference
+        table and shows a closest match. It is a cue-table comparison, <b>not the AI's
+        prediction</b>.
       </>
     ),
   },
   {
     target: '[data-tutorial="reference-table"]',
+    placement: 'above',
     title: 'The absolute reference table',
     body: (
       <>
-        Each column is a category's typical Low/Med/High signature. Compare it with the card
-        above to see which cues support or conflict with the hint.
+        Each column shows the typical Low/Mid/High cue pattern for one sound category. You can
+        compare the recording's levels with these columns one row at a time to see where they
+        match and where they differ.
       </>
     ),
   },
