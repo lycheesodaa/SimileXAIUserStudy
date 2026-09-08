@@ -130,11 +130,6 @@ function renderRanking(ranking: string, highlight: string) {
   ));
 }
 
-function joinClasses(names: string[]): string {
-  if (names.length === 1) return names[0];
-  return `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`;
-}
-
 function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
   if (!w) return [];
   const relationPhrase =
@@ -166,7 +161,9 @@ function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
         <>
           The reference table ranks {w.cueName} across categories as{' '}
           {renderRanking(w.ranking, w.contrastClass)}. So a sound that {positionPhrase} on this cue
-          could be <b>{joinClasses(w.candidates)}</b>.
+          could be {w.candidates.map((c) => (
+            <ClassBadge key={c} className={c} size="xs" extraClasses="align-middle mx-0.5" />
+          ))}.
           <br />
           <br />
           Reading every row this way — and weighing which categories the cues agree on — is how

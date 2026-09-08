@@ -142,6 +142,8 @@ const CUE_NAME_MAP_BIRD_V7 = {
   'fm_extent': 'Pitch Sweep (frequency glide)',
   'peak frequency': 'Song Pitch (high vs low)',
   'peak_frequency': 'Song Pitch (high vs low)',
+  'song pitch (high vs low)': 'Song Pitch (high vs low)',
+  'song pitch': 'Song Pitch (high vs low)',
 };
 
 const CUE_NAME_MAP_LUNG = {
@@ -191,11 +193,7 @@ function filterVisibleCues(cues, isBird, isV7) {
         raw.includes('shrillness') ||
         pretty.includes('shrillness') ||
         raw.includes('hf_content') ||
-        raw.includes('high-frequency energy') ||
-        raw.includes('song pitch') ||
-        pretty.includes('song pitch') ||
-        raw.includes('peak frequency') ||
-        raw.includes('peak_frequency')
+        raw.includes('high-frequency energy')
       ) {
         return false;
       }
@@ -312,13 +310,15 @@ function absoluteLevel(value, spec) {
 // Mirrors closestAbsoluteClass() in CuesExplanationV1_abs.tsx: most cells
 // matching wins, ties broken towards the true label then table order.
 function closestAbsoluteClass(levels, specs, trueLabel) {
+  const norm = (lvl) => (lvl === 'Med' ? 'Mid' : lvl);
   const classes = Object.keys(specs[0]?.levels ?? {});
   if (classes.length === 0 || levels.size === 0) return undefined;
   const matchCounts = classes.map((className) => ({
     className,
     matches: specs.reduce((sum, spec) => {
-      const observed = levels.get(spec.metric);
-      return sum + Number(observed !== undefined && observed === spec.levels[className]);
+      const observed = norm(levels.get(spec.metric));
+      const expected = norm(spec.levels[className]);
+      return sum + Number(observed !== undefined && observed === expected);
     }, 0),
   }));
   const maximum = Math.max(...matchCounts.map((item) => item.matches));
