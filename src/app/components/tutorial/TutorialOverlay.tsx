@@ -51,6 +51,36 @@ interface SpotRect {
   height: number;
 }
 
+function getTargetRect(
+  container: HTMLElement | null,
+  selector: string
+): SpotRect | null {
+  if (!container) return null;
+  const els = container.querySelectorAll(selector);
+  if (!els || els.length === 0) return null;
+  if (els.length === 1) {
+    const r = els[0].getBoundingClientRect();
+    return { top: r.top, left: r.left, width: r.width, height: r.height };
+  }
+
+  let top = Infinity;
+  let left = Infinity;
+  let right = -Infinity;
+  let bottom = -Infinity;
+  let found = false;
+  for (let i = 0; i < els.length; i++) {
+    const r = els[i].getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) continue;
+    found = true;
+    if (r.top < top) top = r.top;
+    if (r.left < left) left = r.left;
+    if (r.right > right) right = r.right;
+    if (r.bottom > bottom) bottom = r.bottom;
+  }
+  if (!found) return null;
+  return { top, left, width: right - left, height: bottom - top };
+}
+
 export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverlayProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -85,10 +115,10 @@ export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverl
       return;
     }
     const target = contentRef.current?.querySelector(step.target);
-    if (!target) return;
+    const targetRect = getTargetRect(contentRef.current, step.target);
+    if (!target || !targetRect) return;
 
     if (step.placement === 'above' || step.placement === 'below') {
-      const targetRect = target.getBoundingClientRect();
       const viewportMargin = 24;
       // Forced placements keep their natural height. Measuring the rendered
       // card lets an above-placement align the viewport to the card's top,
@@ -148,9 +178,8 @@ export function TutorialOverlay({ steps, children, onStepChange }: TutorialOverl
     let raf = 0;
     let last = '';
     const tick = () => {
-      const el = contentRef.current?.querySelector(step.target!);
-      if (el) {
-        const r = el.getBoundingClientRect();
+      const r = getTargetRect(contentRef.current, step.target!);
+      if (r) {
         const key = `${r.top}|${r.left}|${r.width}|${r.height}`;
         if (key !== last) {
           last = key;

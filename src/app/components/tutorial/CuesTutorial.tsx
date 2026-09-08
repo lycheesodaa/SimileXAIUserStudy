@@ -276,7 +276,7 @@ const ABS_STEPS: TutorialStep[] = [
   STEPS[1],
   {
     target: '[data-tutorial="cues-header"]',
-    title: 'Absolute acoustic cues',
+    title: 'Acoustic cue explanations',
     body: (
       <>
         This explanation describes the recording using measurable acoustic properties such as
@@ -299,19 +299,18 @@ const ABS_STEPS: TutorialStep[] = [
   },
   {
     target: '[data-tutorial="cue-class-hint"]',
-    title: 'Closest pattern hint',
+    title: 'Potential classes',
     body: (
       <>
-        This hint counts how many displayed levels exactly match each pattern in the reference
-        table and shows a closest match. It is a cue-table comparison, <b>not the AI's
-        prediction</b>.
+        For each acoustic cue, tags show which categories typically have that level in the
+        reference table. You may also rely on your own intuition instead.
       </>
     ),
   },
   {
     target: '[data-tutorial="reference-table"]',
     placement: 'above',
-    title: 'The absolute reference table',
+    title: 'The cue reference table',
     body: (
       <>
         Each column shows the typical Low/Mid/High cue pattern for one sound category. You can

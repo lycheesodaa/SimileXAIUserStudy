@@ -266,6 +266,7 @@ export function CuesExplanationV1Abs({
     if (!Number.isFinite(value)) return [];
     return [{ spec, level: absoluteLevel(value, spec) }];
   });
+  const domainClasses = Object.keys(specs[0]?.levels ?? {});
   const observedLevels = new Map(rows.map(({ spec, level }) => [spec.metric, level]));
   const hintedClass = closestAbsoluteClass(observedLevels, specs, trueLabel);
 
@@ -298,28 +299,35 @@ export function CuesExplanationV1Abs({
                 <tr>
                   <th className="px-4 py-2 text-left font-medium uppercase text-gray-500">Acoustic Cue</th>
                   <th className="px-4 py-2 text-left font-medium uppercase text-gray-500">System Predicted</th>
+                  <th className="px-4 py-2 text-left font-medium uppercase text-gray-500" data-tutorial="cue-class-hint">
+                    Potential Classes
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-400 bg-white">
-                {rows.map(({ spec, level }) => (
-                  <tr key={spec.metric} data-cue={spec.cue}>
-                    <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{spec.cue}</td>
-                    <td className="px-4 py-2"><LevelIndicator level={level} /></td>
-                  </tr>
-                ))}
+                {rows.map(({ spec, level }) => {
+                  const matchingClasses = domainClasses.filter(
+                    (className) => spec.levels[className] === level
+                  );
+                  return (
+                    <tr key={spec.metric} data-cue={spec.cue}>
+                      <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{spec.cue}</td>
+                      <td className="px-4 py-2"><LevelIndicator level={level} /></td>
+                      <td className="px-4 py-2" data-tutorial="cue-class-hint">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {matchingClasses.map((className) => (
+                            <ClassBadge key={className} className={className} useAbbrev size="xs" />
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-            {hintedClass && (
-              <div className="mt-3 text-sm text-gray-600" data-tutorial="cue-class-hint">
-                <div className="flex items-center gap-2">
-                  <span>Closest cue-table match:</span>
-                  <ClassBadge className={hintedClass} size="sm" />
-                </div>
-                <p className="mt-1 italic">
-                  Based only on the displayed acoustic cues; this is not the AI's prediction.
-                </p>
-              </div>
-            )}
+            {/* <p className="mt-3 text-xs text-gray-500 italic">
+              Potential class tags in each row indicate categories that typically exhibit that cue level in the reference table.
+            </p> */}
           </div>
         )}
       </div>
@@ -327,7 +335,7 @@ export function CuesExplanationV1Abs({
       <div className="mt-8 border-t border-gray-200 pt-4" data-tutorial="reference-table">
         <h3 className="mb-2 text-lg font-semibold">Acoustic Cues Reference Table</h3>
         <p className="mb-4 text-sm text-gray-600">
-          Compare the recording's cue levels above with the typical absolute pattern for each {domainNoun} category.
+          This table shows the typical acoustic cue values (Low/Mid/High) for each {domainNoun} category.
         </p>
         <AbsReferenceTable domain={effectiveDomain} />
       </div>
