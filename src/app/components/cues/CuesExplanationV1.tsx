@@ -203,200 +203,6 @@ export function filterVisibleCues(
   });
 }
 
-export function CuesExplanationV1({
-  audioUrl,
-  report,
-  sampleId,
-  randomFoil = false,
-  hideDropdown: hideDropdownProp,
-  domain,
-  root,
-}: CuesExplanationV1Props) {
-  const hideDropdown = import.meta.env.PROD ? (hideDropdownProp ?? true) : false;
-  const contrasts = report.contrasts;
-  const deterministicFoil =
-    randomFoil && sampleId ? resolveFoilContrast(sampleId, contrasts, root) : contrasts[0];
-
-  const isBird = resolveIsBird(domain, contrasts);
-  const effectiveDomain = isBird ? 'bird' : 'lung';
-  const domainNoun = isBird ? 'bird sound' : 'lung sound';
-
-  const [selectedClass, setSelectedClass] = useState(
-    deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
-  );
-
-  // Re-derive the initial selection only when the sample/report changes;
-  // selectedClass is deliberately excluded so user picks aren't reverted.
-  useEffect(() => {
-    const initial =
-      randomFoil && sampleId ? resolveFoilContrast(sampleId, contrasts, root) : contrasts[0];
-    if (initial) {
-      setSelectedClass(initial.contrastClass);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contrasts, randomFoil, sampleId, root]);
-
-  const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
-
-  const isV7 = usesV7BirdCues(root);
-  const visibleCues = selected ? filterVisibleCues(selected.cues, isBird, isV7) : [];
-  const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
-
-  return (
-    <div className="w-full space-y-6 px-3">
-      {/* Audio Player Section */}
-      <div className="mb-6 pt-6">
-        <div className="flex flex-col gap-2 max-w-md" data-tutorial="original-audio">
-          <span className="text-gray-600">Play this {domainNoun} recording:</span>
-          <audio controls className="w-full h-10" src={audioUrl} data-log-id="original-audio">
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-      </div>
-
-      {/* Cue Relations Section */}
-      <div className="mb-6">
-        <div className="mb-4" data-tutorial="cues-header">
-          <h2 className="text-xl font-semibold mb-2">Acoustic Cue Explanation</h2>
-          <p className="text-gray-600">
-            The system compares this sound against a representative example of each
-            contrast category using measurable acoustic cues. For each cue, the measured
-            relation is shown next to the relation the system predicted.
-          </p>
-        </div>
-
-        {contrasts.length === 0 ? (
-          <p className="text-gray-500 italic">No cue explanations available for this sample.</p>
-        ) : (
-          <>
-            <div className="flex items-center gap-3 mb-4 flex-wrap" data-tutorial="contrast-class">
-              {hideDropdown ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 font-medium">
-                    Comparing against Counterfactual Class:
-                  </span>
-                  {selected?.contrastClass && (
-                    <ClassBadge className={selected.contrastClass} size="sm" />
-                  )}
-                  {/* {selected?.foilAudioUrl && (
-                    <SimileAudioPlayer
-                      url={selected.foilAudioUrl}
-                      logId={`cues-contrast-audio-${selected.contrastClass.replace(/\W+/g, '-')}`}
-                    />
-                  )} */}
-                </div>
-              ) : (
-                <>
-                  <span className="text-gray-600 font-medium">Compare against:</span>
-                  <Select value={selected?.contrastClass} onValueChange={setSelectedClass}>
-                    <SelectTrigger className="w-64" data-log-id="contrast-select">
-                      <SelectValue placeholder="Select a contrast category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {contrasts.map((c) => (
-                        <SelectItem key={c.contrastClass} value={c.contrastClass}>
-                          {c.contrastClass}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selected?.contrastClass && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500">Counterfactual Class:</span>
-                      <ClassBadge className={selected.contrastClass} size="sm" />
-                      {/* {selected?.foilAudioUrl && (
-                        <SimileAudioPlayer
-                          url={selected.foilAudioUrl}
-                          logId={`cues-contrast-audio-${selected.contrastClass.replace(/\W+/g, '-')}`}
-                        />
-                      )} */}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {selected && (
-              <div className="overflow-x-auto">
-                <table className="divide-y divide-gray-400 text-sm border-b border-gray-400" data-tutorial="cue-table">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
-                      {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">This Sound</th> */}
-                      {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">{selected.contrastClass} Sound</th> */}
-                      {/* <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Measured Relation</th> */}
-                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">System Predicted</th>
-                      {/* <th className="px-4 py-2 text-center font-medium text-gray-500 uppercase">Match</th> */}
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-400">
-                    {visibleCues.map((cue) => (
-                      // data-cue lets the tutorial spotlight one specific cue row.
-                      <tr key={cue.cue} data-cue={prettifyCueName(cue.cue, isBird, isV7)}>
-                        <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">
-                          {prettifyCueName(cue.cue, isBird, isV7)}
-                        </td>
-                        {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.targetValue}</td> */}
-                        {/* <td className="px-4 py-2 whitespace-nowrap text-right text-gray-500 tabular-nums">{cue.foilValue}</td> */}
-                        {/* <td className="px-4 py-2 whitespace-nowrap text-gray-800">{cue.heuristicRelation}</td> */}
-                        <td className="px-4 py-2 whitespace-nowrap text-gray-800">
-                          <span aria-hidden="true" className="mr-1">
-                            {cueComparisonGlyph(cue.predictedRelation)}
-                          </span>
-                          {cue.predictedRelation}
-                        </td>
-                        {/* Coloured variant — swap in with cueComparisonStyle: */}
-                        {/* <td className="px-4 py-2 whitespace-nowrap">
-                          {(() => {
-                            const { glyph, colorClass } = cueComparisonStyle(cue.predictedRelation);
-                            return (
-                              <span className={colorClass}>
-                                <span aria-hidden="true" className="mr-1">{glyph}</span>
-                                {cue.predictedRelation}
-                              </span>
-                            );
-                          })()}
-                        </td> */}
-                        {/* <td className={`px-4 py-2 whitespace-nowrap text-center font-semibold ${cue.agree ? 'text-emerald-600' : 'text-red-500'}`}>
-                          {cue.agree ? '✓' : '✗'}
-                        </td> */}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {/* {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
-                  <p className="text-sm text-gray-500 mt-2" data-tutorial="cue-match-summary">
-                    The system's predicted relations match the measured relations for{' '}
-                    {visibleCuesCorrect} of {visibleCues.length} cues.
-                  </p>
-                )} */}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Reference Table Section */}
-      <div className="mt-8 pt-4 border-t border-gray-200" data-tutorial="reference-table">
-        <h3 className="text-lg font-semibold mb-2">Acoustic Cues Reference Table</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Reference table summarizing the ranking of each acoustic attribute across{' '}
-          {isBird ? 'bird sound' : 'lung sound'} categories (
-          <span className="font-medium">
-            {isBird
-              ? isV7
-                ? 'Eastern Towhee · Wood Thrush · Black-capped Chickadee · Tufted Titmouse · Blue Jay'
-                : 'Eastern Towhee · Wood Thrush · Black-capped Chickadee · Tufted Titmouse · Ovenbird'
-              : 'Crackle · Normal · Wheeze · Rhonchi · Stridor'}
-          </span>
-          ):
-        </p>
-        <ReferenceTableV1 domain={effectiveDomain} root={root} />
-      </div>
-    </div>
-  );
-}
-
 export interface CueReferenceRow {
   cue: string;
   metric: string;
@@ -516,6 +322,236 @@ export const BIRD_CUE_ROWS_V7: CueReferenceRow[] = [
 ];
 
 export const BIRD_CUE_ROWS = BIRD_CUE_ROWS_V1;
+
+// "Normal < Crackle < Wheeze ~ Rhonchi ~ Stridor" → [[Normal], [Crackle],
+// [Wheeze, Rhonchi, Stridor]], ordered low → high. '~' ties share a tier.
+export function parseRanking(ranking: string): string[][] {
+  return ranking
+    .split(/[<≪«]/)
+    .map((tier) => tier.split('~').map((c) => c.trim()).filter(Boolean))
+    .filter((tier) => tier.length > 0);
+}
+
+export function CuesExplanationV1({
+  audioUrl,
+  report,
+  sampleId,
+  randomFoil = false,
+  hideDropdown: hideDropdownProp,
+  domain,
+  root,
+}: CuesExplanationV1Props) {
+  const hideDropdown = import.meta.env.PROD ? (hideDropdownProp ?? true) : false;
+  const contrasts = report.contrasts;
+  const deterministicFoil =
+    randomFoil && sampleId ? resolveFoilContrast(sampleId, contrasts, root) : contrasts[0];
+
+  const isBird = resolveIsBird(domain, contrasts);
+  const effectiveDomain = isBird ? 'bird' : 'lung';
+  const domainNoun = isBird ? 'bird sound' : 'lung sound';
+
+  const [selectedClass, setSelectedClass] = useState(
+    deterministicFoil?.contrastClass ?? contrasts[0]?.contrastClass ?? ''
+  );
+
+  // Re-derive the initial selection only when the sample/report changes;
+  // selectedClass is deliberately excluded so user picks aren't reverted.
+  useEffect(() => {
+    const initial =
+      randomFoil && sampleId ? resolveFoilContrast(sampleId, contrasts, root) : contrasts[0];
+    if (initial) {
+      setSelectedClass(initial.contrastClass);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contrasts, randomFoil, sampleId, root]);
+
+  const selected = contrasts.find((c) => c.contrastClass === selectedClass) ?? contrasts[0];
+
+  const isV7 = usesV7BirdCues(root);
+  const visibleCues = selected ? filterVisibleCues(selected.cues, isBird, isV7) : [];
+  const visibleCuesCorrect = visibleCues.filter((cue) => cue.agree).length;
+
+  const domainClasses = isBird
+    ? (isV7
+        ? ['Eastern Towhee', 'Wood Thrush', 'Black-capped Chickadee', 'Tufted Titmouse', 'Blue Jay']
+        : ['Eastern Towhee', 'Wood Thrush', 'Black-capped Chickadee', 'Tufted Titmouse', 'Ovenbird'])
+    : ['Crackle', 'Normal', 'Wheeze', 'Rhonchi', 'Stridor'];
+  const referenceRows = isBird ? (isV7 ? BIRD_CUE_ROWS_V7 : BIRD_CUE_ROWS_V1) : LUNG_CUE_ROWS;
+
+  return (
+    <div className="w-full space-y-6 px-3">
+      {/* Audio Player Section */}
+      <div className="mb-6 pt-6">
+        <div className="flex flex-col gap-2 max-w-md" data-tutorial="original-audio">
+          <span className="text-gray-600">Play this {domainNoun} recording:</span>
+          <audio controls className="w-full h-10" src={audioUrl} data-log-id="original-audio">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      </div>
+
+      {/* Cue Relations Section */}
+      <div className="mb-6">
+        <div className="mb-4" data-tutorial="cues-header">
+          <h2 className="text-xl font-semibold mb-2">Acoustic Cue Explanation</h2>
+          <p className="text-gray-600">
+            The system compares this sound against a representative example of each
+            contrast category using measurable acoustic cues. For each cue, the measured
+            relation is shown next to the relation the system predicted.
+          </p>
+        </div>
+
+        {contrasts.length === 0 ? (
+          <p className="text-gray-500 italic">No cue explanations available for this sample.</p>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-4 flex-wrap" data-tutorial="contrast-class">
+              {hideDropdown ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 font-medium">
+                    Comparing against Counterfactual Class:
+                  </span>
+                  {selected?.contrastClass && (
+                    <ClassBadge className={selected.contrastClass} size="sm" />
+                  )}
+                  {/* {selected?.foilAudioUrl && (
+                    <SimileAudioPlayer
+                      url={selected.foilAudioUrl}
+                      logId={`cues-contrast-audio-${selected.contrastClass.replace(/\W+/g, '-')}`}
+                    />
+                  )} */}
+                </div>
+              ) : (
+                <>
+                  <span className="text-gray-600 font-medium">Compare against:</span>
+                  <Select value={selected?.contrastClass} onValueChange={setSelectedClass}>
+                    <SelectTrigger className="w-64" data-log-id="contrast-select">
+                      <SelectValue placeholder="Select a contrast category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contrasts.map((c) => (
+                        <SelectItem key={c.contrastClass} value={c.contrastClass}>
+                          {c.contrastClass}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selected?.contrastClass && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">Counterfactual Class:</span>
+                      <ClassBadge className={selected.contrastClass} size="sm" />
+                      {/* {selected?.foilAudioUrl && (
+                        <SimileAudioPlayer
+                          url={selected.foilAudioUrl}
+                          logId={`cues-contrast-audio-${selected.contrastClass.replace(/\W+/g, '-')}`}
+                        />
+                      )} */}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {selected && (
+              <div className="overflow-x-auto">
+                <table className="divide-y divide-gray-400 text-sm border-b border-gray-400" data-tutorial="cue-table">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Acoustic Cue</th>
+                      {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">This Sound</th> */}
+                      {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">{selected.contrastClass} Sound</th> */}
+                      {/* <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Measured Relation</th> */}
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">System Predicted</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase" data-tutorial="cue-class-hint">
+                        Potential Classes
+                      </th>
+                      {/* <th className="px-4 py-2 text-center font-medium text-gray-500 uppercase">Match</th> */}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-400">
+                    {visibleCues.map((cue) => {
+                      const prettyName = prettifyCueName(cue.cue, isBird, isV7);
+                      const refRow = referenceRows.find(
+                        (r) => cueBaseName(r.cue).toLowerCase() === prettyName.toLowerCase()
+                      );
+                      let matchingClasses: string[] = [];
+                      if (refRow && selected?.contrastClass) {
+                        const tiers = parseRanking(refRow.ranking);
+                        const tierIdx = tiers.findIndex((tier) =>
+                          tier.some((c) => c.toLowerCase() === selected.contrastClass.toLowerCase())
+                        );
+                        if (tierIdx !== -1) {
+                          const predicted = (cue.predictedRelation || '').toUpperCase();
+                          let candidates: string[] = [];
+                          if (predicted.includes('HIGHER') || predicted.includes('LONGER')) {
+                            candidates = tiers.slice(tierIdx + 1).flat();
+                          } else if (predicted.includes('LOWER') || predicted.includes('SHORTER')) {
+                            candidates = tiers.slice(0, tierIdx).flat();
+                          } else {
+                            candidates = tiers[tierIdx] ?? [];
+                          }
+                          const candidateSet = new Set(candidates.map((c) => c.toLowerCase()));
+                          matchingClasses = domainClasses.filter((c) => candidateSet.has(c.toLowerCase()));
+                        }
+                      }
+
+                      return (
+                        <tr key={cue.cue} data-cue={prettyName}>
+                          <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">
+                            {prettyName}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap text-gray-800">
+                            <span aria-hidden="true" className="mr-1">
+                              {cueComparisonGlyph(cue.predictedRelation)}
+                            </span>
+                            {cue.predictedRelation}
+                          </td>
+                          <td className="px-4 py-2" data-tutorial="cue-class-hint">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {matchingClasses.map((className) => (
+                                <ClassBadge key={className} className={className} useAbbrev size="xs" />
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {/* {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
+                  <p className="text-sm text-gray-500 mt-2" data-tutorial="cue-match-summary">
+                    The system's predicted relations match the measured relations for{' '}
+                    {visibleCuesCorrect} of {visibleCues.length} cues.
+                  </p>
+                )} */}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Reference Table Section */}
+      <div className="mt-8 pt-4 border-t border-gray-200" data-tutorial="reference-table">
+        <h3 className="text-lg font-semibold mb-2">Acoustic Cues Reference Table</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Reference table summarizing the ranking of each acoustic attribute across{' '}
+          {isBird ? 'bird sound' : 'lung sound'} categories (
+          <span className="font-medium">
+            {isBird
+              ? isV7
+                ? 'Eastern Towhee · Wood Thrush · Black-capped Chickadee · Tufted Titmouse · Blue Jay'
+                : 'Eastern Towhee · Wood Thrush · Black-capped Chickadee · Tufted Titmouse · Ovenbird'
+              : 'Crackle · Normal · Wheeze · Rhonchi · Stridor'}
+          </span>
+          ):
+        </p>
+        <ReferenceTableV1 domain={effectiveDomain} root={root} />
+      </div>
+    </div>
+  );
+}
+
+
 
 export function ReferenceTableV1({ domain = 'lung', root }: { domain?: string; root?: DataRoot }) {
   const isBird = domain === 'bird';

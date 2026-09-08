@@ -8,11 +8,11 @@ import {
   LUNG_CUE_ROWS,
   cueBaseName,
   filterVisibleCues,
+  parseRanking,
   prettifyCueName,
   resolveFoilContrast,
   resolveIsBird,
 } from '../cues/CuesExplanationV1';
-import { CuesExplanationV1Abs } from '../cues/CuesExplanationV1_abs';
 import { DataRoot, RexnetReport, usesV7BirdCues } from '../../study/dataV1';
 import { ClassBadge } from '../ClassBadge';
 
@@ -45,14 +45,7 @@ interface WorkedExample {
   candidates: string[];
 }
 
-// "Normal < Crackle < Wheeze ~ Rhonchi ~ Stridor" → [[Normal], [Crackle],
-// [Wheeze, Rhonchi, Stridor]], ordered low → high. '~' ties share a tier.
-function parseRanking(ranking: string): string[][] {
-  return ranking
-    .split(/[<≪«]/)
-    .map((tier) => tier.split('~').map((c) => c.trim()).filter(Boolean))
-    .filter((tier) => tier.length > 0);
-}
+
 
 function referenceRows(isBird: boolean, isV7: boolean): CueReferenceRow[] {
   if (!isBird) return LUNG_CUE_ROWS;
@@ -95,7 +88,7 @@ function buildWorkedExample(
         ? tiers.slice(tierIdx + 1).flat()
         : relation === 'lower'
           ? tiers.slice(0, tierIdx).flat()
-          : tiers[tierIdx].filter((c) => c !== selected.contrastClass);
+          : tiers[tierIdx];
     if (pointsTo.length === 0) continue;
 
     candidates.push({
@@ -239,6 +232,16 @@ const STEPS: TutorialStep[] = [
     ),
   },
   {
+    target: '[data-tutorial="cue-class-hint"]',
+    title: 'Potential classes',
+    body: (
+      <>
+        For each acoustic cue, tags show which categories typically match that relation
+        against the counterfactual class in the reference table. You may also rely on your own intuition instead.
+      </>
+    ),
+  },
+  {
     target: '[data-tutorial="cue-match-summary"]',
     title: 'Agreement with measurements',
     body: (
@@ -271,61 +274,11 @@ const STEPS: TutorialStep[] = [
   },
 ];
 
-const ABS_STEPS: TutorialStep[] = [
-  STEPS[0],
-  STEPS[1],
-  {
-    target: '[data-tutorial="cues-header"]',
-    title: 'Acoustic cue explanations',
-    body: (
-      <>
-        This explanation describes the recording using measurable acoustic properties such as
-        loudness, brightness, or pitch. Each property is placed on a <b>Low</b>, <b>Mid</b>, or{' '}
-        <b>High</b> scale for this type of sound.
-      </>
-    ),
-  },
-  {
-    target: '[data-tutorial="cue-table"]',
-    placement: 'below',
-    title: 'The recording\'s cue pattern',
-    body: (
-      <>
-        Read down the table to see this recording's cue pattern. A down arrow means <b>Low</b>, a
-        dash means <b>Mid</b>, and an up arrow means <b>High</b>. Together, these levels form an
-        acoustic description of the recording.
-      </>
-    ),
-  },
-  {
-    target: '[data-tutorial="cue-class-hint"]',
-    title: 'Potential classes',
-    body: (
-      <>
-        For each acoustic cue, tags show which categories typically have that level in the
-        reference table. You may also rely on your own intuition instead.
-      </>
-    ),
-  },
-  {
-    target: '[data-tutorial="reference-table"]',
-    placement: 'above',
-    title: 'The cue reference table',
-    body: (
-      <>
-        Each column shows the typical Low/Mid/High cue pattern for one sound category. You can
-        compare the recording's levels with these columns one row at a time to see where they
-        match and where they differ.
-      </>
-    ),
-  },
-  STEPS[STEPS.length - 1],
-];
 
-export function CuesTutorial({ audioUrl, report, sampleId, domain, root, trueLabel }: CuesTutorialProps) {
+
+export function CuesTutorial({ audioUrl, report, sampleId, domain, root }: CuesTutorialProps) {
   // Stable identity: a fresh steps array on every render would reset the tour.
   const steps = useMemo(() => {
-    if (root === 'data_v8_2') return ABS_STEPS;
     const worked = buildWorkedExample(report, sampleId, domain, root);
     const done = STEPS[STEPS.length - 1];
     return [...STEPS.slice(0, -1), ...workedExampleSteps(worked), done];
@@ -333,25 +286,15 @@ export function CuesTutorial({ audioUrl, report, sampleId, domain, root, trueLab
 
   return (
     <TutorialOverlay steps={steps}>
-      {root === 'data_v8_2' ? (
-        <CuesExplanationV1Abs
-          audioUrl={audioUrl}
-          report={report}
-          trueLabel={trueLabel}
-          domain={domain}
-          root={root}
-        />
-      ) : (
-        <CuesExplanationV1
-          audioUrl={audioUrl}
-          report={report}
-          sampleId={sampleId}
-          randomFoil={true}
-          hideDropdown={true}
-          domain={domain}
-          root={root}
-        />
-      )}
+      <CuesExplanationV1
+        audioUrl={audioUrl}
+        report={report}
+        sampleId={sampleId}
+        randomFoil={true}
+        hideDropdown={true}
+        domain={domain}
+        root={root}
+      />
     </TutorialOverlay>
   );
 }
