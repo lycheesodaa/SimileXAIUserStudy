@@ -323,6 +323,13 @@ export const BIRD_CUE_ROWS_V7: CueReferenceRow[] = [
 
 export const BIRD_CUE_ROWS = BIRD_CUE_ROWS_V1;
 
+// The cue table used to tag every row with its own "Potential Classes" list,
+// which left the participant to intersect five rows by hand (their union spans
+// ~4 of the 5 classes, so row-by-row the tags say very little). That column is
+// now summarised into one overall hint under the table; flip this back to true
+// to show both.
+const SHOW_PER_ROW_CLASS_HINTS = false;
+
 // "Normal < Crackle < Wheeze ~ Rhonchi ~ Stridor" → [[Normal], [Crackle],
 // [Wheeze, Rhonchi, Stridor]], ordered low → high. '~' ties share a tier.
 export function parseRanking(ranking: string): string[][] {
@@ -330,6 +337,97 @@ export function parseRanking(ranking: string): string[][] {
     .split(/[<≪«]/)
     .map((tier) => tier.split('~').map((c) => c.trim()).filter(Boolean))
     .filter((tier) => tier.length > 0);
+}
+
+// Classes one cue row points at: the reference ranking sliced at the contrast
+// class's tier, in the direction the system predicted. HIGHER/LOWER exclude the
+// contrast class itself (that is the counterfactual claim); SIMILAR keeps its
+// whole tier. Returns [] if the row or the contrast class can't be resolved.
+export function rowCandidateClasses(
+  refRow: CueReferenceRow | undefined,
+  contrastClass: string | undefined,
+  predictedRelation: string,
+  domainClasses: string[]
+): string[] {
+  if (!refRow || !contrastClass) return [];
+  const tiers = parseRanking(refRow.ranking);
+  const tierIdx = tiers.findIndex((tier) =>
+    tier.some((c) => c.toLowerCase() === contrastClass.toLowerCase())
+  );
+  if (tierIdx === -1) return [];
+
+  const predicted = (predictedRelation || '').toUpperCase();
+  let candidates: string[];
+  if (predicted.includes('HIGHER') || predicted.includes('LONGER')) {
+    candidates = tiers.slice(tierIdx + 1).flat();
+  } else if (predicted.includes('LOWER') || predicted.includes('SHORTER')) {
+    candidates = tiers.slice(0, tierIdx).flat();
+  } else {
+    candidates = tiers[tierIdx] ?? [];
+  }
+  const candidateSet = new Set(candidates.map((c) => c.toLowerCase()));
+  return domainClasses.filter((c) => candidateSet.has(c.toLowerCase()));
+}
+
+export interface OverallCueHint {
+  /** Classes tied for the most cue rows satisfied. Never empty when rows exist. */
+  hint: string[];
+  /** Rows satisfied, per class — the "3 of 5 cues" figure behind the hint. */
+  scores: Map<string, number>;
+  /** Rows satisfied by the winning class(es). */
+  best: number;
+  /**
+   * Rows counted in the vote — every visible row whose cue resolves against the
+   * reference table, including ones that point off the end of the ranking and
+   * so credit nobody. This is the denominator the participant can count in the
+   * table, which a "rows that named someone" count would not be.
+   */
+  rowsUsed: number;
+}
+
+// The overall "closest match" across the whole cue table: a class scores one
+// point per row whose candidate set contains it, and the hint is every class
+// tied at the maximum — the Hamming-nearest signature under the contrastive
+// reference table.
+//
+// A strict intersection of the rows was the other candidate, but the rows
+// genuinely contradict each other on most clips (it comes back empty for ~85 %
+// of data_v8_2 samples), so an unsatisfiable "no class matches" would be the
+// common case. Voting degrades gracefully instead: mean 1.8 classes shown,
+// a single class about half the time.
+export function closestContrastiveClasses(
+  cues: RexnetCueRow[],
+  referenceRows: CueReferenceRow[],
+  contrastClass: string | undefined,
+  domainClasses: string[],
+  isBird: boolean,
+  isV7: boolean
+): OverallCueHint {
+  const scores = new Map(domainClasses.map((c) => [c, 0]));
+  let rowsUsed = 0;
+
+  for (const cue of cues) {
+    const prettyName = prettifyCueName(cue.cue, isBird, isV7);
+    const refRow = referenceRows.find(
+      (r) => cueBaseName(r.cue).toLowerCase() === prettyName.toLowerCase()
+    );
+    if (!refRow || !contrastClass) continue;
+    const inRanking = parseRanking(refRow.ranking)
+      .flat()
+      .some((c) => c.toLowerCase() === contrastClass.toLowerCase());
+    if (!inRanking) continue;
+
+    rowsUsed += 1;
+    for (const c of rowCandidateClasses(refRow, contrastClass, cue.predictedRelation, domainClasses)) {
+      scores.set(c, (scores.get(c) ?? 0) + 1);
+    }
+  }
+
+  if (rowsUsed === 0) return { hint: [], scores, best: 0, rowsUsed };
+  const best = Math.max(...scores.values());
+  // best === 0 means every row pointed away from every class; nothing to show.
+  const hint = best === 0 ? [] : domainClasses.filter((c) => scores.get(c) === best);
+  return { hint, scores, best, rowsUsed };
 }
 
 export function CuesExplanationV1({
@@ -377,6 +475,15 @@ export function CuesExplanationV1({
         : ['Eastern Towhee', 'Wood Thrush', 'Black-capped Chickadee', 'Tufted Titmouse', 'Ovenbird'])
     : ['Crackle', 'Normal', 'Wheeze', 'Rhonchi', 'Stridor'];
   const referenceRows = isBird ? (isV7 ? BIRD_CUE_ROWS_V7 : BIRD_CUE_ROWS_V1) : LUNG_CUE_ROWS;
+
+  const overallHint = closestContrastiveClasses(
+    visibleCues,
+    referenceRows,
+    selected?.contrastClass,
+    domainClasses,
+    isBird,
+    isV7
+  );
 
   return (
     <div className="w-full space-y-6 px-3">
@@ -462,9 +569,11 @@ export function CuesExplanationV1({
                       {/* <th className="px-4 py-2 text-right font-medium text-gray-500 uppercase">{selected.contrastClass} Sound</th> */}
                       {/* <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">Measured Relation</th> */}
                       <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">System Predicted</th>
-                      <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase" data-tutorial="cue-class-hint">
-                        Potential Classes
-                      </th>
+                      {SHOW_PER_ROW_CLASS_HINTS && (
+                        <th className="px-4 py-2 text-left font-medium text-gray-500 uppercase">
+                          Potential Classes
+                        </th>
+                      )}
                       {/* <th className="px-4 py-2 text-center font-medium text-gray-500 uppercase">Match</th> */}
                     </tr>
                   </thead>
@@ -474,26 +583,12 @@ export function CuesExplanationV1({
                       const refRow = referenceRows.find(
                         (r) => cueBaseName(r.cue).toLowerCase() === prettyName.toLowerCase()
                       );
-                      let matchingClasses: string[] = [];
-                      if (refRow && selected?.contrastClass) {
-                        const tiers = parseRanking(refRow.ranking);
-                        const tierIdx = tiers.findIndex((tier) =>
-                          tier.some((c) => c.toLowerCase() === selected.contrastClass.toLowerCase())
-                        );
-                        if (tierIdx !== -1) {
-                          const predicted = (cue.predictedRelation || '').toUpperCase();
-                          let candidates: string[] = [];
-                          if (predicted.includes('HIGHER') || predicted.includes('LONGER')) {
-                            candidates = tiers.slice(tierIdx + 1).flat();
-                          } else if (predicted.includes('LOWER') || predicted.includes('SHORTER')) {
-                            candidates = tiers.slice(0, tierIdx).flat();
-                          } else {
-                            candidates = tiers[tierIdx] ?? [];
-                          }
-                          const candidateSet = new Set(candidates.map((c) => c.toLowerCase()));
-                          matchingClasses = domainClasses.filter((c) => candidateSet.has(c.toLowerCase()));
-                        }
-                      }
+                      const matchingClasses = rowCandidateClasses(
+                        refRow,
+                        selected?.contrastClass,
+                        cue.predictedRelation,
+                        domainClasses
+                      );
 
                       return (
                         <tr key={cue.cue} data-cue={prettyName}>
@@ -506,18 +601,50 @@ export function CuesExplanationV1({
                             </span>
                             {cue.predictedRelation}
                           </td>
-                          <td className="px-4 py-2" data-tutorial="cue-class-hint">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              {matchingClasses.map((className) => (
-                                <ClassBadge key={className} className={className} useAbbrev size="xs" />
-                              ))}
-                            </div>
-                          </td>
+                          {SHOW_PER_ROW_CLASS_HINTS && (
+                            <td className="px-4 py-2">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {matchingClasses.map((className) => (
+                                  <ClassBadge key={className} className={className} useAbbrev size="xs" />
+                                ))}
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
+
+                {overallHint.rowsUsed > 0 && (
+                  <div className="mt-4" data-tutorial="cue-class-hint">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-gray-700">Potential Classes:</span>
+                      {overallHint.hint.length > 0 ? (
+                        overallHint.hint.map((className) => (
+                          <ClassBadge key={className} className={className} size="sm" />
+                        ))
+                      ) : (
+                        <span className="text-gray-600">none</span>
+                      )}
+                    </div>
+                    <p className="mt-1.5 text-xs text-gray-500">
+                      {overallHint.hint.length === 0 ? (
+                        <>
+                          The cue relations above do not point to any category consistently for this
+                          recording. Rely on your own judgement of the sound.
+                        </>
+                      ) : (
+                        <>
+                          {overallHint.hint.length === 1 ? 'This category matches' : 'These categories match'}{' '}
+                          the most cue relations above — {overallHint.best} of {overallHint.rowsUsed} — when
+                          read against the reference table. You may also rely on your own intuition instead.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                )}
+
                 {/* {selected.cuesCorrect !== null && selected.cuesTotal !== null && (
                   <p className="text-sm text-gray-500 mt-2" data-tutorial="cue-match-summary">
                     The system's predicted relations match the measured relations for{' '}

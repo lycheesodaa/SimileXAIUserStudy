@@ -10,6 +10,7 @@ import {
   filterVisibleCues,
   parseRanking,
   prettifyCueName,
+  rowCandidateClasses,
   resolveFoilContrast,
   resolveIsBird,
 } from '../cues/CuesExplanationV1';
@@ -65,6 +66,9 @@ function buildWorkedExample(
   const isBird = resolveIsBird(domain, contrasts);
   const isV7 = usesV7BirdCues(root);
   const rows = referenceRows(isBird, isV7);
+  // Class order is only used to keep the tour's badges in reference-table
+  // order; the ranking strings name every class in the domain.
+  const domainClasses = Array.from(new Set(rows.flatMap((r) => parseRanking(r.ranking).flat())));
 
   const candidates: WorkedExample[] = [];
   for (const cue of filterVisibleCues(selected.cues, isBird, isV7)) {
@@ -79,16 +83,12 @@ function buildWorkedExample(
         ? 'lower'
         : 'similar';
 
-    const tiers = parseRanking(row.ranking);
-    const tierIdx = tiers.findIndex((tier) => tier.includes(selected.contrastClass));
-    if (tierIdx === -1) continue;
-
-    const pointsTo =
-      relation === 'higher'
-        ? tiers.slice(tierIdx + 1).flat()
-        : relation === 'lower'
-          ? tiers.slice(0, tierIdx).flat()
-          : tiers[tierIdx];
+    const pointsTo = rowCandidateClasses(
+      row,
+      selected.contrastClass,
+      cue.predictedRelation,
+      domainClasses
+    );
     if (pointsTo.length === 0) continue;
 
     candidates.push({
@@ -166,8 +166,9 @@ function workedExampleSteps(w: WorkedExample | null): TutorialStep[] {
           ))}.
           <br />
           <br />
-          Reading every row this way — and weighing which categories the cues agree on — is how
-          you can narrow down what the <b>system predicted</b>.
+          Every row is read this way, and the <b>Potential Classes</b> line under the table
+          collects the result: the categories the largest number of rows point at. It is a
+          summary of the cues, not the system's answer — you can still weigh the rows yourself.
         </>
       ),
     },
@@ -233,8 +234,10 @@ const STEPS: TutorialStep[] = [
     title: 'Potential classes',
     body: (
       <>
-        For each acoustic cue, tags show which categories typically match that relation
-        against the counterfactual class in the reference table. You may also rely on your own intuition instead.
+        Each cue relation points at the categories that sit on that side of the counterfactual
+        class in the reference table. These tags show the categories the <b>cues agree on
+        most</b> — the ones pointed at by the largest number of rows. You may also rely on your
+        own intuition instead.
       </>
     ),
   },
